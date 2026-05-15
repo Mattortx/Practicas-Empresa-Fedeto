@@ -45,10 +45,13 @@ export function LeadDetailCard({ lead }: LeadDetailCardProps) {
 
       <div className="detail-grid">
         <Info label="Cliente" value={lead.summary.name} />
+        <Info label="Empresa" value={lead.summary.company} />
         <Info label="Correo" value={lead.summary.email} />
         <Info label="Telefono" value={lead.summary.phone} />
         <Info label="Familia" value={lead.summary.productFamily} />
         <Info label="Necesidad" value={lead.summary.needType} />
+        <Info label="Urgencia" value={lead.summary.urgency} />
+        <Info label="Revision tecnica" value={lead.technicalRisk ? "Si" : "No"} />
         <Info label="Ubicacion" value={lead.summary.location} />
       </div>
 

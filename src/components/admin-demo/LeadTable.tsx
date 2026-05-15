@@ -1,4 +1,5 @@
 import type { CommercialLead } from "../../types/commercialCopilot";
+import { Badge } from "../ui/Badge";
 import { PriorityBadge, StatusBadge } from "./LeadStatusBadge";
 
 interface LeadTableProps {
@@ -12,9 +13,13 @@ export function LeadTable({ leads, selectedId, onSelect }: LeadTableProps) {
     <div className="lead-table" role="table" aria-label="Solicitudes generadas">
       <div className="lead-table-row lead-table-head" role="row">
         <span>Cliente</span>
+        <span>Empresa</span>
         <span>Familia</span>
+        <span>Necesidad</span>
         <span>Urgencia</span>
+        <span>Prioridad</span>
         <span>Estado</span>
+        <span>Revision tecnica</span>
       </div>
       {leads.map((lead) => (
         <button
@@ -26,14 +31,21 @@ export function LeadTable({ leads, selectedId, onSelect }: LeadTableProps) {
         >
           <span>
             <strong>{lead.summary.name}</strong>
-            <small>{lead.summary.company}</small>
           </span>
+          <span>{lead.summary.company}</span>
           <span>{lead.productFamilyLabel}</span>
+          <span>{lead.needType}</span>
+          <span>{lead.summary.urgency}</span>
           <span>
             <PriorityBadge priority={lead.priority} />
           </span>
           <span>
             <StatusBadge status={lead.status} />
+          </span>
+          <span>
+            <Badge tone={lead.technicalRisk ? "orange" : "green"}>
+              {lead.technicalRisk ? "Si" : "No"}
+            </Badge>
           </span>
         </button>
       ))}

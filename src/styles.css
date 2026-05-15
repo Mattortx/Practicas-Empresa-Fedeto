@@ -774,7 +774,15 @@ p {
 
 .lead-table-row {
   display: grid;
-  grid-template-columns: minmax(180px, 1.1fr) minmax(160px, 1fr) 120px 190px;
+  grid-template-columns:
+    minmax(140px, 0.9fr)
+    minmax(150px, 1fr)
+    minmax(170px, 1.1fr)
+    minmax(170px, 1.1fr)
+    minmax(100px, 0.7fr)
+    minmax(118px, 0.8fr)
+    minmax(180px, 1fr)
+    minmax(130px, 0.8fr);
   gap: 12px;
   align-items: center;
   width: 100%;
@@ -969,7 +977,7 @@ p {
   }
 
   .lead-table-row {
-    min-width: 760px;
+    min-width: 1120px;
   }
 
   .summary-toolbar {

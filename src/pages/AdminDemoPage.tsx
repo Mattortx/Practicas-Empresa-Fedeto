@@ -17,8 +17,8 @@ export function AdminDemoPage() {
       </header>
 
       <Notice tone="info">
-        Esta vista no tiene autenticacion real y existe solo para la demo de practicas. Las
-        solicitudes locales se guardan en el navegador mediante localStorage.
+        <strong>Vista simulada para demo de practicas.</strong> Esta vista no tiene autenticacion
+        real. Las solicitudes locales se guardan en el navegador mediante localStorage.
       </Notice>
 
       <AdminLeadDashboard />

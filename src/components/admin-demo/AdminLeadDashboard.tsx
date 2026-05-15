@@ -27,7 +27,7 @@ export function AdminLeadDashboard() {
       <div className="admin-toolbar">
         <div>
           <span>Vista interna simulada</span>
-          <h1>Solicitudes comerciales generadas</h1>
+          <h1>Panel comercial de demostracion</h1>
           <p>
             Panel de demostracion para ver como la empresa podria recibir y revisar las
             consultas cualificadas por el copiloto.
