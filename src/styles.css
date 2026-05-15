@@ -845,31 +845,39 @@ p {
 
 .lead-table,
 .lead-detail {
-  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
   box-shadow: 0 12px 30px rgba(23, 27, 34, 0.06);
 }
 
+.lead-table {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.lead-detail {
+  overflow: hidden;
+}
+
 .lead-table-row {
   display: grid;
   grid-template-columns:
-    minmax(130px, 0.8fr)
-    minmax(150px, 0.95fr)
-    minmax(190px, 1.05fr)
-    minmax(110px, 0.75fr)
-    minmax(170px, 1.05fr)
-    minmax(190px, 1.1fr)
-    minmax(140px, 0.85fr)
-    minmax(100px, 0.7fr)
-    minmax(118px, 0.78fr)
-    minmax(180px, 1fr)
-    minmax(130px, 0.78fr)
-    minmax(110px, 0.7fr);
+    140px
+    180px
+    210px
+    120px
+    190px
+    230px
+    145px
+    105px
+    130px
+    190px
+    140px
+    115px;
   gap: 12px;
   align-items: center;
-  width: 100%;
+  width: max(100%, 2027px);
   min-height: 66px;
   padding: 12px 14px;
   border: 0;
@@ -877,6 +885,11 @@ p {
   background: #ffffff;
   color: var(--ink);
   text-align: left;
+}
+
+.lead-table-row > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .lead-table-row:not(.lead-table-head) {
