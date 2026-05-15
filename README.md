@@ -1,30 +1,46 @@
-# MVP Asistente Inteligente - Protecciones Toledo
+# Copiloto Comercial - Protecciones Toledo
 
-Demo de practicas para FEDETO orientada a validar un asistente inteligente integrable en la web de Protecciones Toledo S.L.
+Demo de practicas para FEDETO orientada a Protecciones Toledo S.L. La aplicacion reformula el chatbot inicial como una unica web demostrativa con dos niveles:
 
-El MVP prioriza una prueba funcional, estable y explicable: orienta consultas profesionales sobre proteccion en altura, identifica categorias de producto, recoge una solicitud comercial minima y evita inventar informacion tecnica, normativa, precios o certificaciones.
+- Vista publica con chatbot integrado.
+- Logica funcional de copiloto comercial para cualificar consultas.
+- Panel interno simulado en `/admin-demo` para visualizar solicitudes generadas.
+
+El objetivo no es sustituir al equipo tecnico, sino preparar mejores primeras consultas comerciales sobre sistemas de proteccion en altura.
 
 ## Stack
 
 - Vite
-- React
+- React 18
 - TypeScript
-- Base de conocimiento local en JSON
-- Motor conversacional por reglas
-- Sin backend y sin persistencia de datos personales
+- Vitest
+- Lucide React
+- Datos controlados en modulos TypeScript
+- Persistencia local de demo con `localStorage`
+- Sin backend, sin CRM real y sin IA externa obligatoria
 
 ## Funcionalidades
 
-- Chat web integrado como widget demostrable.
-- Mensaje de bienvenida adaptado a Protecciones Toledo.
-- Orientacion por categorias: proteccion provisional, proteccion definitiva, bases/casquillos, auxiliares y consumibles.
-- FAQs basicas sobre empresa, contacto, presupuesto y limites del asistente.
-- Flujo de solicitud de presupuesto con datos minimos.
-- Resumen final para copiar o enviar por correo.
-- Guardrails para normativa, certificaciones, precios, plazos y calculos tecnicos.
-- Contenidos editables en `src/data/knowledgeBase.json`.
+- Landing publica profesional con enfoque industrial.
+- Tarjetas de familias de producto:
+  - Proteccion provisional de borde.
+  - Proteccion definitiva de borde.
+  - Bases y casquillos.
+  - Auxiliares para la construccion.
+  - Consumibles.
+  - Soluciones a medida.
+- Chatbot visible integrado como copiloto comercial.
+- Menu inicial de necesidades.
+- Flujos guiados por familia comercial.
+- Aviso de privacidad antes de recoger datos personales.
+- Detector de consultas tecnicas sensibles.
+- Lead scoring basico: prioridad baja, media o alta.
+- Generador de resumen comercial estructurado.
+- Simulacion de derivacion al equipo comercial.
+- Historial local de solicitudes para la demo.
+- Vista interna simulada `/admin-demo`.
 
-## Instalacion
+## Ejecucion
 
 En Windows PowerShell, usa `npm.cmd` si `npm` esta bloqueado por la politica de ejecucion:
 
@@ -32,6 +48,11 @@ En Windows PowerShell, usa `npm.cmd` si `npm` esta bloqueado por la politica de 
 npm.cmd install
 npm.cmd run dev
 ```
+
+Rutas:
+
+- `http://localhost:5173/`
+- `http://localhost:5173/admin-demo`
 
 Comprobaciones:
 
@@ -41,57 +62,84 @@ npm.cmd run test
 npm.cmd run build
 ```
 
-## Estructura
+## Estructura principal
 
 ```text
 src/
   components/
-    ChatWidget.tsx
+    admin-demo/
+    commercial-copilot/
+    layout/
+    ui/
   data/
-    knowledgeBase.json
-  domain/
-    assistantEngine.ts
-    lead.ts
-    types.ts
+    conversationFlows.ts
+    faq.ts
+    mockLeads.ts
+    productFamilies.ts
+  pages/
+    AdminDemoPage.tsx
+    PublicDemoPage.tsx
+  types/
+    commercialCopilot.ts
+  utils/
+    leadScoring.ts
+    leadSummary.ts
+    localLeadStore.ts
+    technicalRisk.ts
   App.tsx
   main.tsx
   styles.css
 ```
 
-## Datos y cumplimiento
+## Privacidad y limitaciones
 
-La demo no almacena datos personales en base de datos ni los envia automaticamente. El resumen de consulta se genera en el navegador para que el usuario pueda copiarlo o abrir un correo dirigido a `info@proteccionestoledo.com`.
+Los datos introducidos se utilizan unicamente para preparar una solicitud comercial en esta demo. No se debe introducir informacion sensible. En esta prueba de concepto, las solicitudes se conservan solo de forma local en el navegador o como datos simulados.
 
-La informacion real procede de la web publica de Protecciones Toledo:
+El copiloto no:
 
-- https://proteccionestoledo.com/
-- https://proteccionestoledo.com/contacto/
-- https://proteccionestoledo.com/politica-de-privacidad/
-- https://proteccionestoledo.com/category/sistemas-definitivos-de-proteccion-de-borde/
-
-Cualquier contenido marcado como demo debe validarse con la empresa antes de un uso real.
+- Calcula soluciones estructurales.
+- Confirma normativa aplicable.
+- Certifica cumplimiento.
+- Valida instrucciones de montaje.
+- Confirma precios, stock o plazos.
+- Sustituye fichas tecnicas oficiales ni revision de personal competente.
 
 ## Defensa del proyecto
 
 ### Problema que resuelve
 
-Muchos clientes profesionales llegan con una necesidad de seguridad en altura, pero no siempre saben si deben consultar proteccion provisional, definitiva, fijaciones, auxiliares o consumibles. El asistente reduce esa friccion inicial y estructura la consulta para el equipo comercial.
+Clientes profesionales pueden llegar con necesidades incompletas o poco clasificadas: proteccion provisional, definitiva, fijaciones, consumibles o soluciones singulares. El copiloto reduce esa friccion y estructura la consulta.
 
-### Por que tiene sentido para Protecciones Toledo
+### Por que chatbot + copiloto comercial
 
-La empresa trabaja con productos tecnicos para obra, mantenimiento industrial, cubiertas, infraestructuras y edificaciones con riesgo de caida. Un asistente no sustituye al equipo tecnico, pero puede filtrar consultas, orientar por categoria y mejorar la calidad del primer contacto.
+El chatbot es la interfaz visible y sencilla para el usuario. La logica de copiloto comercial clasifica la necesidad, pregunta datos utiles, detecta riesgos tecnicos y genera una ficha que la empresa podria revisar internamente.
 
-### Limitaciones
+### Valor para Protecciones Toledo
 
-- No calcula soluciones tecnicas.
-- No valida normativa aplicable a una obra.
-- No confirma precios, stock, plazos ni certificaciones.
-- No sustituye fichas tecnicas oficiales ni al equipo comercial/tecnico.
+- Mejora la calidad del primer contacto.
+- Reduce consultas incompletas.
+- Ayuda a priorizar oportunidades.
+- Deriva cuestiones sensibles al equipo tecnico.
+- Mantiene un tono prudente y profesional.
+
+### Funcionalidades del MVP
+
+- Vista publica demostrativa.
+- Copiloto conversacional con flujos.
+- Resumen comercial estructurado.
+- Scoring basico.
+- Deteccion de consulta tecnica sensible.
+- Panel interno simulado.
 
 ### Mejoras futuras razonables
 
-- Integracion real en WordPress como widget.
-- Envio del resumen a correo o CRM.
-- Panel de administracion para editar contenidos.
-- Recuperacion documental sobre fichas tecnicas verificadas.
-- Integracion opcional con IA externa usando guardrails.
+- Integracion real en WordPress.
+- Envio a correo o CRM.
+- Panel real con autenticacion.
+- Edicion de contenidos por personal comercial.
+- Recuperacion documental sobre fichas verificadas.
+- IA externa opcional con guardrails y fuentes controladas.
+
+## Integracion en produccion
+
+Para integrarlo en la web real habria que empaquetar el copiloto como widget, conectar un backend para envio seguro, definir consentimiento y politica de tratamiento, validar contenidos con Protecciones Toledo y revisar cualquier respuesta tecnica con documentacion oficial.
