@@ -3,6 +3,7 @@ import { ClipboardCheck, MessageSquareText, RotateCcw, ShieldAlert, X } from "lu
 import { getConversationFlow } from "../../data/conversationFlows";
 import { controlledFaq } from "../../data/faq";
 import { classifyFamilyFromText } from "../../data/productFamilies";
+import { requestAiCopilot, type AiCopilotResponse } from "../../services/copilotAi";
 import type {
   ChatAction,
   ChatMessage,
@@ -40,23 +41,43 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
   const [privacyShown, setPrivacyShown] = useState(false);
   const [lastCopied, setLastCopied] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
+  const [aiStatus, setAiStatus] = useState<"idle" | "thinking" | "available" | "unavailable">("idle");
 
   const currentStep = activeFlow?.steps[currentStepIndex];
-  const placeholder = currentStep?.placeholder ?? "Escribe tu consulta o elige una opcion...";
+  const placeholder =
+    aiStatus === "thinking"
+      ? "Analizando consulta..."
+      : currentStep?.placeholder ?? "Escribe tu consulta o elige una opcion...";
 
   const isInFlow = Boolean(activeFlow && currentStep);
 
   const helperText = useMemo(() => {
+    if (aiStatus === "thinking") {
+      return "IA opcional analizando la consulta. Los guardrails tecnicos siguen activos.";
+    }
+
+    if (aiStatus === "available") {
+      return "IA opcional activa para texto libre; la cualificacion comercial sigue con flujos controlados.";
+    }
+
+    if (aiStatus === "unavailable") {
+      return "IA opcional no configurada o no disponible; reglas y flujos controlados activos.";
+    }
+
     if (!activeFlow) {
-      return "Modo demo: reglas controladas, sin IA externa y sin envio automatico.";
+      return "Modo demo: reglas controladas, IA opcional y sin envio automatico.";
     }
 
     return `Cualificando: ${activeFlow.label}`;
-  }, [activeFlow]);
+  }, [activeFlow, aiStatus]);
 
-  function handleSubmit(rawValue: string) {
+  async function handleSubmit(rawValue: string) {
     const value = rawValue.trim();
     const canSkipOptionalStep = isInFlow && currentStep?.required === false;
+
+    if (aiStatus === "thinking") {
+      return;
+    }
 
     if (!value && !canSkipOptionalStep) {
       return;
@@ -70,7 +91,7 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
       return;
     }
 
-    handleFreeText(value);
+    await handleFreeText(value);
   }
 
   function handleAction(action: ChatAction) {
@@ -92,7 +113,8 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     }
   }
 
-  function handleFreeText(value: string) {
+  async function handleFreeText(value: string) {
+    setAiStatus("idle");
     const flags = detectTechnicalRisk(value);
 
     if (flags.length > 0) {
@@ -133,9 +155,28 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
       return;
     }
 
+    setAiStatus("thinking");
+    const aiResponse = await requestAiCopilot({
+      message: value,
+      context: {
+        activeFlow: activeFlow?.id ?? null,
+        currentStep: currentStep?.id ?? null
+      }
+    });
+
+    if (aiResponse.available && aiResponse.answer) {
+      setAiStatus("available");
+      appendAssistant({
+        text: buildAiAssistantText(aiResponse),
+        actions: buildAiActions(aiResponse)
+      });
+      return;
+    }
+
+    setAiStatus("unavailable");
     appendAssistant({
       text:
-        "Para orientar bien la consulta necesito clasificar la necesidad. Puedes elegir una opcion o describir si se trata de proteccion provisional, definitiva, fijaciones, consumibles o una solucion a medida.",
+        "Para orientar bien la consulta necesito clasificar la necesidad. La IA opcional no esta configurada o no ha devuelto una clasificacion segura, asi que continuo con los flujos controlados. Puedes elegir una opcion o describir si se trata de proteccion provisional, definitiva, fijaciones, consumibles o una solucion a medida.",
       actions: [
         { label: "No se que necesito", value: "flow:desconocido", variant: "secondary" },
         { label: "Solicitar presupuesto", value: "flow:presupuesto", variant: "primary" },
@@ -220,6 +261,7 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     setDraft({});
     setTechnicalFlags([]);
     setPrivacyShown(false);
+    setAiStatus("idle");
   }
 
   function restart() {
@@ -229,6 +271,7 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     setDraft({});
     setTechnicalFlags([]);
     setPrivacyShown(false);
+    setAiStatus("idle");
   }
 
   async function copyText(text: string) {
@@ -357,6 +400,59 @@ function validateStep(step: ConversationStep, rawValue: string) {
 
 function isContactStep(step: ConversationStep) {
   return ["name", "company", "email", "phone"].includes(step.field);
+}
+
+function buildAiAssistantText(response: AiCopilotResponse) {
+  const sections = [
+    response.answer?.trim() ||
+      "He analizado la consulta, pero conviene continuar con un flujo guiado para recoger datos utiles."
+  ];
+
+  if (response.nextAction) {
+    sections.push(`Siguiente paso sugerido: ${response.nextAction}`);
+  }
+
+  if (response.requiresTechnicalReview) {
+    sections.push("Esta consulta queda marcada como revision tecnica necesaria antes de confirmar una solucion.");
+  }
+
+  if (response.technicalWarnings?.length) {
+    sections.push(`Advertencias: ${response.technicalWarnings.slice(0, 3).join(" ")}`);
+  }
+
+  return sections.join("\n\n");
+}
+
+function buildAiActions(response: AiCopilotResponse): ChatAction[] {
+  const suggestedFlowId = response.requiresTechnicalReview
+    ? "documentacion"
+    : getSafeFlowId(response.suggestedFlowId);
+  const actions: ChatAction[] = [];
+
+  if (suggestedFlowId) {
+    const flow = getConversationFlow(suggestedFlowId);
+    actions.push({
+      label: flow ? `Iniciar: ${flow.label}` : "Iniciar flujo recomendado",
+      value: `flow:${suggestedFlowId}`,
+      variant: response.requiresTechnicalReview ? "warning" : "primary"
+    });
+  }
+
+  if (suggestedFlowId !== "presupuesto") {
+    actions.push({ label: "Solicitar presupuesto", value: "flow:presupuesto", variant: "secondary" });
+  }
+
+  actions.push({ label: "Volver al menu", value: "restart", variant: "secondary" });
+
+  return actions;
+}
+
+function getSafeFlowId(value: AiCopilotResponse["suggestedFlowId"]): FlowId | undefined {
+  if (!value || value === "none") {
+    return undefined;
+  }
+
+  return getConversationFlow(value) ? value : undefined;
 }
 
 function normalize(value: string) {

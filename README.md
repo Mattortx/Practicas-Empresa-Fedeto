@@ -17,7 +17,8 @@ El objetivo no es sustituir al equipo tecnico, sino preparar mejores primeras co
 - Lucide React
 - Datos controlados en modulos TypeScript
 - Persistencia local de demo con `localStorage`
-- Sin backend, sin CRM real y sin IA externa obligatoria
+- Backend Node opcional sin dependencias externas para conectar IA
+- Sin CRM real y sin IA externa obligatoria
 
 ## Funcionalidades
 
@@ -39,6 +40,7 @@ El objetivo no es sustituir al equipo tecnico, sino preparar mejores primeras co
 - Simulacion de derivacion al equipo comercial.
 - Historial local de solicitudes para la demo.
 - Vista interna simulada `/admin-demo` con filtros, contadores, detalle y cambio de estado.
+- Capa opcional de IA para interpretar texto libre sin sustituir los flujos comerciales controlados.
 
 ## Ejecucion
 
@@ -48,6 +50,22 @@ En Windows PowerShell, usa `npm.cmd` si `npm` esta bloqueado por la politica de 
 npm.cmd install
 npm.cmd run dev
 ```
+
+Para activar la IA opcional durante el desarrollo, abre una segunda terminal y ejecuta:
+
+```bash
+npm.cmd run dev:api
+```
+
+Despues crea un archivo `.env.local` a partir de `.env.example` e indica tu clave:
+
+```bash
+OPENAI_API_KEY=tu_clave
+OPENAI_MODEL=gpt-5.4-mini
+PORT=8787
+```
+
+La web de Vite sigue en `http://localhost:5173/` y redirige las llamadas `/api` al backend local `http://localhost:8787/`.
 
 Rutas:
 
@@ -62,9 +80,17 @@ npm.cmd run test
 npm.cmd run build
 ```
 
+Tras compilar, tambien se puede servir la version de produccion junto a la API con:
+
+```bash
+npm.cmd run start
+```
+
 ## Estructura principal
 
 ```text
+server/
+  index.js
 src/
   components/
     admin-demo/
@@ -79,6 +105,8 @@ src/
   pages/
     AdminDemoPage.tsx
     PublicDemoPage.tsx
+  services/
+    copilotAi.ts
   types/
     commercialCopilot.ts
   utils/
@@ -104,6 +132,20 @@ El copiloto no:
 - Confirma precios, stock o plazos.
 - Sustituye fichas tecnicas oficiales ni revision de personal competente.
 
+## IA opcional
+
+La demo funciona aunque no haya IA configurada. En ese caso, el copiloto utiliza reglas, FAQs y flujos guiados. Si existe `OPENAI_API_KEY`, el frontend consulta `/api/copilot` para interpretar mensajes libres o ambiguos.
+
+La IA no decide precios, normativa, calculos, resistencia, certificaciones ni instrucciones de montaje. El backend fuerza una respuesta estructurada y prudente: familia comercial sugerida, flujo recomendado, necesidad de revision tecnica y advertencias. Las consultas sobre normativa, certificacion, instalacion, resistencia, calculo, anclaje, montaje, cumplimiento, ficha tecnica, ensayo o seguridad estructural quedan marcadas como revision tecnica necesaria.
+
+Arquitectura de la capa IA:
+
+- `server/index.js`: API local `/api/copilot`, carga `.env.local`, llama a OpenAI si hay clave y sirve `dist` en produccion.
+- `src/services/copilotAi.ts`: cliente frontend con timeout y fallback seguro.
+- `ChatWidget.tsx`: usa primero reglas locales; llama a IA solo cuando no puede clasificar con seguridad.
+
+Esta separacion permite defender el MVP como una herramienta estable sin dependencia externa y, al mismo tiempo, preparada para evolucionar hacia IA real con guardrails.
+
 ## Como probar el flujo completo
 
 1. Abre `http://localhost:5173/`.
@@ -122,6 +164,7 @@ El copiloto no:
 - Los datos iniciales del panel son mock leads de demostracion.
 - No hay envio real de correo ni integracion con CRM.
 - La revision tecnica se marca como necesidad de revision, no como validacion tecnica.
+- La IA es opcional; sin clave o sin backend, el sistema vuelve automaticamente a reglas controladas.
 
 ## Defensa del proyecto
 
@@ -157,7 +200,7 @@ El chatbot es la interfaz visible y sencilla para el usuario. La logica de copil
 - Panel real con autenticacion.
 - Edicion de contenidos por personal comercial.
 - Recuperacion documental sobre fichas verificadas.
-- IA externa opcional con guardrails y fuentes controladas.
+- IA externa con guardrails, fuentes controladas y validacion documental.
 
 ## Integracion en produccion
 
