@@ -276,7 +276,9 @@ p {
 
 .value-section,
 .families-section,
-.copilot-section {
+.copilot-section,
+.poc-section,
+.demo-copilot-section {
   padding: 32px 0;
 }
 
@@ -286,6 +288,7 @@ p {
 }
 
 .section-title h2,
+.demo-section-title h2,
 .copilot-context h2,
 .admin-toolbar h1 {
   margin-bottom: 10px;
@@ -323,6 +326,9 @@ p {
 
 .value-card p,
 .family-card p,
+.poc-card p,
+.demo-section-title p,
+.demo-guide-card li,
 .copilot-context p,
 .admin-toolbar p,
 .notice,
@@ -383,6 +389,97 @@ p {
   gap: 24px;
   align-items: start;
   padding-bottom: 56px;
+}
+
+.poc-section {
+  border-top: 1px solid var(--line);
+}
+
+.poc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.poc-card {
+  min-height: 150px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 10px 28px rgba(23, 27, 34, 0.05);
+}
+
+.poc-card svg {
+  margin-bottom: 12px;
+  color: var(--red);
+}
+
+.poc-card strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.poc-card p {
+  margin-bottom: 0;
+}
+
+.poc-warning-panel {
+  position: static;
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  background: #ffffff;
+}
+
+.demo-copilot-section {
+  padding-bottom: 56px;
+}
+
+.demo-section-title {
+  max-width: 820px;
+  margin-bottom: 18px;
+}
+
+.demo-section-title p {
+  max-width: 760px;
+  margin-bottom: 0;
+}
+
+.demo-copilot-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.34fr) minmax(520px, 0.66fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.demo-guide-card {
+  position: sticky;
+  top: 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfd;
+  box-shadow: 0 10px 28px rgba(23, 27, 34, 0.05);
+}
+
+.demo-guide-card strong {
+  display: block;
+  margin-bottom: 12px;
+  color: #111827;
+  font-size: 1.05rem;
+}
+
+.demo-guide-card ol {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 16px;
+  padding-left: 20px;
+}
+
+.demo-guide-card li {
+  padding-left: 2px;
 }
 
 .copilot-context {
@@ -1124,15 +1221,18 @@ p {
 @media (max-width: 1080px) {
   .hero-section,
   .copilot-section,
+  .demo-copilot-layout,
   .admin-grid {
     grid-template-columns: 1fr;
   }
 
-  .copilot-context {
+  .copilot-context,
+  .demo-guide-card {
     position: static;
   }
 
-  .value-grid {
+  .value-grid,
+  .poc-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1170,6 +1270,7 @@ p {
 
   .value-grid,
   .family-grid,
+  .poc-grid,
   .admin-metrics,
   .detail-grid {
     grid-template-columns: 1fr;

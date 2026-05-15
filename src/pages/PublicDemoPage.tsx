@@ -102,8 +102,36 @@ export function PublicDemoPage() {
         </div>
       </section>
 
-      <section className="copilot-section">
-        <div className="copilot-context">
+      <section className="poc-section" id="poc">
+        <div className="section-title">
+          <span>Prueba de concepto</span>
+          <h2>Que demuestra este copiloto comercial</h2>
+          <p>
+            Esta seccion explica la POC antes de probar la herramienta. El objetivo es mostrar
+            como una conversacion puede convertirse en una solicitud comercial ordenada, sin
+            sustituir la revision tecnica de Protecciones Toledo.
+          </p>
+        </div>
+
+        <div className="poc-grid">
+          <article className="poc-card">
+            <Route size={20} aria-hidden="true" />
+            <strong>Entrada conversacional</strong>
+            <p>El cliente describe una necesidad real de obra, mantenimiento o suministro.</p>
+          </article>
+          <article className="poc-card">
+            <Gauge size={20} aria-hidden="true" />
+            <strong>Clasificacion comercial</strong>
+            <p>El sistema orienta la consulta hacia una familia y estima prioridad.</p>
+          </article>
+          <article className="poc-card">
+            <FileSearch size={20} aria-hidden="true" />
+            <strong>Ficha para revision</strong>
+            <p>La solicitud queda resumida para el equipo comercial o tecnico.</p>
+          </article>
+        </div>
+
+        <div className="copilot-context poc-warning-panel">
           <span className="eyebrow">Copiloto integrado</span>
           <h2>De conversacion a oportunidad comercial cualificada</h2>
           <p>
@@ -128,7 +156,34 @@ export function PublicDemoPage() {
             </span>
           </div>
         </div>
-        <ChatWidget />
+      </section>
+
+      <section className="demo-copilot-section">
+        <div className="demo-section-title">
+          <span className="eyebrow">Demo interactiva</span>
+          <h2>Prueba el copiloto comercial</h2>
+          <p>
+            Este modulo es la parte funcional de la demo. Puedes simular una consulta, generar
+            una solicitud comercial y verla despues en el panel interno.
+          </p>
+        </div>
+
+        <div className="demo-copilot-layout">
+          <aside className="demo-guide-card" aria-label="Guia breve de uso">
+            <strong>Como probarlo</strong>
+            <ol>
+              <li>Elige una necesidad o escribe una consulta libre.</li>
+              <li>Responde las preguntas guiadas con datos de demo.</li>
+              <li>Genera el resumen comercial.</li>
+              <li>Abre el panel interno para revisar la solicitud.</li>
+            </ol>
+            <a className="button button-secondary" href="/admin-demo">
+              Ver panel comercial demo
+            </a>
+          </aside>
+
+          <ChatWidget />
+        </div>
       </section>
     </main>
   );
