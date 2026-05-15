@@ -26,6 +26,7 @@ export type TechnicalRiskFlag =
   | "calculo"
   | "instalacion"
   | "resistencia"
+  | "anclaje"
   | "documentacion_tecnica";
 
 export type LeadFieldId =
@@ -96,6 +97,7 @@ export interface LeadSummary {
   urgency: string;
   observations: string;
   priority: LeadPriority;
+  requiresTechnicalReview: boolean;
   nextAction: string;
   technicalWarnings: string[];
 }

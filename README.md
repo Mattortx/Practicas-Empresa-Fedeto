@@ -38,7 +38,7 @@ El objetivo no es sustituir al equipo tecnico, sino preparar mejores primeras co
 - Generador de resumen comercial estructurado.
 - Simulacion de derivacion al equipo comercial.
 - Historial local de solicitudes para la demo.
-- Vista interna simulada `/admin-demo`.
+- Vista interna simulada `/admin-demo` con filtros, contadores, detalle y cambio de estado.
 
 ## Ejecucion
 
@@ -103,6 +103,25 @@ El copiloto no:
 - Valida instrucciones de montaje.
 - Confirma precios, stock o plazos.
 - Sustituye fichas tecnicas oficiales ni revision de personal competente.
+
+## Como probar el flujo completo
+
+1. Abre `http://localhost:5173/`.
+2. Pulsa una necesidad en el copiloto, por ejemplo `Proteccion provisional de borde`.
+3. Responde las preguntas guiadas con datos de demo.
+4. Cuando se soliciten datos personales, revisa el aviso de privacidad.
+5. Completa nombre, empresa, correo, telefono y observaciones.
+6. Comprueba que se genera un resumen comercial.
+7. Pulsa `Ver en panel interno` o abre `http://localhost:5173/admin-demo`.
+8. En el panel, revisa la solicitud, usa los filtros y cambia el estado de seguimiento.
+
+## Aspectos simulados
+
+- El panel interno no tiene autenticacion real.
+- Las solicitudes se guardan en `localStorage`, no en una base de datos.
+- Los datos iniciales del panel son mock leads de demostracion.
+- No hay envio real de correo ni integracion con CRM.
+- La revision tecnica se marca como necesidad de revision, no como validacion tecnica.
 
 ## Defensa del proyecto
 

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ClipboardCheck, RotateCcw, ShieldAlert } from "lucide-react";
+import { ClipboardCheck, MessageSquareText, RotateCcw, ShieldAlert, X } from "lucide-react";
 import { getConversationFlow } from "../../data/conversationFlows";
 import { controlledFaq } from "../../data/faq";
 import { classifyFamilyFromText } from "../../data/productFamilies";
@@ -39,6 +39,7 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
   const [technicalFlags, setTechnicalFlags] = useState<TechnicalRiskFlag[]>([]);
   const [privacyShown, setPrivacyShown] = useState(false);
   const [lastCopied, setLastCopied] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const currentStep = activeFlow?.steps[currentStepIndex];
   const placeholder = currentStep?.placeholder ?? "Escribe tu consulta o elige una opcion...";
@@ -55,13 +56,14 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
 
   function handleSubmit(rawValue: string) {
     const value = rawValue.trim();
+    const canSkipOptionalStep = isInFlow && currentStep?.required === false;
 
-    if (!value) {
+    if (!value && !canSkipOptionalStep) {
       return;
     }
 
     setInput("");
-    appendUser(value);
+    appendUser(value || "No indicado");
 
     if (isInFlow && activeFlow && currentStep) {
       handleStepAnswer(activeFlow, currentStep, value);
@@ -230,9 +232,13 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
   }
 
   async function copyText(text: string) {
-    await navigator.clipboard.writeText(text);
-    setLastCopied(true);
-    window.setTimeout(() => setLastCopied(false), 1800);
+    try {
+      await navigator.clipboard.writeText(text);
+      setLastCopied(true);
+      window.setTimeout(() => setLastCopied(false), 1800);
+    } catch {
+      appendAssistant({ text: "No he podido copiar automaticamente. Puedes seleccionar el resumen manualmente." });
+    }
   }
 
   function appendUser(text: string) {
@@ -249,17 +255,39 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     ]);
   }
 
+  if (!isOpen) {
+    return (
+      <section className="copilot-shell copilot-shell-collapsed" id="copiloto" aria-label="Copiloto comercial cerrado">
+        <div>
+          <span>Copiloto comercial</span>
+          <strong>Protecciones Toledo</strong>
+          <p>Abre el asistente para clasificar una consulta y preparar una solicitud comercial.</p>
+        </div>
+        <Button variant="primary" onClick={() => setIsOpen(true)}>
+          <MessageSquareText size={17} aria-hidden="true" />
+          Abrir copiloto
+        </Button>
+      </section>
+    );
+  }
+
   return (
     <section className="copilot-shell" id="copiloto" aria-label="Copiloto comercial">
       <header className="copilot-header">
         <div>
           <span>Copiloto comercial</span>
-          <h2>Clasifica, cualifica y resume consultas</h2>
+          <h2>Protecciones Toledo - Demo comercial</h2>
         </div>
-        <Button variant="ghost" onClick={restart}>
-          <RotateCcw size={16} aria-hidden="true" />
-          Reiniciar
-        </Button>
+        <div className="copilot-header-actions">
+          <Button variant="ghost" onClick={restart}>
+            <RotateCcw size={16} aria-hidden="true" />
+            Reiniciar
+          </Button>
+          <Button variant="ghost" onClick={() => setIsOpen(false)}>
+            <X size={16} aria-hidden="true" />
+            Cerrar
+          </Button>
+        </div>
       </header>
 
       <div className="copilot-alert">
@@ -297,7 +325,7 @@ function welcomeMessage(): ChatMessage {
     id: crypto.randomUUID(),
     role: "assistant",
     text:
-      "Hola. Soy el copiloto comercial de Protecciones Toledo. Puedo ayudarte a orientar tu consulta sobre sistemas de proteccion de borde, bases, casquillos, auxiliares, consumibles o soluciones a medida. Para cuestiones tecnicas definitivas, nuestro equipo revisara tu caso de forma personalizada.",
+      "Hola. Soy el copiloto comercial de Protecciones Toledo. Puedo ayudarte a orientar tu consulta sobre sistemas de proteccion de borde, bases, casquillos, auxiliares, consumibles o soluciones a medida. Para una solucion definitiva, el equipo tecnico debera revisar los datos de obra y la documentacion correspondiente.",
     actions: [
       { label: "Solicitar presupuesto", value: "flow:presupuesto", variant: "primary" },
       { label: "No se que necesito", value: "flow:desconocido", variant: "secondary" },

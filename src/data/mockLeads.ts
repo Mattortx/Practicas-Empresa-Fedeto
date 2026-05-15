@@ -25,6 +25,7 @@ export const mockLeads: CommercialLead[] = [
       observations:
         "Necesitan revisar una solucion permanente para cubierta con mantenimiento recurrente.",
       priority: "alta",
+      requiresTechnicalReview: true,
       nextAction: "Solicitar revision tecnica y propuesta comercial.",
       technicalWarnings: [
         "La solucion definitiva debe validarse por personal competente.",
@@ -37,7 +38,7 @@ export const mockLeads: CommercialLead[] = [
   {
     id: "demo-002",
     createdAt: new Date("2026-05-15T10:05:00").toISOString(),
-    status: "pendiente_contacto_comercial",
+    status: "nueva",
     priority: "media",
     technicalRisk: false,
     technicalRiskFlags: [],
@@ -57,6 +58,7 @@ export const mockLeads: CommercialLead[] = [
       urgency: "Media",
       observations: "Consulta sobre cantidades aproximadas de casquillos para proyecto asociado.",
       priority: "media",
+      requiresTechnicalReview: false,
       nextAction: "Revisar compatibilidad y preparar respuesta comercial.",
       technicalWarnings: ["La compatibilidad debe confirmarse con referencias o documentacion tecnica."]
     },

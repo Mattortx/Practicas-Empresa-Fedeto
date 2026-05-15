@@ -1,5 +1,6 @@
 import type { CommercialLead } from "../../types/commercialCopilot";
 import { Badge } from "../ui/Badge";
+import { LeadFamilyBadge } from "./LeadFamilyBadge";
 import { PriorityBadge, StatusBadge } from "./LeadStatusBadge";
 
 interface LeadTableProps {
@@ -9,17 +10,30 @@ interface LeadTableProps {
 }
 
 export function LeadTable({ leads, selectedId, onSelect }: LeadTableProps) {
+  if (leads.length === 0) {
+    return (
+      <div className="lead-table lead-table-empty">
+        <strong>No hay solicitudes para este filtro</strong>
+        <p>Cuando el copiloto genere nuevas solicitudes, apareceran en este panel de demo.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="lead-table" role="table" aria-label="Solicitudes generadas">
       <div className="lead-table-row lead-table-head" role="row">
         <span>Cliente</span>
         <span>Empresa</span>
+        <span>Correo</span>
+        <span>Telefono</span>
         <span>Familia</span>
         <span>Necesidad</span>
+        <span>Ubicacion</span>
         <span>Urgencia</span>
         <span>Prioridad</span>
         <span>Estado</span>
         <span>Revision tecnica</span>
+        <span>Fecha</span>
       </div>
       {leads.map((lead) => (
         <button
@@ -33,8 +47,13 @@ export function LeadTable({ leads, selectedId, onSelect }: LeadTableProps) {
             <strong>{lead.summary.name}</strong>
           </span>
           <span>{lead.summary.company}</span>
-          <span>{lead.productFamilyLabel}</span>
+          <span>{lead.summary.email}</span>
+          <span>{lead.summary.phone}</span>
+          <span>
+            <LeadFamilyBadge familyId={lead.productFamilyId} label={lead.productFamilyLabel} />
+          </span>
           <span>{lead.needType}</span>
+          <span>{lead.summary.location}</span>
           <span>{lead.summary.urgency}</span>
           <span>
             <PriorityBadge priority={lead.priority} />
@@ -46,6 +65,13 @@ export function LeadTable({ leads, selectedId, onSelect }: LeadTableProps) {
             <Badge tone={lead.technicalRisk ? "orange" : "green"}>
               {lead.technicalRisk ? "Si" : "No"}
             </Badge>
+          </span>
+          <span>
+            {new Intl.DateTimeFormat("es-ES", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric"
+            }).format(new Date(lead.createdAt))}
           </span>
         </button>
       ))}

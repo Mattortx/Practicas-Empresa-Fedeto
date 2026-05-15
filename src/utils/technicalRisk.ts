@@ -1,14 +1,24 @@
 import type { TechnicalRiskFlag } from "../types/commercialCopilot";
 
 const riskMatchers: Array<{ flag: TechnicalRiskFlag; keywords: string[] }> = [
-  { flag: "normativa", keywords: ["norma", "normativa", "une", "iso", "legal", "cumple"] },
+  {
+    flag: "normativa",
+    keywords: ["norma", "normativa", "une", "iso", "legal", "cumple", "cumplimiento"]
+  },
   {
     flag: "certificacion",
     keywords: ["certificado", "certificacion", "homologado", "ensayo"]
   },
-  { flag: "calculo", keywords: ["calculo", "calcular", "dimensionar", "carga"] },
+  {
+    flag: "calculo",
+    keywords: ["calculo", "calcular", "dimensionar", "carga", "seguridad estructural"]
+  },
   { flag: "instalacion", keywords: ["instalar", "montaje", "fijar", "perforar"] },
-  { flag: "resistencia", keywords: ["resistencia", "resiste", "peso", "viento", "empuje"] },
+  { flag: "anclaje", keywords: ["anclaje", "anclar", "atornillar", "fijacion"] },
+  {
+    flag: "resistencia",
+    keywords: ["resistencia", "resiste", "peso", "viento", "empuje", "estructural"]
+  },
   {
     flag: "documentacion_tecnica",
     keywords: ["ficha tecnica", "documentacion", "manual", "instrucciones"]

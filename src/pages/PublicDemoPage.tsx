@@ -40,7 +40,7 @@ export function PublicDemoPage() {
               Probar copiloto <ArrowRight size={17} aria-hidden="true" />
             </a>
             <a className="button button-secondary" href="/admin-demo">
-              Ver panel interno
+              Ver panel comercial demo
             </a>
           </div>
         </div>

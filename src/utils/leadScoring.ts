@@ -7,6 +7,8 @@ export function calculateLeadPriority(
 ): LeadPriority {
   let score = 0;
   const urgency = normalize(draft.urgency ?? "");
+  const workType = normalize(`${draft.workType ?? ""} ${draft.customProblem ?? ""}`);
+  const contactInfo = normalize(`${draft.email ?? ""} ${draft.phone ?? ""}`);
   const quantityText = `${draft.quantity ?? ""} ${draft.approximateLength ?? ""}`;
   const amount = extractFirstNumber(quantityText);
 
@@ -25,6 +27,19 @@ export function calculateLeadPriority(
   }
 
   if (productFamilyId === "definitiva" || productFamilyId === "medida") {
+    score += 1;
+  }
+
+  if (
+    workType.includes("industrial") ||
+    workType.includes("puente") ||
+    workType.includes("silo") ||
+    workType.includes("singular")
+  ) {
+    score += 1;
+  }
+
+  if (contactInfo.includes("@") && !contactInfo.includes("no indicado")) {
     score += 1;
   }
 

@@ -13,7 +13,7 @@ export function Header() {
       <nav className="header-nav" aria-label="Navegacion principal">
         <a href="#familias">Familias</a>
         <a href="#copiloto">Copiloto</a>
-        <a href="/admin-demo">Panel demo</a>
+        <a href="/admin-demo">Panel comercial demo</a>
         <a href="https://proteccionestoledo.com/" target="_blank" rel="noreferrer">
           Web real <ExternalLink size={14} aria-hidden="true" />
         </a>

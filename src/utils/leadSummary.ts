@@ -41,6 +41,7 @@ export function buildCommercialLead(
     urgency: value(draft.urgency),
     observations: buildObservations(draft),
     priority,
+    requiresTechnicalReview: technicalRisk,
     nextAction: flow.nextAction,
     technicalWarnings: warnings
   };
@@ -48,7 +49,7 @@ export function buildCommercialLead(
   return {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
-    status: technicalRisk ? "pendiente_revision_tecnica" : "pendiente_contacto_comercial",
+    status: "nueva",
     priority,
     technicalRisk,
     technicalRiskFlags,
@@ -74,6 +75,7 @@ export function formatLeadSummary(summary: LeadSummary): string {
     `- Urgencia: ${summary.urgency}`,
     `- Observaciones: ${summary.observations}`,
     `- Nivel de prioridad: ${summary.priority}`,
+    `- Requiere revision tecnica: ${summary.requiresTechnicalReview ? "Si" : "No"}`,
     `- Recomendacion de siguiente accion: ${summary.nextAction}`,
     `- Advertencias tecnicas: ${summary.technicalWarnings.join(" ")}`
   ].join("\n");

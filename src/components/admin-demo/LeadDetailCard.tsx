@@ -1,12 +1,21 @@
 import { CalendarDays, ClipboardList, ShieldAlert } from "lucide-react";
-import type { CommercialLead } from "../../types/commercialCopilot";
+import type { CommercialLead, LeadStatus } from "../../types/commercialCopilot";
 import { Badge, PriorityBadge, StatusBadge } from "../ui/Badge";
+import { LeadFamilyBadge } from "./LeadFamilyBadge";
 
 interface LeadDetailCardProps {
   lead?: CommercialLead;
+  onStatusChange?: (leadId: string, status: LeadStatus) => void;
 }
 
-export function LeadDetailCard({ lead }: LeadDetailCardProps) {
+const statusOptions: Array<{ value: LeadStatus; label: string }> = [
+  { value: "nueva", label: "Nueva" },
+  { value: "pendiente_revision_tecnica", label: "Pendiente revision tecnica" },
+  { value: "pendiente_contacto_comercial", label: "Pendiente contacto comercial" },
+  { value: "cerrada_demo", label: "Cerrada en demo" }
+];
+
+export function LeadDetailCard({ lead, onStatusChange }: LeadDetailCardProps) {
   if (!lead) {
     return (
       <aside className="lead-detail empty-state">
@@ -38,17 +47,39 @@ export function LeadDetailCard({ lead }: LeadDetailCardProps) {
           }).format(new Date(lead.createdAt))}
         </span>
         <PriorityBadge priority={lead.priority} />
+        <Badge tone={lead.source === "demo" ? "neutral" : "blue"}>
+          {lead.source === "demo" ? "Dato simulado" : "Generada por el copiloto"}
+        </Badge>
         {lead.technicalRisk && (
           <Badge tone="orange">Revision tecnica necesaria</Badge>
         )}
       </div>
+
+      <label className="status-control">
+        <span>Estado de seguimiento</span>
+        <select
+          value={lead.status}
+          onChange={(event) => onStatusChange?.(lead.id, event.target.value as LeadStatus)}
+        >
+          {statusOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
 
       <div className="detail-grid">
         <Info label="Cliente" value={lead.summary.name} />
         <Info label="Empresa" value={lead.summary.company} />
         <Info label="Correo" value={lead.summary.email} />
         <Info label="Telefono" value={lead.summary.phone} />
-        <Info label="Familia" value={lead.summary.productFamily} />
+        <div className="info-pair">
+          <span>Familia</span>
+          <strong>
+            <LeadFamilyBadge familyId={lead.productFamilyId} label={lead.summary.productFamily} />
+          </strong>
+        </div>
         <Info label="Necesidad" value={lead.summary.needType} />
         <Info label="Urgencia" value={lead.summary.urgency} />
         <Info label="Revision tecnica" value={lead.technicalRisk ? "Si" : "No"} />

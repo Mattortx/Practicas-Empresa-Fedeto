@@ -1,25 +1,64 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Trash2 } from "lucide-react";
-import type { CommercialLead } from "../../types/commercialCopilot";
-import { clearLocalLeads, readLocalLeads } from "../../utils/localLeadStore";
+import type { CommercialLead, LeadStatus } from "../../types/commercialCopilot";
+import { clearLocalLeads, readLocalLeads, replaceLocalLeads } from "../../utils/localLeadStore";
 import { Button } from "../ui/Button";
 import { LeadDetailCard } from "./LeadDetailCard";
 import { LeadTable } from "./LeadTable";
 
+type LeadFilter =
+  | "todas"
+  | "nuevas"
+  | "revision"
+  | "alta"
+  | "provisional"
+  | "definitiva"
+  | "medida";
+
+const filters: Array<{ id: LeadFilter; label: string }> = [
+  { id: "todas", label: "Todas" },
+  { id: "nuevas", label: "Nuevas" },
+  { id: "revision", label: "Revision tecnica" },
+  { id: "alta", label: "Alta prioridad" },
+  { id: "provisional", label: "Proteccion provisional" },
+  { id: "definitiva", label: "Proteccion definitiva" },
+  { id: "medida", label: "Soluciones a medida" }
+];
+
 export function AdminLeadDashboard() {
   const [leads, setLeads] = useState<CommercialLead[]>(() => readLocalLeads());
+  const [activeFilter, setActiveFilter] = useState<LeadFilter>("todas");
   const [selectedId, setSelectedId] = useState(leads[0]?.id);
 
-  const selectedLead = useMemo(
-    () => leads.find((lead) => lead.id === selectedId) ?? leads[0],
-    [leads, selectedId]
+  const filteredLeads = useMemo(
+    () => leads.filter((lead) => matchesFilter(lead, activeFilter)),
+    [leads, activeFilter]
   );
+
+  const selectedLead = useMemo(
+    () => filteredLeads.find((lead) => lead.id === selectedId) ?? filteredLeads[0],
+    [filteredLeads, selectedId]
+  );
+
+  useEffect(() => {
+    if (!filteredLeads.some((lead) => lead.id === selectedId)) {
+      setSelectedId(filteredLeads[0]?.id);
+    }
+  }, [filteredLeads, selectedId]);
 
   function clearDemoLeads() {
     clearLocalLeads();
     const refreshed = readLocalLeads();
     setLeads(refreshed);
     setSelectedId(refreshed[0]?.id);
+  }
+
+  function updateLeadStatus(leadId: string, status: LeadStatus) {
+    setLeads((current) => {
+      const updated = current.map((lead) => (lead.id === leadId ? { ...lead, status } : lead));
+      replaceLocalLeads(updated);
+      return updated;
+    });
   }
 
   return (
@@ -40,7 +79,11 @@ export function AdminLeadDashboard() {
       </div>
 
       <div className="admin-metrics">
-        <Metric label="Solicitudes" value={String(leads.length)} />
+        <Metric label="Total de solicitudes" value={String(leads.length)} />
+        <Metric
+          label="Nuevas"
+          value={String(leads.filter((lead) => lead.status === "nueva").length)}
+        />
         <Metric
           label="Revision tecnica"
           value={String(leads.filter((lead) => lead.technicalRisk).length)}
@@ -51,9 +94,26 @@ export function AdminLeadDashboard() {
         />
       </div>
 
+      <div className="admin-filters" aria-label="Filtros de solicitudes">
+        {filters.map((filter) => (
+          <button
+            className={filter.id === activeFilter ? "filter-chip filter-chip-active" : "filter-chip"}
+            key={filter.id}
+            type="button"
+            onClick={() => setActiveFilter(filter.id)}
+          >
+            {filter.label}
+          </button>
+        ))}
+      </div>
+
       <div className="admin-grid">
-        <LeadTable leads={leads} selectedId={selectedLead?.id} onSelect={(lead) => setSelectedId(lead.id)} />
-        <LeadDetailCard lead={selectedLead} />
+        <LeadTable
+          leads={filteredLeads}
+          selectedId={selectedLead?.id}
+          onSelect={(lead) => setSelectedId(lead.id)}
+        />
+        <LeadDetailCard lead={selectedLead} onStatusChange={updateLeadStatus} />
       </div>
     </section>
   );
@@ -66,4 +126,32 @@ function Metric({ label, value }: { label: string; value: string }) {
       <strong>{value}</strong>
     </div>
   );
+}
+
+function matchesFilter(lead: CommercialLead, filter: LeadFilter) {
+  if (filter === "todas") {
+    return true;
+  }
+
+  if (filter === "nuevas") {
+    return lead.status === "nueva";
+  }
+
+  if (filter === "revision") {
+    return lead.technicalRisk;
+  }
+
+  if (filter === "alta") {
+    return lead.priority === "alta";
+  }
+
+  if (filter === "provisional") {
+    return lead.productFamilyId === "provisional";
+  }
+
+  if (filter === "definitiva") {
+    return lead.productFamilyId === "definitiva";
+  }
+
+  return lead.productFamilyId === "medida";
 }

@@ -25,6 +25,15 @@ export function saveLocalLead(lead: CommercialLead) {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify([lead, ...current]));
 }
 
+export function replaceLocalLeads(leads: CommercialLead[]) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const localLeads = leads.filter((lead) => lead.source === "local");
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(localLeads));
+}
+
 export function clearLocalLeads() {
   if (typeof window !== "undefined") {
     window.localStorage.removeItem(STORAGE_KEY);
