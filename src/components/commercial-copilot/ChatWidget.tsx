@@ -1,9 +1,12 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ClipboardCheck, MessageSquareText, RotateCcw, ShieldAlert, X } from "lucide-react";
 import { getConversationFlow } from "../../data/conversationFlows";
 import { controlledFaq } from "../../data/faq";
 import { classifyFamilyFromText } from "../../data/productFamilies";
-import { requestAiCopilot, type AiCopilotResponse } from "../../services/copilotAi";
+import { getAiHealth, isAiEnabled as readAiEnabled, setAiEnabled as persistAiEnabled } from "../../services/ai/aiClient";
+import { classifyLeadWithAi } from "../../services/ai/classifyLead";
+import { summarizeLeadWithAi } from "../../services/ai/summarizeLead";
+import type { AILeadClassification, AILeadSummary, AIProductFamily } from "../../types/ai";
 import type {
   ChatAction,
   ChatMessage,
@@ -17,6 +20,7 @@ import type {
 import { buildCommercialLead } from "../../utils/leadSummary";
 import { saveLocalLead } from "../../utils/localLeadStore";
 import { detectTechnicalRisk } from "../../utils/technicalRisk";
+import { logDemoEvent } from "../../utils/demoEvents";
 import { Button } from "../ui/Button";
 import { NeedSelector } from "./NeedSelector";
 import { ChatWindow } from "./ChatWindow";
@@ -42,6 +46,10 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
   const [lastCopied, setLastCopied] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
   const [aiStatus, setAiStatus] = useState<"idle" | "thinking" | "available" | "unavailable">("idle");
+  const [aiEnabled, setAiEnabledState] = useState(() => readAiEnabled());
+  const [aiHealthLabel, setAiHealthLabel] = useState("Comprobando IA...");
+  const [lastAiClassification, setLastAiClassification] = useState<AILeadClassification | undefined>();
+  const [activeAiClassification, setActiveAiClassification] = useState<AILeadClassification | undefined>();
 
   const currentStep = activeFlow?.steps[currentStepIndex];
   const placeholder =
@@ -50,6 +58,25 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
       : currentStep?.placeholder ?? "Escribe tu consulta o elige una opcion...";
 
   const isInFlow = Boolean(activeFlow && currentStep);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!aiEnabled) {
+      setAiHealthLabel("Usando respuestas locales");
+      return;
+    }
+
+    getAiHealth().then((health) => {
+      if (!cancelled) {
+        setAiHealthLabel(health.mode === "ai" ? "IA disponible" : "Modo demo sin IA");
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [aiEnabled]);
 
   const helperText = useMemo(() => {
     if (aiStatus === "thinking") {
@@ -64,12 +91,16 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
       return "IA opcional no configurada o no disponible; reglas y flujos controlados activos.";
     }
 
+    if (!aiEnabled) {
+      return "Modo local activado: solo reglas y flujos controlados.";
+    }
+
     if (!activeFlow) {
       return "Modo demo: reglas controladas, IA opcional y sin envio automatico.";
     }
 
     return `Cualificando: ${activeFlow.label}`;
-  }, [activeFlow, aiStatus]);
+  }, [activeFlow, aiEnabled, aiStatus]);
 
   async function handleSubmit(rawValue: string) {
     const value = rawValue.trim();
@@ -87,7 +118,7 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     appendUser(value || "No indicado");
 
     if (isInFlow && activeFlow && currentStep) {
-      handleStepAnswer(activeFlow, currentStep, value);
+      await handleStepAnswer(activeFlow, currentStep, value);
       return;
     }
 
@@ -98,7 +129,12 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     appendUser(action.label);
 
     if (action.value.startsWith("flow:")) {
-      startFlow(action.value.replace("flow:", "") as FlowId);
+      const flowId = action.value.replace("flow:", "") as FlowId;
+      const classificationForFlow =
+        lastAiClassification && resolveFlowFromClassification(lastAiClassification) === flowId
+          ? lastAiClassification
+          : undefined;
+      startFlow(flowId, classificationForFlow);
       return;
     }
 
@@ -116,8 +152,10 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
   async function handleFreeText(value: string) {
     setAiStatus("idle");
     const flags = detectTechnicalRisk(value);
+    const localFamily = classifyFamilyFromText(value);
 
-    if (flags.length > 0) {
+    if (flags.length > 0 && !aiEnabled) {
+      logDemoEvent("riesgo_tecnico_detectado", { mode: "local", flags });
       appendAssistant({
         text: `${technicalGuardrail}\n\nSi quieres, preparo una consulta tecnica documentada para el equipo de Protecciones Toledo.`,
         actions: [
@@ -148,44 +186,47 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
       return;
     }
 
-    const family = classifyFamilyFromText(value);
-
-    if (family) {
-      startFlow(family.id);
-      return;
-    }
-
-    setAiStatus("thinking");
-    const aiResponse = await requestAiCopilot({
-      message: value,
-      context: {
-        activeFlow: activeFlow?.id ?? null,
-        currentStep: currentStep?.id ?? null
+    if (!aiEnabled) {
+      if (localFamily) {
+        startFlow(localFamily.id);
+        return;
       }
-    });
 
-    if (aiResponse.available && aiResponse.answer) {
-      setAiStatus("available");
       appendAssistant({
-        text: buildAiAssistantText(aiResponse),
-        actions: buildAiActions(aiResponse)
+        text:
+          "Para orientar bien la consulta necesito clasificar la necesidad. El modo local esta activo, asi que continuo con los flujos controlados.",
+        actions: [
+          { label: "No se que necesito", value: "flow:desconocido", variant: "secondary" },
+          { label: "Solicitar presupuesto", value: "flow:presupuesto", variant: "primary" },
+          { label: "Documentacion o normativa", value: "flow:documentacion", variant: "warning" }
+        ]
       });
       return;
     }
 
-    setAiStatus("unavailable");
+    setAiStatus("thinking");
+    const aiResponse = await classifyLeadWithAi(value, {
+      activeFlow: activeFlow?.id ?? null,
+      currentStep: currentStep?.id ?? null,
+      localFamily: localFamily?.id ?? "",
+      localRiskFlags: flags
+    });
+
+    setLastAiClassification(aiResponse.data);
+
+    if (aiResponse.available) {
+      setAiStatus("available");
+    } else {
+      setAiStatus("unavailable");
+    }
+
     appendAssistant({
-      text:
-        "Para orientar bien la consulta necesito clasificar la necesidad. La IA opcional no esta configurada o no ha devuelto una clasificacion segura, asi que continuo con los flujos controlados. Puedes elegir una opcion o describir si se trata de proteccion provisional, definitiva, fijaciones, consumibles o una solucion a medida.",
-      actions: [
-        { label: "No se que necesito", value: "flow:desconocido", variant: "secondary" },
-        { label: "Solicitar presupuesto", value: "flow:presupuesto", variant: "primary" },
-        { label: "Documentacion o normativa", value: "flow:documentacion", variant: "warning" }
-      ]
+      text: buildAiAssistantText(aiResponse.data, aiResponse.available),
+      actions: buildAiActions(aiResponse.data)
     });
   }
 
-  function startFlow(flowId: FlowId) {
+  function startFlow(flowId: FlowId, aiClassification?: AILeadClassification) {
     const flow = getConversationFlow(flowId);
 
     if (!flow) {
@@ -194,16 +235,18 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
 
     setActiveFlow(flow);
     setCurrentStepIndex(0);
-    setDraft({ needType: flow.needType });
-    setTechnicalFlags(flow.technicalReviewRequired ? ["documentacion_tecnica"] : []);
+    setDraft({ needType: aiClassification?.needType ?? flow.needType });
+    setTechnicalFlags(flow.technicalReviewRequired || aiClassification?.requiresTechnicalReview ? ["documentacion_tecnica"] : []);
     setPrivacyShown(false);
+    setActiveAiClassification(aiClassification);
+    setAiStatus("idle");
 
     appendAssistant({
       text: `${flow.intro}\n\n${flow.steps[0].prompt}`
     });
   }
 
-  function handleStepAnswer(flow: ConversationFlow, step: ConversationStep, value: string) {
+  async function handleStepAnswer(flow: ConversationFlow, step: ConversationStep, value: string) {
     const validation = validateStep(step, value);
 
     if (!validation.valid) {
@@ -222,7 +265,7 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     const nextStep = flow.steps[nextIndex];
 
     if (!nextStep) {
-      completeFlow(flow, nextDraft, nextFlags);
+      await completeFlow(flow, nextDraft, nextFlags);
       return;
     }
 
@@ -237,14 +280,45 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     appendAssistant({ text: nextStep.prompt });
   }
 
-  function completeFlow(
+  async function completeFlow(
     flow: ConversationFlow,
     completedDraft: LeadDraft,
     completedFlags: TechnicalRiskFlag[]
   ) {
-    const lead = buildCommercialLead(completedDraft, flow, completedFlags);
+    setAiStatus(aiEnabled ? "thinking" : "idle");
+    const baseLead = buildCommercialLead(completedDraft, flow, completedFlags);
+    let lead: CommercialLead = {
+      ...baseLead,
+      aiClassification: activeAiClassification,
+      extractedLeadData: activeAiClassification?.extractedData,
+      priority: activeAiClassification?.priority ?? baseLead.priority,
+      technicalRisk: baseLead.technicalRisk || Boolean(activeAiClassification?.requiresTechnicalReview),
+      summary: {
+        ...baseLead.summary,
+        priority: activeAiClassification?.priority ?? baseLead.summary.priority,
+        requiresTechnicalReview:
+          baseLead.summary.requiresTechnicalReview || Boolean(activeAiClassification?.requiresTechnicalReview)
+      }
+    };
+
+    const summaryResult = await summarizeLeadWithAi(lead);
+    const aiSummary = summaryResult.data;
+    lead = {
+      ...lead,
+      aiSummary,
+      aiSummarySource: summaryResult.available ? "ai" : "local",
+      aiGeneratedAt: summaryResult.available ? new Date().toISOString() : undefined,
+      summaryText: buildLeadSummaryText(lead.summaryText, aiSummary, summaryResult.available)
+    } as CommercialLead;
+
     saveLocalLead(lead);
     onLeadGenerated?.(lead);
+    logDemoEvent("lead_generado", {
+      leadId: lead.id,
+      aiSummary: summaryResult.available,
+      technicalRisk: lead.technicalRisk
+    });
+    logDemoEvent("solicitud_enviada_demo", { leadId: lead.id });
 
     appendAssistant({
       text:
@@ -261,7 +335,18 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     setDraft({});
     setTechnicalFlags([]);
     setPrivacyShown(false);
-    setAiStatus("idle");
+    setActiveAiClassification(undefined);
+    setAiStatus(summaryResult.available ? "available" : "unavailable");
+  }
+
+  function toggleAiMode() {
+    const next = !aiEnabled;
+    persistAiEnabled(next);
+    setAiEnabledState(next);
+    setAiStatus(next ? "idle" : "unavailable");
+    logDemoEvent(next ? "consulta_clasificada" : "fallback_activado", {
+      reason: next ? "ai_enabled_by_user" : "ai_disabled_by_user"
+    });
   }
 
   function restart() {
@@ -271,6 +356,8 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     setDraft({});
     setTechnicalFlags([]);
     setPrivacyShown(false);
+    setLastAiClassification(undefined);
+    setActiveAiClassification(undefined);
     setAiStatus("idle");
   }
 
@@ -326,6 +413,9 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
             <RotateCcw size={16} aria-hidden="true" />
             Reiniciar
           </Button>
+          <Button variant="ghost" onClick={toggleAiMode}>
+            {aiEnabled ? "IA asistida" : "Modo local"}
+          </Button>
           <Button variant="ghost" onClick={() => setIsOpen(false)}>
             <X size={16} aria-hidden="true" />
             Cerrar
@@ -352,6 +442,9 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
 
       <footer className="copilot-footer">
         <span>{helperText}</span>
+        <span className={`ai-status-pill ${aiHealthLabel === "IA disponible" ? "ai-status-on" : ""}`}>
+          {aiHealthLabel}
+        </span>
         {lastCopied && (
           <span className="copy-confirmation">
             <ClipboardCheck size={15} aria-hidden="true" />
@@ -402,31 +495,39 @@ function isContactStep(step: ConversationStep) {
   return ["name", "company", "email", "phone"].includes(step.field);
 }
 
-function buildAiAssistantText(response: AiCopilotResponse) {
+function buildAiAssistantText(classification: AILeadClassification, generatedWithAi: boolean) {
   const sections = [
-    response.answer?.trim() ||
+    classification.suggestedReply ||
       "He analizado la consulta, pero conviene continuar con un flujo guiado para recoger datos utiles."
   ];
 
-  if (response.nextAction) {
-    sections.push(`Siguiente paso sugerido: ${response.nextAction}`);
+  sections.push(
+    generatedWithAi
+      ? "Clasificacion automatica generada con IA asistida y validacion local."
+      : "Fallback local aplicado: usando reglas de demo y flujos controlados."
+  );
+
+  if (classification.confidence < 0.45) {
+    sections.push("La clasificacion es orientativa porque la consulta es ambigua.");
   }
 
-  if (response.requiresTechnicalReview) {
+  if (classification.suggestedNextQuestion) {
+    sections.push(`Pregunta sugerida: ${classification.suggestedNextQuestion}`);
+  }
+
+  if (classification.requiresTechnicalReview) {
     sections.push("Esta consulta queda marcada como revision tecnica necesaria antes de confirmar una solucion.");
   }
 
-  if (response.technicalWarnings?.length) {
-    sections.push(`Advertencias: ${response.technicalWarnings.slice(0, 3).join(" ")}`);
+  if (classification.safetyWarning) {
+    sections.push(`Aviso: ${classification.safetyWarning}`);
   }
 
   return sections.join("\n\n");
 }
 
-function buildAiActions(response: AiCopilotResponse): ChatAction[] {
-  const suggestedFlowId = response.requiresTechnicalReview
-    ? "documentacion"
-    : getSafeFlowId(response.suggestedFlowId);
+function buildAiActions(classification: AILeadClassification): ChatAction[] {
+  const suggestedFlowId = resolveFlowFromClassification(classification);
   const actions: ChatAction[] = [];
 
   if (suggestedFlowId) {
@@ -434,7 +535,7 @@ function buildAiActions(response: AiCopilotResponse): ChatAction[] {
     actions.push({
       label: flow ? `Iniciar: ${flow.label}` : "Iniciar flujo recomendado",
       value: `flow:${suggestedFlowId}`,
-      variant: response.requiresTechnicalReview ? "warning" : "primary"
+      variant: classification.requiresTechnicalReview ? "warning" : "primary"
     });
   }
 
@@ -447,12 +548,57 @@ function buildAiActions(response: AiCopilotResponse): ChatAction[] {
   return actions;
 }
 
-function getSafeFlowId(value: AiCopilotResponse["suggestedFlowId"]): FlowId | undefined {
-  if (!value || value === "none") {
-    return undefined;
+function resolveFlowFromClassification(classification: AILeadClassification): FlowId {
+  if (
+    classification.requiresTechnicalReview ||
+    classification.family === "documentacion_normativa" ||
+    classification.intent === "preguntar_normativa" ||
+    classification.intent === "preguntar_instalacion" ||
+    classification.intent === "pedir_documentacion" ||
+    classification.intent === "soporte_tecnico"
+  ) {
+    return "documentacion";
   }
 
-  return getConversationFlow(value) ? value : undefined;
+  if (classification.intent === "solicitar_presupuesto") {
+    return "presupuesto";
+  }
+
+  if (classification.intent === "no_sabe_que_necesita" || classification.confidence < 0.42) {
+    return "desconocido";
+  }
+
+  const familyMap: Record<AIProductFamily, FlowId> = {
+    proteccion_provisional: "provisional",
+    proteccion_definitiva: "definitiva",
+    bases_casquillos: "bases-casquillos",
+    auxiliares: "auxiliares",
+    consumibles: "consumibles",
+    solucion_medida: "medida",
+    documentacion_normativa: "documentacion",
+    desconocida: "desconocido"
+  };
+
+  return familyMap[classification.family];
+}
+
+function buildLeadSummaryText(
+  localSummaryText: string,
+  aiSummary: AILeadSummary,
+  generatedWithAi: boolean
+) {
+  return [
+    localSummaryText,
+    "",
+    generatedWithAi ? "Resumen generado con IA:" : "Resumen complementario local:",
+    `- Titulo: ${aiSummary.title}`,
+    `- Resumen comercial: ${aiSummary.commercialSummary}`,
+    `- Notas tecnicas: ${aiSummary.technicalNotes}`,
+    `- Informacion pendiente: ${
+      aiSummary.missingInformation.length > 0 ? aiSummary.missingInformation.join(", ") : "No indicada"
+    }`,
+    `- Motivo de prioridad: ${aiSummary.priorityReason}`
+  ].join("\n");
 }
 
 function normalize(value: string) {

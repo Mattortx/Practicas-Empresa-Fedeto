@@ -115,6 +115,12 @@ export interface CommercialLead {
   summary: LeadSummary;
   summaryText: string;
   source: "demo" | "local";
+  aiClassification?: import("./ai").AILeadClassification;
+  aiSummary?: import("./ai").AILeadSummary;
+  aiSummarySource?: "ai" | "local";
+  extractedLeadData?: import("./ai").ExtractedLeadData;
+  aiCommercialReply?: import("./ai").AICommercialReply;
+  aiGeneratedAt?: string;
 }
 
 export interface ChatAction {

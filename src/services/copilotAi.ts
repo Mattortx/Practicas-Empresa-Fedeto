@@ -1,8 +1,9 @@
+import { classifyLeadWithAi } from "./ai/classifyLead";
 import type { FlowId, ProductFamilyId } from "../types/commercialCopilot";
 
 export interface AiCopilotResponse {
   available: boolean;
-  mode?: "ai" | "rules";
+  mode?: "ai" | "local" | "rules";
   model?: string;
   reason?: string;
   error?: string;
@@ -25,39 +26,60 @@ export async function requestAiCopilot({
   message,
   context = {}
 }: AiCopilotRequest): Promise<AiCopilotResponse> {
-  const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), 8000);
+  const result = await classifyLeadWithAi(message, context);
+  const classification = result.data;
 
-  try {
-    const response = await fetch("/api/copilot", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ message, context }),
-      signal: controller.signal
-    });
+  return {
+    available: result.available,
+    mode: result.mode,
+    model: result.model,
+    reason: result.reason,
+    error: result.error,
+    intent: classification.intent,
+    productFamilyId: mapProductFamily(classification.family),
+    suggestedFlowId: resolveSuggestedFlow(classification),
+    requiresTechnicalReview: classification.requiresTechnicalReview,
+    confidence: classification.confidence,
+    answer: classification.suggestedReply,
+    nextAction: classification.suggestedNextQuestion,
+    technicalWarnings: classification.safetyWarning ? [classification.safetyWarning] : []
+  };
+}
 
-    const payload = (await response.json()) as AiCopilotResponse;
+function mapProductFamily(family: string): ProductFamilyId | "none" {
+  const map: Record<string, ProductFamilyId | "none"> = {
+    proteccion_provisional: "provisional",
+    proteccion_definitiva: "definitiva",
+    bases_casquillos: "bases-casquillos",
+    auxiliares: "auxiliares",
+    consumibles: "consumibles",
+    solucion_medida: "medida",
+    documentacion_normativa: "none",
+    desconocida: "none"
+  };
 
-    if (!response.ok) {
-      return {
-        available: false,
-        mode: "rules",
-        error: payload.error ?? "api_error",
-        answer: payload.answer
-      };
-    }
+  return map[family] ?? "none";
+}
 
-    return payload;
-  } catch {
-    return {
-      available: false,
-      mode: "rules",
-      error: "api_unavailable",
-      answer: "IA no disponible en este momento."
-    };
-  } finally {
-    window.clearTimeout(timeout);
+function resolveSuggestedFlow(classification: {
+  family: string;
+  intent: string;
+  confidence: number;
+  requiresTechnicalReview: boolean;
+}): FlowId | "none" {
+  if (classification.requiresTechnicalReview || classification.family === "documentacion_normativa") {
+    return "documentacion";
   }
+
+  if (classification.intent === "solicitar_presupuesto") {
+    return "presupuesto";
+  }
+
+  if (classification.confidence < 0.42) {
+    return "desconocido";
+  }
+
+  return mapProductFamily(classification.family) === "none"
+    ? "desconocido"
+    : (mapProductFamily(classification.family) as FlowId);
 }

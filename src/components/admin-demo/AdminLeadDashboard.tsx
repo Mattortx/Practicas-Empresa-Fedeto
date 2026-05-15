@@ -61,6 +61,14 @@ export function AdminLeadDashboard() {
     });
   }
 
+  function updateLead(updatedLead: CommercialLead) {
+    setLeads((current) => {
+      const updated = current.map((lead) => (lead.id === updatedLead.id ? updatedLead : lead));
+      replaceLocalLeads(updated);
+      return updated;
+    });
+  }
+
   return (
     <section className="admin-dashboard">
       <div className="admin-toolbar">
@@ -113,7 +121,11 @@ export function AdminLeadDashboard() {
           selectedId={selectedLead?.id}
           onSelect={(lead) => setSelectedId(lead.id)}
         />
-        <LeadDetailCard lead={selectedLead} onStatusChange={updateLeadStatus} />
+        <LeadDetailCard
+          lead={selectedLead}
+          onStatusChange={updateLeadStatus}
+          onLeadUpdate={updateLead}
+        />
       </div>
     </section>
   );
