@@ -438,9 +438,14 @@ p {
 
 .copilot-header-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
   gap: 8px;
   justify-content: flex-end;
+}
+
+.copilot-header-actions .button {
+  white-space: nowrap;
 }
 
 .copilot-header h2 {
