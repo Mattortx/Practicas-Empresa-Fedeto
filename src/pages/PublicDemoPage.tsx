@@ -21,6 +21,15 @@ const valueItems = [
   "Reduccion de consultas incompletas."
 ];
 
+const technicalStripItems = [
+  "Fabricacion propia",
+  "Proteccion colectiva",
+  "Obra y mantenimiento",
+  "Cubiertas tecnicas",
+  "Documentacion tecnica",
+  "Soluciones a medida"
+];
+
 export function PublicDemoPage() {
   return (
     <main className="public-page">
@@ -43,12 +52,35 @@ export function PublicDemoPage() {
               Ver panel comercial demo
             </a>
           </div>
+          <div className="hero-proof-grid" aria-label="Indicadores de la demo">
+            <span>IA opcional</span>
+            <span>Fallback local</span>
+            <span>Panel interno</span>
+          </div>
         </div>
 
         <div className="hero-visual" aria-label="Esquema del copiloto comercial">
           <div className="visual-header">
             <Factory size={22} aria-hidden="true" />
             <span>Flujo comercial tecnico</span>
+          </div>
+          <div className="industrial-scene" aria-hidden="true">
+            <div className="scene-roof">
+              <span className="scene-post scene-post-left" />
+              <span className="scene-post scene-post-center" />
+              <span className="scene-post scene-post-right" />
+              <span className="scene-rail scene-rail-top" />
+              <span className="scene-rail scene-rail-mid" />
+              <span className="scene-toeboard" />
+            </div>
+            <div className="scene-panel scene-panel-left">
+              <strong>Alta</strong>
+              <span>Prioridad</span>
+            </div>
+            <div className="scene-panel scene-panel-right">
+              <strong>Si</strong>
+              <span>Revision</span>
+            </div>
           </div>
           <ol>
             <li>
@@ -69,6 +101,12 @@ export function PublicDemoPage() {
             </li>
           </ol>
         </div>
+      </section>
+
+      <section className="technical-strip" aria-label="Contexto industrial de la demo">
+        {technicalStripItems.map((item) => (
+          <span key={item}>{item}</span>
+        ))}
       </section>
 
       <section className="value-section">
