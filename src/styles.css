@@ -860,15 +860,18 @@ p {
 .family-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  gap: 16px;
 }
 
 .family-card {
-  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  min-height: 282px;
   padding: 18px;
   position: relative;
   overflow: hidden;
   border-top: 4px solid var(--slate);
+  isolation: isolate;
 }
 
 .family-card::before {
@@ -887,13 +890,15 @@ p {
 
 .family-card::after {
   position: absolute;
-  right: 14px;
-  bottom: 12px;
-  width: 48px;
-  height: 48px;
-  border: 1px solid rgba(51, 65, 85, 0.1);
-  border-radius: 50%;
+  top: 18px;
+  right: 18px;
+  width: 44px;
+  height: 2px;
+  border: 0;
+  border-radius: 999px;
+  background: currentColor;
   content: "";
+  opacity: 0.28;
 }
 
 .family-card:hover::before {
@@ -904,18 +909,48 @@ p {
   display: block;
   margin-bottom: 10px;
   color: #18212b;
-  font-size: 1.08rem;
+  font-size: 1.14rem;
+  line-height: 1.22;
 }
 
 .family-card p {
   margin-bottom: 14px;
 }
 
+.family-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-right: 56px;
+}
+
+.family-card-top span:first-child {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 8px;
+  border: 1px solid rgba(51, 65, 85, 0.14);
+  border-radius: 999px;
+  background: #f8fafb;
+  color: #42505d;
+  font-size: 0.73rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.family-card-top span:last-child {
+  color: currentColor;
+  font-size: 0.9rem;
+  font-weight: 950;
+}
+
 .family-subcategory-list {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .family-subcategory-list span {
@@ -934,6 +969,29 @@ p {
 .family-card:hover .family-subcategory-list span {
   border-color: rgba(51, 65, 85, 0.24);
   background: #ffffff;
+}
+
+.family-card-data {
+  display: grid;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #e4eaee;
+}
+
+.family-card-data span {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.family-card-data p {
+  margin: 0;
+  color: #334155;
+  font-size: 0.86rem;
+  font-weight: 780;
+  line-height: 1.45;
 }
 
 .family-card small {

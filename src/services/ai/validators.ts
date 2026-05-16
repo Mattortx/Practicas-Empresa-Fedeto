@@ -49,7 +49,7 @@ export function validateAIClassification(value: unknown): AILeadClassification |
     missingFields: stringArray(value.missingFields),
     suggestedNextQuestion: stringValue(
       value.suggestedNextQuestion,
-      "Puede indicar si la solucion debe ser temporal o permanente?"
+      "¿Puede indicar si la solución debe ser temporal o permanente?"
     ),
     suggestedReply: stringValue(
       value.suggestedReply,
@@ -69,7 +69,7 @@ export function validateAILeadSummary(value: unknown): AILeadSummary | null {
   return {
     title: stringValue(value.title, "Solicitud comercial"),
     commercialSummary: stringValue(value.commercialSummary, "Resumen pendiente de completar."),
-    technicalNotes: stringValue(value.technicalNotes, "Sin notas tecnicas adicionales."),
+    technicalNotes: stringValue(value.technicalNotes, "Sin notas técnicas adicionales."),
     recommendedNextAction: stringValue(value.recommendedNextAction, "Contactar con el cliente."),
     missingInformation: stringArray(value.missingInformation),
     riskFlags: stringArray(value.riskFlags),
@@ -85,8 +85,8 @@ export function validateAITechnicalRisk(value: unknown): AITechnicalRiskResult |
   return {
     requiresTechnicalReview: Boolean(value.requiresTechnicalReview),
     riskFlags: stringArray(value.riskFlags),
-    reason: stringValue(value.reason, "Revision prudente requerida."),
-    safeReply: stringValue(value.safeReply, "Puedo recoger la consulta para revision tecnica."),
+    reason: stringValue(value.reason, "Revisión prudente requerida."),
+    safeReply: stringValue(value.safeReply, "Puedo recoger la consulta para revisión técnica."),
     promptInjectionDetected: Boolean(value.promptInjectionDetected)
   };
 }

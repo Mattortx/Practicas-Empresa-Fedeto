@@ -16,7 +16,7 @@ interface LeadDetailCardProps {
 
 const statusOptions: Array<{ value: LeadStatus; label: string }> = [
   { value: "nueva", label: "Nueva" },
-  { value: "pendiente_revision_tecnica", label: "Pendiente revision tecnica" },
+  { value: "pendiente_revision_tecnica", label: "Pendiente revisión técnica" },
   { value: "pendiente_contacto_comercial", label: "Pendiente contacto comercial" },
   { value: "cerrada_demo", label: "Cerrada en demo" }
 ];
@@ -121,10 +121,10 @@ export function LeadDetailCard({ lead, onStatusChange, onLeadUpdate }: LeadDetai
         <Badge tone={lead.source === "demo" ? "neutral" : "blue"}>
           {lead.source === "demo" ? "Dato simulado" : "Generada por el copiloto"}
         </Badge>
-        {lead.aiClassification && <Badge tone="blue">Clasificacion automatica</Badge>}
+        {lead.aiClassification && <Badge tone="blue">Clasificación automática</Badge>}
         {lead.aiSummarySource === "ai" && <Badge tone="green">Resumen generado con IA</Badge>}
         {lead.technicalRisk && (
-          <Badge tone="orange">Revision tecnica necesaria</Badge>
+          <Badge tone="orange">Revisión técnica necesaria</Badge>
         )}
       </div>
 
@@ -153,7 +153,7 @@ export function LeadDetailCard({ lead, onStatusChange, onLeadUpdate }: LeadDetai
         </Button>
         <Button variant="ghost" onClick={markTechnicalReview}>
           <ShieldAlert size={16} aria-hidden="true" />
-          Marcar revision tecnica
+          Marcar revisión técnica
         </Button>
       </div>
 
@@ -161,20 +161,20 @@ export function LeadDetailCard({ lead, onStatusChange, onLeadUpdate }: LeadDetai
         <Info label="Cliente" value={lead.summary.name} />
         <Info label="Empresa" value={lead.summary.company} />
         <Info label="Correo" value={lead.summary.email} />
-        <Info label="Telefono" value={lead.summary.phone} />
+        <Info label="Teléfono" value={lead.summary.phone} />
         <div className="info-pair">
           <span>Familia</span>
           <strong>
             <LeadFamilyBadge familyId={lead.productFamilyId} label={lead.summary.productFamily} />
           </strong>
         </div>
-        <Info label="Subcategoria / enfoque" value={lead.summary.subcategory ?? "Por determinar"} />
+        <Info label="Subcategoría / enfoque" value={lead.summary.subcategory ?? "Por determinar"} />
         <Info label="Necesidad" value={lead.summary.needType} />
         <Info label="Urgencia" value={lead.summary.urgency} />
-        <Info label="Revision tecnica" value={lead.technicalRisk ? "Si" : "No"} />
-        <Info label="Ubicacion" value={lead.summary.location} />
+        <Info label="Revisión técnica" value={lead.technicalRisk ? "Sí" : "No"} />
+        <Info label="Ubicación" value={lead.summary.location} />
         <Info
-          label="Senales detectadas"
+          label="Señales detectadas"
           value={
             lead.summary.detectedSignals && lead.summary.detectedSignals.length > 0
               ? lead.summary.detectedSignals.join(" | ")
@@ -208,7 +208,7 @@ export function LeadDetailCard({ lead, onStatusChange, onLeadUpdate }: LeadDetai
         <div className="technical-risk-panel">
           <ShieldAlert size={18} aria-hidden="true" />
           <div>
-            <strong>Consulta tecnica sensible</strong>
+            <strong>Consulta técnica sensible</strong>
             <p>
               Revisar documentacion, soporte, uso previsto y requisitos aplicables antes de
               responder al cliente.
@@ -239,7 +239,7 @@ export function LeadDetailCard({ lead, onStatusChange, onLeadUpdate }: LeadDetai
           <p>{lead.aiSummary.commercialSummary}</p>
           <dl>
             <div>
-              <dt>Notas tecnicas</dt>
+              <dt>Notas técnicas</dt>
               <dd>{lead.aiSummary.technicalNotes}</dd>
             </div>
             <div>
@@ -251,7 +251,7 @@ export function LeadDetailCard({ lead, onStatusChange, onLeadUpdate }: LeadDetai
               </dd>
             </div>
             <div>
-              <dt>Siguiente accion</dt>
+              <dt>Siguiente acción</dt>
               <dd>{lead.aiSummary.recommendedNextAction}</dd>
             </div>
             <div>

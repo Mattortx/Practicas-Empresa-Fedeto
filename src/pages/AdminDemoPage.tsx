@@ -8,7 +8,7 @@ export function AdminDemoPage() {
       <header className="admin-page-header">
         <a className="button button-secondary" href="/">
           <ArrowLeft size={17} aria-hidden="true" />
-          Vista publica
+          Vista pública
         </a>
         <span>
           <DatabaseZap size={17} aria-hidden="true" />
@@ -17,7 +17,7 @@ export function AdminDemoPage() {
       </header>
 
       <Notice tone="info">
-        <strong>Vista simulada para demo de practicas.</strong> Esta vista no tiene autenticacion
+        <strong>Vista simulada para demo de prácticas.</strong> Esta vista no tiene autenticación
         real. Las solicitudes locales se guardan en el navegador mediante localStorage.
       </Notice>
 

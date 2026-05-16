@@ -3,6 +3,13 @@ import { ClipboardCheck, MessageSquareText, RotateCcw, ShieldAlert, X } from "lu
 import { getConversationFlow } from "../../data/conversationFlows";
 import { controlledFaq } from "../../data/faq";
 import { classifyFamilyFromText } from "../../data/productFamilies";
+import {
+  getCommercialResponse,
+  getContextualPromptNotes,
+  getTechnicalSensitiveReply,
+  privacyNotice,
+  technicalGuardrail
+} from "../../data/responseLibrary";
 import { getAiHealth, isAiEnabled as readAiEnabled, setAiEnabled as persistAiEnabled } from "../../services/ai/aiClient";
 import { classifyLeadWithAi } from "../../services/ai/classifyLead";
 import { summarizeLeadWithAi } from "../../services/ai/summarizeLead";
@@ -26,12 +33,6 @@ import { NeedSelector } from "./NeedSelector";
 import { ChatWindow } from "./ChatWindow";
 import { buildDeepOrientationReply, buildFlowStartMessage } from "../../utils/commercialDepth";
 
-const privacyNotice =
-  "Los datos introducidos se utilizaran unicamente para preparar una solicitud comercial en esta demo. No introduzca informacion sensible. La solucion definitiva debera ser revisada por el equipo tecnico de la empresa.";
-
-const technicalGuardrail =
-  "Puedo orientar de forma general, pero no confirmo normativa, certificados, ensayos, resistencias, calculos ni instrucciones de montaje. Para confirmar la solucion adecuada, el equipo tecnico debe revisar soporte, uso previsto y documentacion oficial.";
-
 const quickDemoCases = [
   {
     label: "Obra provisional",
@@ -51,7 +52,7 @@ const quickDemoCases = [
   },
   {
     label: "No lo tengo claro",
-    text: "No se que necesito, tengo una zona elevada en una nave."
+    text: "No sé qué necesito, tengo una zona elevada en una nave."
   }
 ];
 
@@ -79,7 +80,7 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
   const placeholder =
     aiStatus === "thinking"
       ? "Analizando consulta..."
-      : currentStep?.placeholder ?? "Escribe tu consulta o elige una opcion...";
+      : currentStep?.placeholder ?? "Escribe tu consulta o elige una opción...";
 
   const isInFlow = Boolean(activeFlow && currentStep);
   const qualificationState = useMemo(
@@ -108,11 +109,11 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
 
   const helperText = useMemo(() => {
     if (aiStatus === "thinking") {
-      return "IA opcional analizando la consulta. Los guardrails tecnicos siguen activos.";
+      return "IA opcional analizando la consulta. Los guardrails técnicos siguen activos.";
     }
 
     if (aiStatus === "available") {
-      return "IA opcional activa para texto libre; la cualificacion comercial sigue con flujos controlados.";
+      return "IA opcional activa para texto libre; la cualificación comercial sigue con flujos controlados.";
     }
 
     if (aiStatus === "unavailable") {
@@ -124,7 +125,7 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     }
 
     if (!activeFlow) {
-      return "Modo demo: reglas controladas, IA opcional y sin envio automatico.";
+      return "Modo demo: reglas controladas, IA opcional y sin envío automático.";
     }
 
     return `Cualificando: ${activeFlow.label}`;
@@ -188,10 +189,10 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     if (flags.length > 0 && !aiEnabled) {
       logDemoEvent("riesgo_tecnico_detectado", { mode: "local", flags });
       appendAssistant({
-        text: `${technicalGuardrail}\n\nSi quieres, preparo una consulta tecnica documentada para el equipo de Protecciones Toledo.`,
+        text: `${technicalGuardrail}\n\n${getTechnicalSensitiveReply(flags)}\n\nSi quieres, preparo una consulta técnica documentada para el equipo de Protecciones Toledo.`,
         actions: [
-          { label: "Preparar consulta tecnica", value: "flow:documentacion", variant: "warning" },
-          { label: "Volver al menu", value: "restart", variant: "secondary" }
+          { label: "Preparar consulta técnica", value: "flow:documentacion", variant: "warning" },
+          { label: "Volver al menú", value: "restart", variant: "secondary" }
         ]
       });
       return;
@@ -224,12 +225,11 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
       }
 
       appendAssistant({
-        text:
-          "Para orientar bien la consulta necesito clasificar la necesidad. El modo local esta activo, asi que continuo con los flujos controlados.",
+        text: getCommercialResponse("ambiguousLocal", value),
         actions: [
-          { label: "No se que necesito", value: "flow:desconocido", variant: "secondary" },
+          { label: "No sé qué necesito", value: "flow:desconocido", variant: "secondary" },
           { label: "Solicitar presupuesto", value: "flow:presupuesto", variant: "primary" },
-          { label: "Documentacion o normativa", value: "flow:documentacion", variant: "warning" }
+          { label: "Documentación o normativa", value: "flow:documentacion", variant: "warning" }
         ]
       });
       return;
@@ -374,10 +374,10 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     appendAssistant({
       text:
         [
-          "Solicitud comercial preparada.",
+          getCommercialResponse("summaryReady", lead.id),
           `Familia: ${lead.productFamilyLabel}.`,
           `Prioridad: ${lead.priority}.`,
-          `Revision tecnica: ${lead.technicalRisk ? "Si" : "No"}.`,
+          `Revisión técnica: ${lead.technicalRisk ? "Sí" : "No"}.`,
           "En esta prueba de concepto se conserva solo de forma local o simulada."
         ].join("\n"),
       lead,
@@ -424,7 +424,7 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
       setLastCopied(true);
       window.setTimeout(() => setLastCopied(false), 1800);
     } catch {
-      appendAssistant({ text: "No he podido copiar automaticamente. Puedes seleccionar el resumen manualmente." });
+      appendAssistant({ text: getCommercialResponse("copyError") });
     }
   }
 
@@ -487,9 +487,9 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
 
       <NeedSelector onSelect={handleAction} />
 
-      <div className="quick-demo-panel" aria-label="Casos rapidos de prueba">
+      <div className="quick-demo-panel" aria-label="Casos rápidos de prueba">
         <div>
-          <span>Casos rapidos</span>
+          <span>Casos rápidos</span>
           <strong>Simular consulta</strong>
         </div>
         <div className="quick-demo-actions">
@@ -506,7 +506,7 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
         </div>
       </div>
 
-      <div className="qualification-panel" aria-label="Estado de cualificacion comercial">
+      <div className="qualification-panel" aria-label="Estado de cualificación comercial">
         <div className="qualification-item">
           <span>Estado</span>
           <strong>{qualificationState.stage}</strong>
@@ -520,7 +520,7 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
           <strong>{qualificationState.priority}</strong>
         </div>
         <div className={`qualification-item ${qualificationState.technicalReview ? "qualification-warning" : ""}`}>
-          <span>Revision tecnica</span>
+          <span>Revisión técnica</span>
           <strong>{qualificationState.technicalReview ? "Necesaria" : "No marcada"}</strong>
         </div>
       </div>
@@ -556,11 +556,11 @@ function welcomeMessage(): ChatMessage {
     id: crypto.randomUUID(),
     role: "assistant",
     text:
-      "Hola. Soy el copiloto comercial de Protecciones Toledo. Puedo ayudarte a orientar tu consulta sobre sistemas de proteccion de borde, bases, casquillos, auxiliares, consumibles o soluciones a medida. Para una solucion definitiva, el equipo tecnico debera revisar los datos de obra y la documentacion correspondiente.",
+      "Hola. Soy el copiloto comercial de Protecciones Toledo. Puedo ayudarte a orientar tu consulta sobre sistemas de protección de borde, bases, casquillos, auxiliares, consumibles o soluciones a medida. Para una solución definitiva, el equipo técnico deberá revisar los datos de obra y la documentación correspondiente.",
     actions: [
       { label: "Solicitar presupuesto", value: "flow:presupuesto", variant: "primary" },
-      { label: "No se que necesito", value: "flow:desconocido", variant: "secondary" },
-      { label: "Documentacion o normativa", value: "flow:documentacion", variant: "warning" }
+      { label: "No sé qué necesito", value: "flow:desconocido", variant: "secondary" },
+      { label: "Documentación o normativa", value: "flow:documentacion", variant: "warning" }
     ]
   };
 }
@@ -569,7 +569,7 @@ function validateStep(step: ConversationStep, rawValue: string) {
   const value = rawValue.trim();
 
   if (step.required !== false && !value) {
-    return { valid: false as const, error: "Necesito este dato para preparar un resumen comercial util." };
+    return { valid: false as const, error: getCommercialResponse("requiredField", step.id) };
   }
 
   if (!value && step.required === false) {
@@ -579,7 +579,7 @@ function validateStep(step: ConversationStep, rawValue: string) {
   if (step.field === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
     return {
       valid: false as const,
-      error: "El correo no parece valido. Escribelo con formato nombre@empresa.com."
+      error: "El correo no parece válido. Escríbelo con formato nombre@empresa.com."
     };
   }
 
@@ -598,34 +598,7 @@ function buildContextualStepPrompt(
 ) {
   const notes: string[] = [];
   const text = normalize(Object.values(draft).filter(Boolean).join(" "));
-
-  if (step.field === "canDrill" && (text.includes("cubierta") || text.includes("terraza"))) {
-    notes.push(
-      "Como se ha mencionado una cubierta o terraza, este dato es importante para no proponer una orientacion tecnica cerrada sin revisar el soporte."
-    );
-  }
-
-  if (step.field === "approximateLength" && (flow.id === "provisional" || flow.id === "definitiva")) {
-    notes.push(
-      "La longitud no se usa aqui para calcular una solucion, sino para dimensionar comercialmente la consulta y valorar su alcance."
-    );
-  }
-
-  if (step.field === "quantity" && (flow.id === "bases-casquillos" || flow.id === "consumibles")) {
-    notes.push("La cantidad ayuda a priorizar la respuesta comercial y preparar una estimacion de suministro.");
-  }
-
-  if (step.field === "observations" && flags.length > 0) {
-    notes.push(
-      "La consulta incluye elementos tecnicos sensibles; anade solo contexto de obra, referencias o documentacion disponible, sin datos sensibles."
-    );
-  }
-
-  if (step.field === "documentationAvailable" && flow.id === "medida") {
-    notes.push(
-      "En soluciones a medida, planos o fotografias ayudan al equipo a revisar la viabilidad sin que el copiloto tenga que inventar detalles."
-    );
-  }
+  notes.push(...getContextualPromptNotes(flow.id, step.field, text, flags));
 
   return notes.length > 0 ? `${notes.join("\n\n")}\n\n${step.prompt}` : step.prompt;
 }
@@ -655,7 +628,7 @@ function buildAiActions(classification: AILeadClassification): ChatAction[] {
     actions.push({ label: "Solicitar presupuesto", value: "flow:presupuesto", variant: "secondary" });
   }
 
-  actions.push({ label: "Volver al menu", value: "restart", variant: "secondary" });
+  actions.push({ label: "Volver al menú", value: "restart", variant: "secondary" });
 
   return actions;
 }
@@ -732,13 +705,13 @@ function buildQualificationState(
 
 function aiFamilyLabel(family: AIProductFamily) {
   const labels: Record<AIProductFamily, string> = {
-    proteccion_provisional: "Proteccion provisional",
-    proteccion_definitiva: "Proteccion definitiva",
+    proteccion_provisional: "Protección provisional",
+    proteccion_definitiva: "Protección definitiva",
     bases_casquillos: "Bases y casquillos",
     auxiliares: "Auxiliares",
     consumibles: "Consumibles",
-    solucion_medida: "Solucion a medida",
-    documentacion_normativa: "Documentacion o normativa",
+    solucion_medida: "Solución a medida",
+    documentacion_normativa: "Documentación o normativa",
     desconocida: "Por determinar"
   };
 
@@ -754,10 +727,10 @@ function buildLeadSummaryText(
     localSummaryText,
     "",
     generatedWithAi ? "Resumen generado con IA:" : "Resumen complementario local:",
-    `- Titulo: ${aiSummary.title}`,
+    `- Título: ${aiSummary.title}`,
     `- Resumen comercial: ${aiSummary.commercialSummary}`,
-    `- Notas tecnicas: ${aiSummary.technicalNotes}`,
-    `- Informacion pendiente: ${
+    `- Notas técnicas: ${aiSummary.technicalNotes}`,
+    `- Información pendiente: ${
       aiSummary.missingInformation.length > 0 ? aiSummary.missingInformation.join(", ") : "No indicada"
     }`,
     `- Motivo de prioridad: ${aiSummary.priorityReason}`

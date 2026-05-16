@@ -18,10 +18,10 @@ type LeadFilter =
 const filters: Array<{ id: LeadFilter; label: string }> = [
   { id: "todas", label: "Todas" },
   { id: "nuevas", label: "Nuevas" },
-  { id: "revision", label: "Revision tecnica" },
+  { id: "revision", label: "Revisión técnica" },
   { id: "alta", label: "Alta prioridad" },
-  { id: "provisional", label: "Proteccion provisional" },
-  { id: "definitiva", label: "Proteccion definitiva" },
+  { id: "provisional", label: "Protección provisional" },
+  { id: "definitiva", label: "Protección definitiva" },
   { id: "medida", label: "Soluciones a medida" }
 ];
 
@@ -74,9 +74,9 @@ export function AdminLeadDashboard() {
       <div className="admin-toolbar">
         <div>
           <span>Vista interna simulada</span>
-          <h1>Panel comercial de demostracion</h1>
+          <h1>Panel comercial de demostración</h1>
           <p>
-            Panel de demostracion para ver como la empresa podria recibir y revisar las
+            Panel de demostración para ver cómo la empresa podría recibir y revisar las
             consultas cualificadas por el copiloto.
           </p>
         </div>
@@ -93,7 +93,7 @@ export function AdminLeadDashboard() {
           value={String(leads.filter((lead) => lead.status === "nueva").length)}
         />
         <Metric
-          label="Revision tecnica"
+          label="Revisión técnica"
           value={String(leads.filter((lead) => lead.technicalRisk).length)}
         />
         <Metric

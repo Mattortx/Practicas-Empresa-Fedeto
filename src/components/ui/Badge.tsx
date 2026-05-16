@@ -18,7 +18,7 @@ export function PriorityBadge({ priority }: { priority: LeadPriority }) {
 export function StatusBadge({ status }: { status: LeadStatus }) {
   const labels: Record<LeadStatus, string> = {
     nueva: "Nueva",
-    pendiente_revision_tecnica: "Pendiente revision tecnica",
+    pendiente_revision_tecnica: "Pendiente revisión técnica",
     pendiente_contacto_comercial: "Pendiente contacto comercial",
     cerrada_demo: "Cerrada en demo"
   };

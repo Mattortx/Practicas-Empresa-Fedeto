@@ -25,14 +25,14 @@ export function LeadTable({ leads, selectedId, onSelect }: LeadTableProps) {
         <span>Cliente</span>
         <span>Empresa</span>
         <span>Correo</span>
-        <span>Telefono</span>
+        <span>Teléfono</span>
         <span>Familia</span>
         <span>Necesidad</span>
-        <span>Ubicacion</span>
+        <span>Ubicación</span>
         <span>Urgencia</span>
         <span>Prioridad</span>
         <span>Estado</span>
-        <span>Revision tecnica</span>
+        <span>Revisión técnica</span>
         <span>Fecha</span>
       </div>
       {leads.map((lead) => (
@@ -63,7 +63,7 @@ export function LeadTable({ leads, selectedId, onSelect }: LeadTableProps) {
           </span>
           <span>
             <Badge tone={lead.technicalRisk ? "orange" : "green"}>
-              {lead.technicalRisk ? "Si" : "No"}
+              {lead.technicalRisk ? "Sí" : "No"}
             </Badge>
           </span>
           <span>

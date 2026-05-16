@@ -25,7 +25,7 @@ export function buildCommercialLead(
       ...flow.defaultWarnings,
       ...(technicalRisk
         ? [
-            "Consulta marcada para revision tecnica antes de confirmar solucion, normativa o documentacion."
+            "Consulta marcada para revisión técnica antes de confirmar solución, normativa o documentación."
           ]
         : [])
     ])
@@ -73,29 +73,29 @@ export function formatLeadSummary(summary: LeadSummary): string {
     `- Nombre: ${summary.name}`,
     `- Empresa: ${summary.company}`,
     `- Correo: ${summary.email}`,
-    `- Telefono: ${summary.phone}`,
+    `- Teléfono: ${summary.phone}`,
     `- Tipo de necesidad: ${summary.needType}`,
     `- Familia de producto: ${summary.productFamily}`,
-    `- Subcategoria o enfoque probable: ${summary.subcategory ?? "Por determinar"}`,
+    `- Subcategoría o enfoque probable: ${summary.subcategory ?? "Por determinar"}`,
     `- Tipo de obra: ${summary.workType}`,
-    `- Ubicacion aproximada: ${summary.location}`,
+    `- Ubicación aproximada: ${summary.location}`,
     `- Urgencia: ${summary.urgency}`,
     `- Observaciones: ${summary.observations}`,
-    `- Motivo de clasificacion: ${summary.classificationReason ?? "Clasificacion orientativa pendiente de revisar."}`,
-    `- Senales detectadas: ${
+    `- Motivo de clasificación: ${summary.classificationReason ?? "Clasificación orientativa pendiente de revisar."}`,
+    `- Señales detectadas: ${
       summary.detectedSignals && summary.detectedSignals.length > 0
         ? summary.detectedSignals.join(" | ")
         : "No indicadas"
     }`,
-    `- Informacion pendiente: ${
+    `- Información pendiente: ${
       summary.missingInformation && summary.missingInformation.length > 0
         ? summary.missingInformation.join(", ")
         : "No indicada"
     }`,
     `- Nivel de prioridad: ${summary.priority}`,
-    `- Requiere revision tecnica: ${summary.requiresTechnicalReview ? "Si" : "No"}`,
-    `- Recomendacion de siguiente accion: ${summary.nextAction}`,
-    `- Advertencias tecnicas: ${summary.technicalWarnings.join(" ")}`
+    `- Requiere revisión técnica: ${summary.requiresTechnicalReview ? "Sí" : "No"}`,
+    `- Recomendación de siguiente acción: ${summary.nextAction}`,
+    `- Advertencias técnicas: ${summary.technicalWarnings.join(" ")}`
   ].join("\n");
 }
 
@@ -103,15 +103,15 @@ function buildObservations(draft: LeadDraft): string {
   const details = [
     draft.observations,
     draft.supportType ? `Soporte: ${draft.supportType}` : "",
-    draft.canDrill ? `Fijacion/perforacion: ${draft.canDrill}` : "",
+    draft.canDrill ? `Fijación/perforación: ${draft.canDrill}` : "",
     draft.approximateLength ? `Longitud aproximada: ${draft.approximateLength}` : "",
     draft.quantity ? `Cantidad: ${draft.quantity}` : "",
     draft.environment ? `Entorno: ${draft.environment}` : "",
     draft.customProblem ? `Problema: ${draft.customProblem}` : "",
-    draft.documentationAvailable ? `Documentacion disponible: ${draft.documentationAvailable}` : "",
+    draft.documentationAvailable ? `Documentación disponible: ${draft.documentationAvailable}` : "",
     draft.expectedDeadline ? `Plazo: ${draft.expectedDeadline}` : "",
     draft.riskLocation ? `Zona de riesgo: ${draft.riskLocation}` : "",
-    draft.solutionDuration ? `Duracion prevista: ${draft.solutionDuration}` : "",
+    draft.solutionDuration ? `Duración prevista: ${draft.solutionDuration}` : "",
     draft.commercialGoal ? `Objetivo comercial: ${draft.commercialGoal}` : ""
   ].filter(Boolean);
 

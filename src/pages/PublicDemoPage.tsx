@@ -12,23 +12,33 @@ import { ChatWidget } from "../components/commercial-copilot/ChatWidget";
 import { Header } from "../components/layout/Header";
 import { Notice } from "../components/ui/Notice";
 import { productFamilies } from "../data/productFamilies";
+import type { ProductFamilyId } from "../types/commercialCopilot";
 
 const valueItems = [
-  "Cualificacion rapida de consultas.",
-  "Orientacion hacia la familia de producto adecuada.",
+  "Cualificación rápida de consultas.",
+  "Orientación hacia la familia de producto adecuada.",
   "Recogida ordenada de datos comerciales.",
-  "Derivacion al equipo tecnico/comercial.",
-  "Reduccion de consultas incompletas."
+  "Derivación al equipo técnico/comercial.",
+  "Reducción de consultas incompletas."
 ];
 
 const technicalStripItems = [
-  "Fabricacion propia",
-  "Proteccion colectiva",
+  "Fabricación propia",
+  "Protección colectiva",
   "Obra y mantenimiento",
-  "Cubiertas tecnicas",
-  "Documentacion tecnica",
+  "Cubiertas técnicas",
+  "Documentación técnica",
   "Soluciones a medida"
 ];
+
+const familyCardDetails: Record<ProductFamilyId, string[]> = {
+  provisional: ["soporte", "perforación", "longitud", "urgencia"],
+  definitiva: ["entorno", "fijación", "uso permanente", "documentación"],
+  "bases-casquillos": ["tipo de pieza", "soporte", "cantidad", "compatibilidad"],
+  auxiliares: ["producto", "uso previsto", "cantidad", "entrega"],
+  consumibles: ["referencia", "cantidad", "reposición", "suministro"],
+  medida: ["problema", "restricciones", "planos", "plazo"]
+};
 
 export function PublicDemoPage() {
   return (
@@ -37,12 +47,12 @@ export function PublicDemoPage() {
 
       <section className="hero-section">
         <div className="hero-copy">
-          <span className="eyebrow">Demo de practicas FEDETO</span>
-          <h1>Copiloto comercial para consultas de proteccion en altura</h1>
+          <span className="eyebrow">Demo de prácticas FEDETO</span>
+          <h1>Copiloto comercial para consultas de protección en altura</h1>
           <p>
             Una prueba de concepto para Protecciones Toledo: el usuario conversa con un
-            chatbot integrado, mientras el sistema clasifica la necesidad, recoge datos utiles
-            y genera una ficha comercial para revision interna.
+            chatbot integrado, mientras el sistema clasifica la necesidad, recoge datos útiles
+            y genera una ficha comercial para revisión interna.
           </p>
           <div className="hero-actions">
             <a className="button button-primary" href="#copiloto">
@@ -62,7 +72,7 @@ export function PublicDemoPage() {
         <div className="hero-visual" aria-label="Esquema del copiloto comercial">
           <div className="visual-header">
             <Factory size={22} aria-hidden="true" />
-            <span>Flujo comercial tecnico</span>
+            <span>Flujo comercial técnico</span>
           </div>
           <div className="industrial-scene" aria-hidden="true">
             <div className="scene-roof">
@@ -78,8 +88,8 @@ export function PublicDemoPage() {
               <span>Prioridad</span>
             </div>
             <div className="scene-panel scene-panel-right">
-              <strong>Si</strong>
-              <span>Revision</span>
+              <strong>Sí</strong>
+              <span>Revisión</span>
             </div>
           </div>
           <ol>
@@ -112,7 +122,7 @@ export function PublicDemoPage() {
       <section className="value-section">
         <div className="section-title">
           <span>Valor para la empresa</span>
-          <h2>Un chatbot visible con logica de copiloto comercial</h2>
+          <h2>Un chatbot visible con lógica de copiloto comercial</h2>
         </div>
         <div className="value-grid">
           {valueItems.map((item) => (
@@ -127,19 +137,26 @@ export function PublicDemoPage() {
       <section className="families-section" id="familias">
         <div className="section-title">
           <span>Familias orientadas</span>
-          <h2>Lineas comerciales contempladas en la demo</h2>
+          <h2>Líneas comerciales contempladas en la demo</h2>
         </div>
         <div className="family-grid">
-          {productFamilies.map((family) => (
+          {productFamilies.map((family, index) => (
             <article className={`family-card family-${family.accent}`} key={family.id}>
+              <div className="family-card-top">
+                <span>{family.shortLabel}</span>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+              </div>
               <strong>{family.label}</strong>
               <p>{family.description}</p>
-              <div className="family-subcategory-list" aria-label={`Subcategorias de ${family.label}`}>
+              <div className="family-subcategory-list" aria-label={`Enfoques de ${family.label}`}>
                 {family.subcategories.slice(0, 3).map((subcategory) => (
                   <span key={subcategory.id}>{subcategory.label}</span>
                 ))}
               </div>
-              <small>{family.examples.join(" / ")}</small>
+              <div className="family-card-data">
+                <span>Datos que cualifica</span>
+                <p>{familyCardDetails[family.id].join(" / ")}</p>
+              </div>
             </article>
           ))}
         </div>
@@ -148,54 +165,54 @@ export function PublicDemoPage() {
       <section className="poc-section" id="poc">
         <div className="section-title">
           <span>Prueba de concepto</span>
-          <h2>Que demuestra este copiloto comercial</h2>
+          <h2>Qué demuestra este copiloto comercial</h2>
           <p>
-            Esta seccion explica la POC antes de probar la herramienta. El objetivo es mostrar
-            como una conversacion puede convertirse en una solicitud comercial ordenada, sin
-            sustituir la revision tecnica de Protecciones Toledo.
+            Esta sección explica la POC antes de probar la herramienta. El objetivo es mostrar
+            cómo una conversación puede convertirse en una solicitud comercial ordenada, sin
+            sustituir la revisión técnica de Protecciones Toledo.
           </p>
         </div>
 
         <div className="poc-grid">
           <article className="poc-card">
             <Route size={20} aria-hidden="true" />
-            <strong>Entrada conversacional</strong>
+            <strong>Entrada conversaciónal</strong>
             <p>El cliente describe una necesidad real de obra, mantenimiento o suministro.</p>
           </article>
           <article className="poc-card">
             <Gauge size={20} aria-hidden="true" />
-            <strong>Clasificacion comercial</strong>
+            <strong>Clasificación comercial</strong>
             <p>El sistema orienta la consulta hacia una familia y estima prioridad.</p>
           </article>
           <article className="poc-card">
             <FileSearch size={20} aria-hidden="true" />
-            <strong>Ficha para revision</strong>
-            <p>La solicitud queda resumida para el equipo comercial o tecnico.</p>
+            <strong>Ficha para revisión</strong>
+            <p>La solicitud queda resumida para el equipo comercial o técnico.</p>
           </article>
         </div>
 
         <div className="copilot-context poc-warning-panel">
           <span className="eyebrow">Copiloto integrado</span>
-          <h2>De conversacion a oportunidad comercial cualificada</h2>
+          <h2>De conversación a oportunidad comercial cualificada</h2>
           <p>
-            El copiloto no sustituye al equipo tecnico. Su funcion es estructurar la primera
+            El copiloto no sustituye al equipo técnico. Su función es estructurar la primera
             consulta para que Protecciones Toledo reciba mejor contexto: familia probable,
-            tipo de obra, ubicacion, urgencia, datos de contacto y advertencias.
+            tipo de obra, ubicación, urgencia, datos de contacto y advertencias.
           </p>
           <Notice>
-            <strong>Aviso tecnico y de privacidad.</strong> Las soluciones definitivas deben ser
-            validadas por personal competente. No se ofrecen calculos estructurales automaticos
+            <strong>Aviso técnico y de privacidad.</strong> Las soluciones definitivas deben ser
+            validadas por personal competente. No se ofrecen cálculos estructurales automáticos
             ni confirmaciones normativas. En esta prueba, las solicitudes se conservan solo de
             forma local o simulada.
           </Notice>
           <div className="context-list">
             <span>
               <ShieldAlert size={17} aria-hidden="true" />
-              Detecta consultas tecnicas sensibles
+              Detecta consultas técnicas sensibles
             </span>
             <span>
               <FileSearch size={17} aria-hidden="true" />
-              Prepara resumen para revision interna
+              Prepara resumen para revisión interna
             </span>
           </div>
         </div>
@@ -206,16 +223,16 @@ export function PublicDemoPage() {
           <span className="eyebrow">Demo interactiva</span>
           <h2>Prueba el copiloto comercial</h2>
           <p>
-            Este modulo es la parte funcional de la demo. Puedes simular una consulta, generar
-            una solicitud comercial y verla despues en el panel interno.
+            Este módulo es la parte funciónal de la demo. Puedes simular una consulta, generar
+            una solicitud comercial y verla después en el panel interno.
           </p>
         </div>
 
         <div className="demo-copilot-layout">
-          <aside className="demo-guide-card" aria-label="Guia breve de uso">
-            <strong>Como probarlo</strong>
+          <aside className="demo-guide-card" aria-label="Guía breve de uso">
+            <strong>Cómo probarlo</strong>
             <ol>
-              <li>Usa un caso rapido o escribe una consulta libre.</li>
+              <li>Usa un caso rápido o escribe una consulta libre.</li>
               <li>Responde las preguntas guiadas con datos de demo.</li>
               <li>Genera el resumen comercial.</li>
               <li>Abre el panel interno para revisar la solicitud.</li>

@@ -14,7 +14,7 @@ const riskMatchers: Array<{ flag: TechnicalRiskFlag; keywords: string[] }> = [
     keywords: ["calculo", "calcular", "dimensionar", "carga", "seguridad estructural"]
   },
   { flag: "instalacion", keywords: ["instalar", "montaje", "montar", "montarlo", "fijar", "perforar"] },
-  { flag: "anclaje", keywords: ["anclaje", "anclar", "atornillar", "fijacion", "soldadura", "hormigon"] },
+  { flag: "anclaje", keywords: ["anclaje", "anclar", "atornillar", "fijación", "soldadura", "hormigon"] },
   {
     flag: "resistencia",
     keywords: ["resistencia", "resiste", "peso", "viento", "empuje", "estructural"]
@@ -22,15 +22,15 @@ const riskMatchers: Array<{ flag: TechnicalRiskFlag; keywords: string[] }> = [
   {
     flag: "documentacion_tecnica",
     keywords: [
-      "ficha tecnica",
+      "ficha técnica",
       "documentacion",
       "manual",
       "instrucciones",
       "ignora tus instrucciones",
       "api key",
       "clave api",
-      "sin tecnico",
-      "tecnico certificado"
+      "sin técnico",
+      "técnico certificado"
     ]
   }
 ];

@@ -3,7 +3,7 @@ import { ExternalLink, ShieldCheck } from "lucide-react";
 export function Header() {
   return (
     <header className="site-header">
-      <a className="brand-link" href="/" aria-label="Ir a la vista publica">
+      <a className="brand-link" href="/" aria-label="Ir a la vista pública">
         <span className="brand-symbol">PT</span>
         <span>
           <strong>Protecciones Toledo</strong>

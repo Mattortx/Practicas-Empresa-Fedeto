@@ -22,7 +22,7 @@ export function LeadSummary({ lead, onCopy }: LeadSummaryProps) {
         <div className="lead-summary-badges">
           <PriorityBadge priority={lead.priority} />
           <Badge tone={lead.technicalRisk ? "orange" : "green"}>
-            {lead.technicalRisk ? "Revision tecnica necesaria" : "Consulta comercial"}
+            {lead.technicalRisk ? "Revisión técnica necesaria" : "Consulta comercial"}
           </Badge>
         </div>
       </div>
@@ -44,7 +44,7 @@ export function LeadSummary({ lead, onCopy }: LeadSummaryProps) {
           <strong>{lead.summary.subcategory ?? "Por determinar"}</strong>
         </div>
         <div>
-          <span>Siguiente accion</span>
+          <span>Siguiente acción</span>
           <strong>{lead.summary.nextAction}</strong>
         </div>
       </div>
