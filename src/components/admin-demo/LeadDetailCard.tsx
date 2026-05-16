@@ -168,10 +168,27 @@ export function LeadDetailCard({ lead, onStatusChange, onLeadUpdate }: LeadDetai
             <LeadFamilyBadge familyId={lead.productFamilyId} label={lead.summary.productFamily} />
           </strong>
         </div>
+        <Info label="Subcategoria / enfoque" value={lead.summary.subcategory ?? "Por determinar"} />
         <Info label="Necesidad" value={lead.summary.needType} />
         <Info label="Urgencia" value={lead.summary.urgency} />
         <Info label="Revision tecnica" value={lead.technicalRisk ? "Si" : "No"} />
         <Info label="Ubicacion" value={lead.summary.location} />
+        <Info
+          label="Senales detectadas"
+          value={
+            lead.summary.detectedSignals && lead.summary.detectedSignals.length > 0
+              ? lead.summary.detectedSignals.join(" | ")
+              : "No indicadas"
+          }
+        />
+        <Info
+          label="Datos pendientes"
+          value={
+            lead.summary.missingInformation && lead.summary.missingInformation.length > 0
+              ? lead.summary.missingInformation.join(", ")
+              : "No indicados"
+          }
+        />
         {lead.aiClassification && (
           <>
             <Info label="Intencion IA" value={lead.aiClassification.intent} />
@@ -179,6 +196,13 @@ export function LeadDetailCard({ lead, onStatusChange, onLeadUpdate }: LeadDetai
           </>
         )}
       </div>
+
+      {lead.summary.classificationReason && (
+        <section className="classification-reason-card">
+          <strong>Lectura comercial del copiloto</strong>
+          <p>{lead.summary.classificationReason}</p>
+        </section>
+      )}
 
       {lead.technicalRisk && (
         <div className="technical-risk-panel">

@@ -24,6 +24,7 @@ import { logDemoEvent } from "../../utils/demoEvents";
 import { Button } from "../ui/Button";
 import { NeedSelector } from "./NeedSelector";
 import { ChatWindow } from "./ChatWindow";
+import { buildDeepOrientationReply, buildFlowStartMessage } from "../../utils/commercialDepth";
 
 const privacyNotice =
   "Los datos introducidos se utilizaran unicamente para preparar una solicitud comercial en esta demo. No introduzca informacion sensible. La solucion definitiva debera ser revisada por el equipo tecnico de la empresa.";
@@ -251,7 +252,7 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     }
 
     appendAssistant({
-      text: buildAiAssistantText(aiResponse.data, aiResponse.available),
+      text: buildAiAssistantText(aiResponse.data, aiResponse.available, value),
       actions: buildAiActions(aiResponse.data)
     });
   }
@@ -292,7 +293,7 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     setAiStatus("idle");
 
     appendAssistant({
-      text: `${flow.intro}\n\n${flow.steps[0].prompt}`
+      text: buildFlowStartMessage(flow, aiClassification)
     });
   }
 
@@ -322,12 +323,12 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     if (!privacyShown && isContactStep(nextStep)) {
       setPrivacyShown(true);
       appendAssistant({
-        text: `${privacyNotice}\n\n${nextStep.prompt}`
+        text: `${privacyNotice}\n\n${buildContextualStepPrompt(flow, nextStep, nextDraft, nextFlags)}`
       });
       return;
     }
 
-    appendAssistant({ text: nextStep.prompt });
+    appendAssistant({ text: buildContextualStepPrompt(flow, nextStep, nextDraft, nextFlags) });
   }
 
   async function completeFlow(
@@ -589,35 +590,52 @@ function isContactStep(step: ConversationStep) {
   return ["name", "company", "email", "phone"].includes(step.field);
 }
 
-function buildAiAssistantText(classification: AILeadClassification, generatedWithAi: boolean) {
-  const sections = [
-    classification.suggestedReply ||
-      "He analizado la consulta, pero conviene continuar con un flujo guiado para recoger datos utiles."
-  ];
+function buildContextualStepPrompt(
+  flow: ConversationFlow,
+  step: ConversationStep,
+  draft: LeadDraft,
+  flags: TechnicalRiskFlag[]
+) {
+  const notes: string[] = [];
+  const text = normalize(Object.values(draft).filter(Boolean).join(" "));
 
-  sections.push(
-    generatedWithAi
-      ? "Clasificacion automatica generada con IA asistida y validacion local."
-      : "Fallback local aplicado: usando reglas de demo y flujos controlados."
-  );
-
-  if (classification.confidence < 0.45) {
-    sections.push("La clasificacion es orientativa porque la consulta es ambigua.");
+  if (step.field === "canDrill" && (text.includes("cubierta") || text.includes("terraza"))) {
+    notes.push(
+      "Como se ha mencionado una cubierta o terraza, este dato es importante para no proponer una orientacion tecnica cerrada sin revisar el soporte."
+    );
   }
 
-  if (classification.suggestedNextQuestion) {
-    sections.push(`Pregunta sugerida: ${classification.suggestedNextQuestion}`);
+  if (step.field === "approximateLength" && (flow.id === "provisional" || flow.id === "definitiva")) {
+    notes.push(
+      "La longitud no se usa aqui para calcular una solucion, sino para dimensionar comercialmente la consulta y valorar su alcance."
+    );
   }
 
-  if (classification.requiresTechnicalReview) {
-    sections.push("Esta consulta queda marcada como revision tecnica necesaria antes de confirmar una solucion.");
+  if (step.field === "quantity" && (flow.id === "bases-casquillos" || flow.id === "consumibles")) {
+    notes.push("La cantidad ayuda a priorizar la respuesta comercial y preparar una estimacion de suministro.");
   }
 
-  if (classification.safetyWarning) {
-    sections.push(`Aviso: ${classification.safetyWarning}`);
+  if (step.field === "observations" && flags.length > 0) {
+    notes.push(
+      "La consulta incluye elementos tecnicos sensibles; anade solo contexto de obra, referencias o documentacion disponible, sin datos sensibles."
+    );
   }
 
-  return sections.join("\n\n");
+  if (step.field === "documentationAvailable" && flow.id === "medida") {
+    notes.push(
+      "En soluciones a medida, planos o fotografias ayudan al equipo a revisar la viabilidad sin que el copiloto tenga que inventar detalles."
+    );
+  }
+
+  return notes.length > 0 ? `${notes.join("\n\n")}\n\n${step.prompt}` : step.prompt;
+}
+
+function buildAiAssistantText(
+  classification: AILeadClassification,
+  generatedWithAi: boolean,
+  sourceText: string
+) {
+  return buildDeepOrientationReply(classification, generatedWithAi, sourceText);
 }
 
 function buildAiActions(classification: AILeadClassification): ChatAction[] {

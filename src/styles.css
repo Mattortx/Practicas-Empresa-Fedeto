@@ -907,6 +907,35 @@ p {
   font-size: 1.08rem;
 }
 
+.family-card p {
+  margin-bottom: 14px;
+}
+
+.family-subcategory-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.family-subcategory-list span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 8px;
+  border: 1px solid rgba(51, 65, 85, 0.14);
+  border-radius: 999px;
+  background: #f7fafb;
+  color: #43515f;
+  font-size: 0.74rem;
+  font-weight: 850;
+}
+
+.family-card:hover .family-subcategory-list span {
+  border-color: rgba(51, 65, 85, 0.24);
+  background: #ffffff;
+}
+
 .family-card small {
   display: block;
   color: #53606c;
@@ -2039,6 +2068,26 @@ p {
 
 .info-pair strong {
   overflow-wrap: anywhere;
+}
+
+.classification-reason-card {
+  margin-bottom: 16px;
+  padding: 13px;
+  border: 1px solid #dce5ea;
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(29, 79, 122, 0.05), transparent),
+    #f7fafb;
+}
+
+.classification-reason-card strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #111827;
+}
+
+.classification-reason-card p {
+  margin: 0;
 }
 
 .technical-risk-panel {

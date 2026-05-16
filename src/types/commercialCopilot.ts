@@ -29,6 +29,14 @@ export type TechnicalRiskFlag =
   | "anclaje"
   | "documentacion_tecnica";
 
+export interface ProductSubcategory {
+  id: string;
+  label: string;
+  description: string;
+  keywords: string[];
+  followUpQuestion: string;
+}
+
 export type LeadFieldId =
   | "name"
   | "company"
@@ -59,6 +67,7 @@ export interface ProductFamily {
   shortLabel: string;
   description: string;
   examples: string[];
+  subcategories: ProductSubcategory[];
   keywords: string[];
   accent: "red" | "blue" | "orange" | "slate";
 }
@@ -92,10 +101,14 @@ export interface LeadSummary {
   phone: string;
   needType: string;
   productFamily: string;
+  subcategory?: string;
   workType: string;
   location: string;
   urgency: string;
   observations: string;
+  classificationReason?: string;
+  detectedSignals?: string[];
+  missingInformation?: string[];
   priority: LeadPriority;
   requiresTechnicalReview: boolean;
   nextAction: string;

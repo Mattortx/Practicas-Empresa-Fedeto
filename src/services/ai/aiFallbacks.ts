@@ -29,7 +29,7 @@ export function localClassifyLead(message: string): AILeadClassification {
       : localNextQuestion(family),
     suggestedReply: requiresTechnicalReview
       ? "No puedo confirmar ese extremo ni sustituir una revision tecnica. Puedo recoger la consulta para que el equipo competente la revise."
-      : "Puedo orientar inicialmente la consulta y preparar una solicitud comercial con los datos principales.",
+      : localOrientationReply(family),
     safetyWarning: requiresTechnicalReview ? "Revision tecnica necesaria antes de confirmar solucion." : null,
     intent: requiresTechnicalReview ? "soporte_tecnico" : "pedir_informacion_producto",
     extractedData: {
@@ -54,6 +54,29 @@ function localNextQuestion(family: AIProductFamily) {
   return questions[family];
 }
 
+function localOrientationReply(family: AIProductFamily) {
+  const replies: Record<AIProductFamily, string> = {
+    proteccion_provisional:
+      "Por lo que indicas, la consulta encaja inicialmente con proteccion provisional de borde. Conviene concretar soporte, posibilidad de perforacion, longitud aproximada y urgencia antes de derivarla.",
+    proteccion_definitiva:
+      "La necesidad parece orientada a una proteccion definitiva. Para avanzar de forma prudente hay que conocer entorno, tipo de soporte, si se puede fijar y si existe documentacion de la zona.",
+    bases_casquillos:
+      "La consulta apunta a bases, casquillos o elementos de fijacion. Para responder mejor conviene identificar tipo de pieza, soporte, cantidad aproximada y compatibilidad con el sistema existente.",
+    auxiliares:
+      "Parece una consulta de auxiliares para construccion o mantenimiento. Puedo ayudar a concretar producto, uso previsto, cantidad y urgencia de suministro.",
+    consumibles:
+      "La consulta encaja con consumibles o recambios. Para prepararla bien interesa recoger referencia, cantidad, uso previsto y ubicacion aproximada.",
+    solucion_medida:
+      "La necesidad parece singular o adaptada. La cualificacion debe recoger problema principal, restricciones del soporte, documentacion disponible y plazo aproximado.",
+    documentacion_normativa:
+      "La consulta debe tratarse como documentacion o normativa; el copiloto solo puede orientarla y derivarla para revision competente.",
+    desconocida:
+      "Todavia no hay datos suficientes para fijar una familia. Puedo hacer unas preguntas breves para distinguir si la solucion es temporal, permanente, de suministro o a medida."
+  };
+
+  return replies[family];
+}
+
 export function localDetectRisk(message: string): AITechnicalRiskResult {
   const riskFlags = detectTechnicalRisk(message);
   const promptInjectionDetected = hasPromptInjection(message);
@@ -75,14 +98,19 @@ export function localDetectRisk(message: string): AITechnicalRiskResult {
 export function localSummarizeLead(lead: CommercialLead): AILeadSummary {
   return {
     title: `${lead.summary.productFamily} - ${lead.summary.company}`,
-    commercialSummary: `Consulta sobre ${lead.summary.productFamily}. Necesidad: ${lead.summary.needType}. Obra/uso: ${lead.summary.workType}. Ubicacion: ${lead.summary.location}. Urgencia: ${lead.summary.urgency}.`,
+    commercialSummary: `Consulta sobre ${lead.summary.productFamily}${
+      lead.summary.subcategory ? `, enfoque ${lead.summary.subcategory}` : ""
+    }. Necesidad: ${lead.summary.needType}. Obra/uso: ${lead.summary.workType}. Ubicacion: ${lead.summary.location}. Urgencia: ${lead.summary.urgency}.`,
     technicalNotes: lead.technicalRisk
       ? "Requiere revision tecnica antes de confirmar solucion, normativa, montaje o documentacion."
       : "Sin revision tecnica marcada por el copiloto.",
     recommendedNextAction: lead.summary.nextAction,
-    missingInformation: ["Confirmar datos tecnicos si faltan en observaciones"].filter(() =>
-      lead.summary.observations === "No indicado"
-    ),
+    missingInformation:
+      lead.summary.missingInformation && lead.summary.missingInformation.length > 0
+        ? lead.summary.missingInformation
+        : ["Confirmar datos tecnicos si faltan en observaciones"].filter(() =>
+            lead.summary.observations === "No indicado"
+          ),
     riskFlags: lead.technicalRiskFlags,
     priorityReason: `Prioridad ${lead.priority} asignada por urgencia, familia, volumen y riesgo tecnico.`
   };
@@ -103,18 +131,20 @@ export function localAnswerFaq(question: string): AIFaqAnswer {
 
 export function localCommercialReply(lead: CommercialLead): AICommercialReply {
   const pendingInformation = [
+    ...(lead.summary.missingInformation ?? []),
     lead.summary.location === "No indicado" ? "ubicacion aproximada" : "",
     lead.summary.urgency === "No indicado" ? "urgencia" : "",
     lead.summary.observations === "No indicado" ? "observaciones tecnicas" : ""
   ].filter(Boolean);
+  const uniquePendingInformation = Array.from(new Set(pendingInformation));
 
   return {
     commercialReply: `Estimado/a ${lead.summary.name !== "No indicado" ? lead.summary.name : ""}, gracias por contactar con Protecciones Toledo. Hemos recibido su consulta sobre ${lead.summary.productFamily}. ${
-      pendingInformation.length > 0
-        ? `Para valorar la solicitud con mayor precision, necesitariamos confirmar: ${pendingInformation.join(", ")}.`
+      uniquePendingInformation.length > 0
+        ? `Para valorar la solicitud con mayor precision, necesitariamos confirmar: ${uniquePendingInformation.join(", ")}.`
         : "Con la informacion recibida, el equipo comercial puede revisar el caso."
     } ${lead.technicalRisk ? "La consulta se revisara tambien desde el punto de vista tecnico antes de confirmar una solucion definitiva." : "Nuestro equipo revisara la informacion y le respondera con una propuesta ajustada."}`,
-    pendingInformation,
+    pendingInformation: uniquePendingInformation,
     recommendedNextAction: lead.technicalRisk
       ? "Derivar a revision tecnica y posterior contacto comercial."
       : "Contactar comercialmente con el cliente.",

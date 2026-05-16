@@ -134,6 +134,11 @@ export function PublicDemoPage() {
             <article className={`family-card family-${family.accent}`} key={family.id}>
               <strong>{family.label}</strong>
               <p>{family.description}</p>
+              <div className="family-subcategory-list" aria-label={`Subcategorias de ${family.label}`}>
+                {family.subcategories.slice(0, 3).map((subcategory) => (
+                  <span key={subcategory.id}>{subcategory.label}</span>
+                ))}
+              </div>
               <small>{family.examples.join(" / ")}</small>
             </article>
           ))}

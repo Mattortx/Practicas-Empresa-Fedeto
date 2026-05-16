@@ -7,6 +7,7 @@ import type {
   ProductFamilyId,
   TechnicalRiskFlag
 } from "../types/commercialCopilot";
+import { buildCommercialDepthInsight } from "./commercialDepth";
 import { calculateLeadPriority } from "./leadScoring";
 
 export function buildCommercialLead(
@@ -18,6 +19,7 @@ export function buildCommercialLead(
   const productFamily = getProductFamily(productFamilyId);
   const technicalRisk = Boolean(flow.technicalReviewRequired || technicalRiskFlags.length > 0);
   const priority = calculateLeadPriority(draft, productFamilyId, technicalRisk);
+  const depthInsight = buildCommercialDepthInsight(draft, flow, technicalRiskFlags);
   const warnings = Array.from(
     new Set([
       ...flow.defaultWarnings,
@@ -36,10 +38,14 @@ export function buildCommercialLead(
     phone: value(draft.phone),
     needType: value(draft.needType, flow.needType),
     productFamily: productFamily?.label ?? value(draft.productFamily, "Por determinar"),
+    subcategory: depthInsight.subcategory,
     workType: value(draft.workType, value(draft.project, "No indicado")),
     location: value(draft.location),
     urgency: value(draft.urgency),
     observations: buildObservations(draft),
+    classificationReason: depthInsight.classificationReason,
+    detectedSignals: depthInsight.detectedSignals,
+    missingInformation: depthInsight.missingInformation,
     priority,
     requiresTechnicalReview: technicalRisk,
     nextAction: flow.nextAction,
@@ -70,10 +76,22 @@ export function formatLeadSummary(summary: LeadSummary): string {
     `- Telefono: ${summary.phone}`,
     `- Tipo de necesidad: ${summary.needType}`,
     `- Familia de producto: ${summary.productFamily}`,
+    `- Subcategoria o enfoque probable: ${summary.subcategory ?? "Por determinar"}`,
     `- Tipo de obra: ${summary.workType}`,
     `- Ubicacion aproximada: ${summary.location}`,
     `- Urgencia: ${summary.urgency}`,
     `- Observaciones: ${summary.observations}`,
+    `- Motivo de clasificacion: ${summary.classificationReason ?? "Clasificacion orientativa pendiente de revisar."}`,
+    `- Senales detectadas: ${
+      summary.detectedSignals && summary.detectedSignals.length > 0
+        ? summary.detectedSignals.join(" | ")
+        : "No indicadas"
+    }`,
+    `- Informacion pendiente: ${
+      summary.missingInformation && summary.missingInformation.length > 0
+        ? summary.missingInformation.join(", ")
+        : "No indicada"
+    }`,
     `- Nivel de prioridad: ${summary.priority}`,
     `- Requiere revision tecnica: ${summary.requiresTechnicalReview ? "Si" : "No"}`,
     `- Recomendacion de siguiente accion: ${summary.nextAction}`,

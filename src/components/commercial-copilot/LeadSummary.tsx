@@ -40,6 +40,10 @@ export function LeadSummary({ lead, onCopy }: LeadSummaryProps) {
           <strong>{lead.summary.urgency}</strong>
         </div>
         <div>
+          <span>Enfoque</span>
+          <strong>{lead.summary.subcategory ?? "Por determinar"}</strong>
+        </div>
+        <div>
           <span>Siguiente accion</span>
           <strong>{lead.summary.nextAction}</strong>
         </div>
