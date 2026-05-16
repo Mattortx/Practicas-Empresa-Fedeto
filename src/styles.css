@@ -27,6 +27,10 @@
   box-sizing: border-box;
 }
 
+::selection {
+  background: rgba(180, 35, 24, 0.16);
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -50,6 +54,14 @@ input {
 button,
 a {
   -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgba(29, 79, 122, 0.24);
+  outline-offset: 2px;
 }
 
 a {
@@ -149,6 +161,10 @@ a {
   color: var(--slate);
   font-size: 0.82rem;
   font-weight: 750;
+}
+
+.admin-page-header {
+  margin-bottom: 16px;
 }
 
 .hero-section {
@@ -502,6 +518,11 @@ p {
   margin-bottom: 18px;
 }
 
+.section-title p {
+  color: var(--muted);
+  line-height: 1.62;
+}
+
 .section-title h2,
 .demo-section-title h2,
 .copilot-context h2,
@@ -720,6 +741,10 @@ p {
   box-shadow: 0 10px 28px rgba(23, 27, 34, 0.05);
 }
 
+.demo-guide-card .button {
+  width: 100%;
+}
+
 .demo-guide-card strong {
   display: block;
   margin-bottom: 12px;
@@ -777,6 +802,10 @@ p {
   border-radius: 12px;
   background: var(--surface);
   box-shadow: 0 24px 70px rgba(23, 27, 34, 0.15);
+}
+
+.copilot-shell:hover {
+  border-color: #bcc8d0;
 }
 
 .copilot-header {
@@ -1011,6 +1040,26 @@ p {
   background-size: 28px 28px, 28px 28px, auto;
 }
 
+.copilot-thread::-webkit-scrollbar,
+.lead-table::-webkit-scrollbar,
+.lead-detail::-webkit-scrollbar,
+.lead-summary-card pre::-webkit-scrollbar,
+.detail-summary pre::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.copilot-thread::-webkit-scrollbar-thumb,
+.lead-table::-webkit-scrollbar-thumb,
+.lead-detail::-webkit-scrollbar-thumb,
+.lead-summary-card pre::-webkit-scrollbar-thumb,
+.detail-summary pre::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: #b9c3ca;
+  background-clip: padding-box;
+}
+
 .copilot-message {
   display: grid;
   grid-template-columns: 34px minmax(0, 1fr);
@@ -1044,6 +1093,10 @@ p {
   border-radius: 8px;
   background: #eaf0f4;
   color: var(--blue);
+}
+
+.copilot-message-user .message-content {
+  box-shadow: 0 10px 24px rgba(23, 27, 34, 0.12);
 }
 
 .message-content {
@@ -1240,6 +1293,13 @@ p {
   font-weight: 800;
 }
 
+.summary-toolbar button:hover,
+.summary-toolbar a:hover,
+.icon-copy-button:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -1286,6 +1346,14 @@ p {
 
 .admin-dashboard {
   margin-top: 18px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-top: 5px solid var(--blue);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 250, 252, 0.96)),
+    #ffffff;
+  box-shadow: var(--shadow-soft);
 }
 
 .admin-toolbar {
@@ -1294,6 +1362,8 @@ p {
   justify-content: space-between;
   gap: 18px;
   margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
 }
 
 .admin-toolbar p {
@@ -1327,6 +1397,11 @@ p {
   font-weight: 800;
 }
 
+.filter-chip:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
 .filter-chip-active {
   border-color: var(--red);
   background: #fff0ee;
@@ -1334,7 +1409,25 @@ p {
 }
 
 .metric-card {
+  position: relative;
+  overflow: hidden;
   padding: 16px;
+}
+
+.metric-card::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--blue);
+  content: "";
+}
+
+.metric-card:nth-child(3)::before {
+  background: var(--orange);
+}
+
+.metric-card:nth-child(4)::before {
+  background: var(--red);
 }
 
 .metric-card span {
@@ -1359,7 +1452,7 @@ p {
 .lead-table,
 .lead-detail {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--surface);
   box-shadow: 0 12px 30px rgba(23, 27, 34, 0.06);
 }
@@ -1370,7 +1463,10 @@ p {
 }
 
 .lead-detail {
-  overflow: hidden;
+  position: sticky;
+  top: 94px;
+  max-height: calc(100vh - 112px);
+  overflow-y: auto;
 }
 
 .lead-table-row {
@@ -1400,6 +1496,10 @@ p {
   text-align: left;
 }
 
+.lead-table-row:not(.lead-table-head):hover {
+  background: #f9fbfc;
+}
+
 .lead-table-row > span {
   min-width: 0;
   overflow-wrap: anywhere;
@@ -1410,10 +1510,14 @@ p {
 }
 
 .lead-table-row-active {
-  background: #fff7f5;
+  background: #fff7f5 !important;
+  box-shadow: inset 4px 0 0 var(--red);
 }
 
 .lead-table-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   min-height: 44px;
   background: #f3f6f8;
   color: var(--muted);
@@ -1464,6 +1568,10 @@ p {
 }
 
 .lead-detail-head h2 {
+  overflow-wrap: anywhere;
+}
+
+.lead-detail-head h2 {
   margin: 4px 0 0;
 }
 
@@ -1503,6 +1611,12 @@ p {
   padding: 0 10px;
 }
 
+.status-control select:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(29, 79, 122, 0.13);
+  outline: none;
+}
+
 .ai-action-panel {
   display: flex;
   flex-wrap: wrap;
@@ -1511,7 +1625,9 @@ p {
   padding: 12px;
   border: 1px solid #dce5ea;
   border-radius: 8px;
-  background: #f7fafb;
+  background:
+    linear-gradient(90deg, rgba(29, 79, 122, 0.05), transparent),
+    #f7fafb;
 }
 
 .detail-grid {
@@ -1526,6 +1642,10 @@ p {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fbfcfd;
+}
+
+.info-pair:hover {
+  border-color: #cfd8df;
 }
 
 .info-pair span {
@@ -1560,6 +1680,11 @@ p {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #f9fbfc;
+}
+
+.detail-summary,
+.ai-insight-card {
+  box-shadow: 0 8px 22px rgba(23, 27, 34, 0.04);
 }
 
 .detail-summary-title {
@@ -1638,8 +1763,10 @@ p {
   }
 
   .copilot-context,
-  .demo-guide-card {
+  .demo-guide-card,
+  .lead-detail {
     position: static;
+    max-height: none;
   }
 
   .value-grid,
@@ -1669,6 +1796,11 @@ p {
     flex-direction: column;
   }
 
+  .site-header {
+    margin: 0 -10px;
+    padding: 12px 10px;
+  }
+
   .header-nav {
     flex-wrap: wrap;
     gap: 10px 14px;
@@ -1679,8 +1811,23 @@ p {
     padding: 20px 0;
   }
 
+  .hero-section,
+  .demo-copilot-section,
+  .admin-dashboard {
+    padding: 18px;
+    border-radius: 10px;
+  }
+
   .hero-visual {
     min-height: auto;
+  }
+
+  .industrial-scene {
+    min-height: 190px;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(2rem, 12vw, 3.15rem);
   }
 
   .value-grid,
@@ -1697,6 +1844,23 @@ p {
   .copilot-thread {
     height: 480px;
     padding: 12px;
+  }
+
+  .copilot-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .copilot-header::before {
+    width: 100%;
+    height: 4px;
+  }
+
+  .copilot-header-actions {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    justify-content: flex-start;
   }
 
   .lead-table {
