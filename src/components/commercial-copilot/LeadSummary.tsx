@@ -1,6 +1,6 @@
 import { Clipboard, ExternalLink, Mail } from "lucide-react";
 import type { CommercialLead } from "../../types/commercialCopilot";
-import { PriorityBadge } from "../ui/Badge";
+import { Badge, PriorityBadge } from "../ui/Badge";
 
 interface LeadSummaryProps {
   lead: CommercialLead;
@@ -16,10 +16,33 @@ export function LeadSummary({ lead, onCopy }: LeadSummaryProps) {
     <section className="lead-summary-card" aria-label="Resumen comercial generado">
       <div className="lead-summary-head">
         <div>
-          <span>Resumen comercial</span>
+          <span>Solicitud preparada</span>
           <strong>{lead.productFamilyLabel}</strong>
         </div>
-        <PriorityBadge priority={lead.priority} />
+        <div className="lead-summary-badges">
+          <PriorityBadge priority={lead.priority} />
+          <Badge tone={lead.technicalRisk ? "orange" : "green"}>
+            {lead.technicalRisk ? "Revision tecnica necesaria" : "Consulta comercial"}
+          </Badge>
+        </div>
+      </div>
+      <div className="lead-summary-highlights">
+        <div>
+          <span>Cliente</span>
+          <strong>{lead.summary.name}</strong>
+        </div>
+        <div>
+          <span>Empresa</span>
+          <strong>{lead.summary.company}</strong>
+        </div>
+        <div>
+          <span>Urgencia</span>
+          <strong>{lead.summary.urgency}</strong>
+        </div>
+        <div>
+          <span>Siguiente accion</span>
+          <strong>{lead.summary.nextAction}</strong>
+        </div>
       </div>
       <pre>{lead.summaryText}</pre>
       <div className="summary-toolbar">

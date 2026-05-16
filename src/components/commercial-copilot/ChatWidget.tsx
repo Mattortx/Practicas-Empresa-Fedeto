@@ -31,6 +31,29 @@ const privacyNotice =
 const technicalGuardrail =
   "Puedo orientar de forma general, pero no confirmo normativa, certificados, ensayos, resistencias, calculos ni instrucciones de montaje. Para confirmar la solucion adecuada, el equipo tecnico debe revisar soporte, uso previsto y documentacion oficial.";
 
+const quickDemoCases = [
+  {
+    label: "Obra provisional",
+    text: "Necesito proteger el borde de un forjado durante una obra en Toledo."
+  },
+  {
+    label: "Cubierta definitiva",
+    text: "Busco una barandilla definitiva para una cubierta industrial donde no se puede perforar."
+  },
+  {
+    label: "Casquillos",
+    text: "Necesito presupuesto para casquillos atornillables, unas 200 unidades."
+  },
+  {
+    label: "Duda normativa",
+    text: "Cumple la UNE EN 13374?"
+  },
+  {
+    label: "No lo tengo claro",
+    text: "No se que necesito, tengo una zona elevada en una nave."
+  }
+];
+
 interface ChatWidgetProps {
   onLeadGenerated?: (lead: CommercialLead) => void;
 }
@@ -58,6 +81,10 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
       : currentStep?.placeholder ?? "Escribe tu consulta o elige una opcion...";
 
   const isInFlow = Boolean(activeFlow && currentStep);
+  const qualificationState = useMemo(
+    () => buildQualificationState(activeFlow, currentStepIndex, technicalFlags, lastAiClassification),
+    [activeFlow, currentStepIndex, lastAiClassification, technicalFlags]
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -149,7 +176,10 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     }
   }
 
-  async function handleFreeText(value: string) {
+  async function handleFreeText(
+    value: string,
+    contextOverride?: { activeFlowId?: string | null; currentStepId?: string | null }
+  ) {
     setAiStatus("idle");
     const flags = detectTechnicalRisk(value);
     const localFamily = classifyFamilyFromText(value);
@@ -206,8 +236,8 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
 
     setAiStatus("thinking");
     const aiResponse = await classifyLeadWithAi(value, {
-      activeFlow: activeFlow?.id ?? null,
-      currentStep: currentStep?.id ?? null,
+      activeFlow: contextOverride?.activeFlowId ?? activeFlow?.id ?? null,
+      currentStep: contextOverride?.currentStepId ?? currentStep?.id ?? null,
       localFamily: localFamily?.id ?? "",
       localRiskFlags: flags
     });
@@ -224,6 +254,26 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
       text: buildAiAssistantText(aiResponse.data, aiResponse.available),
       actions: buildAiActions(aiResponse.data)
     });
+  }
+
+  async function handleQuickDemoCase(text: string) {
+    if (aiStatus === "thinking") {
+      return;
+    }
+
+    setInput("");
+    setActiveFlow(null);
+    setCurrentStepIndex(0);
+    setDraft({});
+    setTechnicalFlags([]);
+    setPrivacyShown(false);
+    setLastAiClassification(undefined);
+    setActiveAiClassification(undefined);
+    setMessages([
+      welcomeMessage(),
+      { id: crypto.randomUUID(), role: "user", text }
+    ]);
+    await handleFreeText(text, { activeFlowId: null, currentStepId: null });
   }
 
   function startFlow(flowId: FlowId, aiClassification?: AILeadClassification) {
@@ -322,7 +372,13 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
 
     appendAssistant({
       text:
-        "Solicitud preparada para el equipo comercial. En esta prueba de concepto se conserva solo de forma local o simulada.",
+        [
+          "Solicitud comercial preparada.",
+          `Familia: ${lead.productFamilyLabel}.`,
+          `Prioridad: ${lead.priority}.`,
+          `Revision tecnica: ${lead.technicalRisk ? "Si" : "No"}.`,
+          "En esta prueba de concepto se conserva solo de forma local o simulada."
+        ].join("\n"),
       lead,
       actions: [
         { label: "Ver en panel interno", value: "admin", variant: "primary" },
@@ -429,6 +485,44 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
       </div>
 
       <NeedSelector onSelect={handleAction} />
+
+      <div className="quick-demo-panel" aria-label="Casos rapidos de prueba">
+        <div>
+          <span>Casos rapidos</span>
+          <strong>Simular consulta</strong>
+        </div>
+        <div className="quick-demo-actions">
+          {quickDemoCases.map((item) => (
+            <button
+              key={item.label}
+              type="button"
+              onClick={() => handleQuickDemoCase(item.text)}
+              disabled={aiStatus === "thinking"}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="qualification-panel" aria-label="Estado de cualificacion comercial">
+        <div className="qualification-item">
+          <span>Estado</span>
+          <strong>{qualificationState.stage}</strong>
+        </div>
+        <div className="qualification-item">
+          <span>Familia</span>
+          <strong>{qualificationState.family}</strong>
+        </div>
+        <div className="qualification-item">
+          <span>Prioridad</span>
+          <strong>{qualificationState.priority}</strong>
+        </div>
+        <div className={`qualification-item ${qualificationState.technicalReview ? "qualification-warning" : ""}`}>
+          <span>Revision tecnica</span>
+          <strong>{qualificationState.technicalReview ? "Necesaria" : "No marcada"}</strong>
+        </div>
+      </div>
 
       <ChatWindow
         messages={messages}
@@ -580,6 +674,57 @@ function resolveFlowFromClassification(classification: AILeadClassification): Fl
   };
 
   return familyMap[classification.family];
+}
+
+function buildQualificationState(
+  activeFlow: ConversationFlow | null,
+  currentStepIndex: number,
+  technicalFlags: TechnicalRiskFlag[],
+  classification?: AILeadClassification
+) {
+  const technicalReview = Boolean(
+    activeFlow?.technicalReviewRequired || technicalFlags.length > 0 || classification?.requiresTechnicalReview
+  );
+
+  if (activeFlow) {
+    return {
+      stage: `Paso ${Math.min(currentStepIndex + 1, activeFlow.steps.length)}/${activeFlow.steps.length}`,
+      family: activeFlow.label,
+      priority: classification?.priority ?? "Por determinar",
+      technicalReview
+    };
+  }
+
+  if (classification) {
+    return {
+      stage: classification.confidence < 0.45 ? "Ambigua" : "Clasificada",
+      family: aiFamilyLabel(classification.family),
+      priority: classification.priority,
+      technicalReview
+    };
+  }
+
+  return {
+    stage: "Pendiente",
+    family: "Sin clasificar",
+    priority: "Por determinar",
+    technicalReview
+  };
+}
+
+function aiFamilyLabel(family: AIProductFamily) {
+  const labels: Record<AIProductFamily, string> = {
+    proteccion_provisional: "Proteccion provisional",
+    proteccion_definitiva: "Proteccion definitiva",
+    bases_casquillos: "Bases y casquillos",
+    auxiliares: "Auxiliares",
+    consumibles: "Consumibles",
+    solucion_medida: "Solucion a medida",
+    documentacion_normativa: "Documentacion o normativa",
+    desconocida: "Por determinar"
+  };
+
+  return labels[family];
 }
 
 function buildLeadSummaryText(

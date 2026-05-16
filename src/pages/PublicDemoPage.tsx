@@ -172,7 +172,7 @@ export function PublicDemoPage() {
           <aside className="demo-guide-card" aria-label="Guia breve de uso">
             <strong>Como probarlo</strong>
             <ol>
-              <li>Elige una necesidad o escribe una consulta libre.</li>
+              <li>Usa un caso rapido o escribe una consulta libre.</li>
               <li>Responde las preguntas guiadas con datos de demo.</li>
               <li>Genera el resumen comercial.</li>
               <li>Abre el panel interno para revisar la solicitud.</li>
