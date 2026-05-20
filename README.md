@@ -163,7 +163,15 @@ El copiloto no:
 
 ## IA opcional
 
-La demo funciona aunque no haya IA configurada. En ese caso, el copiloto utiliza reglas, FAQs y flujos guiados. Si existe `OPENAI_API_KEY` y `AI_ENABLED=true`, el frontend consulta endpoints `/api/ai/*` para interpretar mensajes libres o ambiguos.
+La demo funciona aunque no haya IA configurada. En ese caso, el copiloto utiliza reglas, FAQs y flujos guiados. Si existe `OPENAI_API_KEY` o `GROQ_API_KEY` y `AI_ENABLED=true`, el frontend consulta endpoints `/api/ai/*` para interpretar mensajes libres o ambiguos.
+
+Para preproducción se puede usar Groq configurando:
+
+```bash
+AI_PROVIDER=groq
+GROQ_API_KEY=tu_clave
+GROQ_MODEL=llama-3.3-70b-versatile
+```
 
 La IA no decide precios, normativa, cálculos, resistencia, certificaciones ni instrucciones de montaje. El backend fuerza respuestas estructuradas y prudentes. Las consultas sobre normativa, certificación, instalación, resistencia, cálculo, anclaje, montaje, cumplimiento, ficha técnica, ensayo, seguridad estructural o intentos de prompt injection quedan marcadas como revisión técnica necesaria.
 
@@ -189,6 +197,23 @@ Esta separación permite defender el MVP como una herramienta estable sin depend
 - `POST /api/ai/answer-faq`
 - `POST /api/ai/generate-commercial-reply`
 - `POST /api/copilot` se mantiene como compatibilidad.
+- `POST /api/twilio/inbound` recibe mensajes de Twilio y responde con TwiML para SMS o WhatsApp.
+
+## Preproducción Railway + Twilio + Groq
+
+La guía completa está en:
+
+```text
+docs/preproduccion-railway-twilio-groq.md
+```
+
+Resumen:
+
+- Railway aloja frontend y backend con `npm run build` y `npm run start`.
+- Groq se configura con `AI_PROVIDER=groq` y `GROQ_API_KEY`.
+- Twilio apunta su webhook entrante a `/api/twilio/inbound?token=TU_TOKEN`.
+- `TWILIO_WEBHOOK_TOKEN` protege de forma básica el endpoint en preproducción.
+- `PUBLIC_APP_URL` permite que las respuestas de Twilio enlacen a la demo web.
 
 ### Modo sin IA
 

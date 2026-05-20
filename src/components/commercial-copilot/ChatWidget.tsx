@@ -98,7 +98,8 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
 
     getAiHealth().then((health) => {
       if (!cancelled) {
-        setAiHealthLabel(health.mode === "ai" ? "IA disponible" : "Modo demo sin IA");
+        const providerLabel = health.provider === "groq" ? "Groq" : "OpenAI";
+        setAiHealthLabel(health.mode === "ai" ? `IA disponible (${providerLabel})` : "Modo demo sin IA");
       }
     });
 
@@ -537,7 +538,7 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
 
       <footer className="copilot-footer">
         <span>{helperText}</span>
-        <span className={`ai-status-pill ${aiHealthLabel === "IA disponible" ? "ai-status-on" : ""}`}>
+        <span className={`ai-status-pill ${aiHealthLabel.startsWith("IA disponible") ? "ai-status-on" : ""}`}>
           {aiHealthLabel}
         </span>
         {lastCopied && (

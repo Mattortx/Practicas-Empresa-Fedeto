@@ -3,20 +3,26 @@ import { existsSync, readFileSync } from "node:fs";
 import { extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { handleAiRoute } from "./ai/routes.js";
+import { handleTwilioRoute } from "./twilio/routes.js";
 
 const rootDir = resolve(fileURLToPath(new URL("..", import.meta.url)));
 loadEnvFile(join(rootDir, ".env"));
 loadEnvFile(join(rootDir, ".env.local"));
 
 const port = Number(process.env.PORT ?? 8787);
-const model = process.env.OPENAI_MODEL || "gpt-5-mini";
-const summaryModel = process.env.OPENAI_SUMMARY_MODEL || model;
-const classifierModel = process.env.OPENAI_CLASSIFIER_MODEL || model;
-const apiKey = process.env.OPENAI_API_KEY;
+const provider = normalizeProvider(process.env.AI_PROVIDER ?? (process.env.GROQ_API_KEY ? "groq" : "openai"));
+const model = resolveModel(provider, process.env.OPENAI_MODEL || process.env.GROQ_MODEL);
+const summaryModel = process.env.OPENAI_SUMMARY_MODEL || process.env.GROQ_SUMMARY_MODEL || model;
+const classifierModel = process.env.OPENAI_CLASSIFIER_MODEL || process.env.GROQ_CLASSIFIER_MODEL || model;
+const apiKey = provider === "groq" ? process.env.GROQ_API_KEY : process.env.OPENAI_API_KEY;
 const aiEnabled = process.env.AI_ENABLED !== "false";
 const timeoutMs = Number(process.env.AI_TIMEOUT_MS ?? 10000);
 const distDir = join(rootDir, "dist");
-const aiConfig = { apiKey, aiEnabled, model, summaryModel, classifierModel, timeoutMs, port };
+const aiConfig = { apiKey, aiEnabled, provider, model, summaryModel, classifierModel, timeoutMs, port };
+const twilioConfig = {
+  webhookToken: process.env.TWILIO_WEBHOOK_TOKEN ?? "",
+  publicAppUrl: process.env.PUBLIC_APP_URL ?? ""
+};
 
 const server = createServer(async (request, response) => {
   applyCors(response);
@@ -34,6 +40,7 @@ const server = createServer(async (request, response) => {
         aiEnabled,
         aiConfigured: Boolean(apiKey),
         mode: aiEnabled && apiKey ? "ai" : "local",
+        provider,
         model,
         summaryModel,
         classifierModel
@@ -42,6 +49,10 @@ const server = createServer(async (request, response) => {
     }
 
     if (await handleAiRoute(request, response, aiConfig, sendJson)) {
+      return;
+    }
+
+    if (await handleTwilioRoute(request, response, twilioConfig, aiConfig)) {
       return;
     }
 
@@ -58,6 +69,18 @@ const server = createServer(async (request, response) => {
 server.listen(port, () => {
   console.log(`Copilot API listening on http://localhost:${port}`);
 });
+
+function normalizeProvider(value) {
+  return value === "groq" ? "groq" : "openai";
+}
+
+function resolveModel(activeProvider, configuredModel) {
+  if (configuredModel) {
+    return configuredModel;
+  }
+
+  return activeProvider === "groq" ? "llama-3.3-70b-versatile" : "gpt-5-mini";
+}
 
 function serveStatic(request, response) {
   if (!existsSync(distDir)) {

@@ -1,5 +1,5 @@
 import { commercialCopilotSystemPrompt } from "./systemPrompt.js";
-import { callStructuredOpenAI } from "./openaiClient.js";
+import { callStructuredLlm } from "./llmClient.js";
 import { compactKnowledgeBase } from "./knowledgeBase.js";
 import {
   classificationSchema,
@@ -35,6 +35,7 @@ export async function handleAiRoute(request, response, config, sendJson) {
       aiEnabled: config.aiEnabled,
       aiConfigured: Boolean(config.apiKey),
       mode: config.aiEnabled && config.apiKey ? "ai" : "local",
+      provider: config.provider,
       model: config.model,
       summaryModel: config.summaryModel,
       classifierModel: config.classifierModel
@@ -296,7 +297,8 @@ async function callAiOrFallback({ config, model, schemaName, schema, input, fall
     return { available: false, mode: "local", reason: "missing_api_key", data: fallback };
   }
 
-  const result = await callStructuredOpenAI({
+  const result = await callStructuredLlm({
+    provider: config.provider,
     apiKey: config.apiKey,
     model,
     instructions: commercialCopilotSystemPrompt,

@@ -101,6 +101,7 @@ export interface AIHealth {
   aiEnabled: boolean;
   aiConfigured: boolean;
   mode: "ai" | "local";
+  provider?: "openai" | "groq";
   model: string;
   summaryModel?: string;
   classifierModel?: string;
