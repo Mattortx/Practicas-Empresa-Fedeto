@@ -3,7 +3,7 @@
  * Conecta con los endpoints /api/leads y /api/events del backend.
  */
 
-const API_BASE = ""; // mismo origen (proxy Vite o servido por backend)
+import { buildApiUrl } from "./apiBase";
 
 interface ApiResponse<T> {
   available: boolean;
@@ -16,7 +16,7 @@ async function apiFetch<T>(
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
   try {
-    const res = await fetch(`${API_BASE}${path}`, {
+    const res = await fetch(buildApiUrl(path), {
       headers: { "Content-Type": "application/json", ...options.headers },
       ...options
     });

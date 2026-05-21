@@ -19,3 +19,6 @@ username = ""
 sender_email = ""
 sender_name = ""
 min_interval_seconds = 60
+
+[deployments]
+subdomain = "copiloto-comercial-protecciones-toledo"

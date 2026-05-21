@@ -100,20 +100,26 @@ curl https://protecciones-api-abc123.fly.dev/api/health/db
 
 ## Paso 4: Deploy del frontend (Site Deployment)
 
-### 4.1 Build del frontend
+### 4.1 Build del frontend con URL de API
+
+`VITE_API_URL` se incrusta en el bundle durante `npm run build`. Si frontend y backend van en dominios distintos, definirla antes de generar `dist/`.
+
+macOS/Linux:
 
 ```bash
-npm run build
+VITE_API_URL=https://protecciones-api-abc123.fly.dev npm run build
 # genera dist/
 ```
 
-### 4.2 Configurar env vars de build
+Windows PowerShell:
 
-```bash
-npx @insforge/cli deployments env set VITE_API_URL https://protecciones-api-abc123.fly.dev
+```powershell
+$env:VITE_API_URL="https://protecciones-api-abc123.fly.dev"
+npm.cmd run build
+# genera dist/
 ```
 
-### 4.3 Deploy
+### 4.2 Deploy
 
 ```bash
 npx @insforge/cli deployments deploy ./dist
@@ -121,7 +127,7 @@ npx @insforge/cli deployments deploy ./dist
 
 Esto devuelve una URL tipo: `https://protecciones-toledo.insforge.site`
 
-### 4.4 Verificar
+### 4.3 Verificar
 
 ```text
 https://protecciones-toledo.insforge.site/

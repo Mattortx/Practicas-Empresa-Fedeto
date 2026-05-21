@@ -1,6 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
+    { "source": "/admin-demo", "destination": "/index.html" },
+    { "source": "/practicas", "destination": "/index.html" },
+    { "source": "/practicas/tecnica", "destination": "/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "github": {

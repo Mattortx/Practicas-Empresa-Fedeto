@@ -1,248 +1,246 @@
+import { useState } from "react";
 import {
   ArrowRight,
+  BarChart3,
   ClipboardCheck,
   Factory,
-  FileSearch,
+  FileCheck2,
   Gauge,
-  Handshake,
+  MessageSquareText,
   Route,
-  ShieldAlert
+  ShieldAlert,
+  ShieldCheck,
+  Sparkles,
+  UsersRound
 } from "lucide-react";
 import { ChatWidget } from "../components/commercial-copilot/ChatWidget";
 import { Header } from "../components/layout/Header";
-import { Notice } from "../components/ui/Notice";
-import { productFamilies } from "../data/productFamilies";
-import type { ProductFamilyId } from "../types/commercialCopilot";
 
-const valueItems = [
-  "Cualificación rápida de consultas.",
-  "Orientación hacia la familia de producto adecuada.",
-  "Recogida ordenada de datos comerciales.",
-  "Derivación al equipo técnico/comercial.",
-  "Reducción de consultas incompletas."
+const operatingStats = [
+  { label: "IA", value: "Groq activo", tone: "green" },
+  { label: "Datos", value: "Supabase conectado", tone: "blue" },
+  { label: "Salida", value: "Ficha comercial", tone: "red" },
+  { label: "Riesgo", value: "Guardrails tecnicos", tone: "orange" }
 ];
 
-const technicalStripItems = [
-  "Fabricación propia",
-  "Protección colectiva",
-  "Obra y mantenimiento",
-  "Cubiertas técnicas",
-  "Documentación técnica",
-  "Soluciones a medida"
+const scenarioCards = [
+  {
+    id: "provisional",
+    title: "Proteccion provisional",
+    prompt: "Necesito proteger el borde de un forjado durante una obra en Toledo.",
+    result: "Familia probable: proteccion provisional. Pide soporte, longitud, urgencia y contacto.",
+    priority: "Media"
+  },
+  {
+    id: "definitiva",
+    title: "Cubierta industrial",
+    prompt: "Busco una barandilla definitiva para una cubierta donde no se puede perforar.",
+    result: "Familia probable: proteccion definitiva. Marca revision por entorno y fijacion.",
+    priority: "Alta"
+  },
+  {
+    id: "normativa",
+    title: "Consulta normativa",
+    prompt: "Cumple la UNE EN 13374?",
+    result: "Consulta sensible. No confirma cumplimiento y deriva a revision tecnica.",
+    priority: "Revision"
+  }
 ];
 
-const familyCardDetails: Record<ProductFamilyId, string[]> = {
-  provisional: ["soporte", "perforación", "longitud", "urgencia"],
-  definitiva: ["entorno", "fijación", "uso permanente", "documentación"],
-  "bases-casquillos": ["tipo de pieza", "soporte", "cantidad", "compatibilidad"],
-  auxiliares: ["producto", "uso previsto", "cantidad", "entrega"],
-  consumibles: ["referencia", "cantidad", "reposición", "suministro"],
-  medida: ["problema", "restricciones", "planos", "plazo"]
-};
+const companyBenefits = [
+  {
+    icon: MessageSquareText,
+    title: "Menos consultas incompletas",
+    text: "El usuario no abandona una caja de texto abierta: el copiloto guia la primera toma de datos."
+  },
+  {
+    icon: Gauge,
+    title: "Prioridad visible",
+    text: "Cada solicitud llega con familia probable, urgencia, riesgo tecnico y siguiente accion."
+  },
+  {
+    icon: UsersRound,
+    title: "Mejor traspaso interno",
+    text: "Comercial y tecnico revisan una ficha comun en vez de reconstruir el contexto desde cero."
+  }
+];
 
 export function PublicDemoPage() {
+  const [activeScenario, setActiveScenario] = useState(scenarioCards[0]);
+
   return (
-    <main className="public-page">
+    <main className="public-page product-demo-page">
       <Header />
 
-      <section className="hero-section">
-        <div className="hero-copy">
-          <span className="eyebrow">Demo de prácticas FEDETO</span>
-          <h1>Copiloto comercial para consultas de protección en altura</h1>
+      <section className="product-hero">
+        <div className="product-hero-copy">
+          <span className="eyebrow">Demo funcional para presentacion</span>
+          <h1>Copiloto comercial Protecciones Toledo</h1>
           <p>
-            Una prueba de concepto para Protecciones Toledo: el usuario conversa con un
-            chatbot integrado, mientras el sistema clasifica la necesidad, recoge datos útiles
-            y genera una ficha comercial para revisión interna.
+            Una experiencia conversacional para cualificar consultas de proteccion en altura,
+            ordenar datos comerciales y entregar una ficha revisable por el equipo interno.
           </p>
           <div className="hero-actions">
             <a className="button button-primary" href="#copiloto">
               Probar copiloto <ArrowRight size={17} aria-hidden="true" />
             </a>
             <a className="button button-secondary" href="/admin-demo">
-              Ver panel comercial demo
+              Abrir panel interno
             </a>
           </div>
-          <div className="hero-proof-grid" aria-label="Indicadores de la demo">
-            <span>IA opcional</span>
-            <span>Fallback local</span>
-            <span>Panel interno</span>
+          <div className="status-rack" aria-label="Estado operativo de la demo">
+            {operatingStats.map((item) => (
+              <div className={`status-tile status-${item.tone}`} key={item.label}>
+                <span>{item.label}</span>
+                <strong>{item.value}</strong>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="hero-visual" aria-label="Esquema del copiloto comercial">
-          <div className="visual-header">
-            <Factory size={22} aria-hidden="true" />
-            <span>Flujo comercial técnico</span>
+        <div className="commercial-console" aria-label="Vista previa comercial">
+          <div className="console-topbar">
+            <span>Lead intake</span>
+            <strong>Solicitud cualificada</strong>
           </div>
-          <div className="industrial-scene" aria-hidden="true">
-            <div className="scene-roof">
-              <span className="scene-post scene-post-left" />
-              <span className="scene-post scene-post-center" />
-              <span className="scene-post scene-post-right" />
-              <span className="scene-rail scene-rail-top" />
-              <span className="scene-rail scene-rail-mid" />
-              <span className="scene-toeboard" />
+          <div className="console-message">
+            <MessageSquareText size={19} aria-hidden="true" />
+            <p>{activeScenario.prompt}</p>
+          </div>
+          <div className="console-pipeline">
+            <span>Consulta</span>
+            <span>Clasificacion</span>
+            <span>Ficha</span>
+            <span>Revision</span>
+          </div>
+          <div className="console-result">
+            <div>
+              <span>Resultado esperado</span>
+              <strong>{activeScenario.title}</strong>
+              <p>{activeScenario.result}</p>
             </div>
-            <div className="scene-panel scene-panel-left">
-              <strong>Alta</strong>
+            <div className="priority-dial">
               <span>Prioridad</span>
-            </div>
-            <div className="scene-panel scene-panel-right">
-              <strong>Sí</strong>
-              <span>Revisión</span>
+              <strong>{activeScenario.priority}</strong>
             </div>
           </div>
-          <ol>
-            <li>
-              <Route size={18} aria-hidden="true" />
-              Usuario describe la necesidad
-            </li>
-            <li>
-              <Gauge size={18} aria-hidden="true" />
-              Copiloto clasifica familia y prioridad
-            </li>
-            <li>
-              <ClipboardCheck size={18} aria-hidden="true" />
-              Se genera resumen comercial
-            </li>
-            <li>
-              <Handshake size={18} aria-hidden="true" />
-              Equipo revisa y responde
-            </li>
-          </ol>
-        </div>
-      </section>
-
-      <section className="technical-strip" aria-label="Contexto industrial de la demo">
-        {technicalStripItems.map((item) => (
-          <span key={item}>{item}</span>
-        ))}
-      </section>
-
-      <section className="value-section">
-        <div className="section-title">
-          <span>Valor para la empresa</span>
-          <h2>Un chatbot visible con lógica de copiloto comercial</h2>
-        </div>
-        <div className="value-grid">
-          {valueItems.map((item) => (
-            <article className="value-card" key={item}>
-              <ClipboardCheck size={20} aria-hidden="true" />
-              <p>{item}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="families-section" id="familias">
-        <div className="section-title">
-          <span>Familias orientadas</span>
-          <h2>Líneas comerciales contempladas en la demo</h2>
-        </div>
-        <div className="family-grid">
-          {productFamilies.map((family, index) => (
-            <article className={`family-card family-${family.accent}`} key={family.id}>
-              <div className="family-card-top">
-                <span>{family.shortLabel}</span>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-              </div>
-              <strong>{family.label}</strong>
-              <p>{family.description}</p>
-              <div className="family-subcategory-list" aria-label={`Enfoques de ${family.label}`}>
-                {family.subcategories.slice(0, 3).map((subcategory) => (
-                  <span key={subcategory.id}>{subcategory.label}</span>
-                ))}
-              </div>
-              <div className="family-card-data">
-                <span>Datos que cualifica</span>
-                <p>{familyCardDetails[family.id].join(" / ")}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="poc-section" id="poc">
-        <div className="section-title">
-          <span>Prueba de concepto</span>
-          <h2>Qué demuestra este copiloto comercial</h2>
-          <p>
-            Esta sección explica la POC antes de probar la herramienta. El objetivo es mostrar
-            cómo una conversación puede convertirse en una solicitud comercial ordenada, sin
-            sustituir la revisión técnica de Protecciones Toledo.
-          </p>
-        </div>
-
-        <div className="poc-grid">
-          <article className="poc-card">
-            <Route size={20} aria-hidden="true" />
-            <strong>Entrada conversaciónal</strong>
-            <p>El cliente describe una necesidad real de obra, mantenimiento o suministro.</p>
-          </article>
-          <article className="poc-card">
-            <Gauge size={20} aria-hidden="true" />
-            <strong>Clasificación comercial</strong>
-            <p>El sistema orienta la consulta hacia una familia y estima prioridad.</p>
-          </article>
-          <article className="poc-card">
-            <FileSearch size={20} aria-hidden="true" />
-            <strong>Ficha para revisión</strong>
-            <p>La solicitud queda resumida para el equipo comercial o técnico.</p>
-          </article>
-        </div>
-
-        <div className="copilot-context poc-warning-panel">
-          <span className="eyebrow">Copiloto integrado</span>
-          <h2>De conversación a oportunidad comercial cualificada</h2>
-          <p>
-            El copiloto no sustituye al equipo técnico. Su función es estructurar la primera
-            consulta para que Protecciones Toledo reciba mejor contexto: familia probable,
-            tipo de obra, ubicación, urgencia, datos de contacto y advertencias.
-          </p>
-          <Notice>
-            <strong>Aviso técnico y de privacidad.</strong> Las soluciones definitivas deben ser
-            validadas por personal competente. No se ofrecen cálculos estructurales automáticos
-            ni confirmaciones normativas. En esta prueba, las solicitudes se conservan solo de
-            forma local o simulada.
-          </Notice>
-          <div className="context-list">
-            <span>
-              <ShieldAlert size={17} aria-hidden="true" />
-              Detecta consultas técnicas sensibles
-            </span>
-            <span>
-              <FileSearch size={17} aria-hidden="true" />
-              Prepara resumen para revisión interna
-            </span>
+          <div className="console-actions" aria-label="Escenarios de presentacion">
+            {scenarioCards.map((scenario) => (
+              <button
+                className={scenario.id === activeScenario.id ? "active" : ""}
+                type="button"
+                key={scenario.id}
+                onClick={() => setActiveScenario(scenario)}
+              >
+                {scenario.title}
+              </button>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="demo-copilot-section">
+      <section className="presentation-strip" aria-label="Resumen de valor">
+        <span>
+          <Factory size={17} aria-hidden="true" />
+          Contexto industrial
+        </span>
+        <span>
+          <Sparkles size={17} aria-hidden="true" />
+          IA asistida
+        </span>
+        <span>
+          <ShieldAlert size={17} aria-hidden="true" />
+          Derivacion tecnica prudente
+        </span>
+        <span>
+          <BarChart3 size={17} aria-hidden="true" />
+          Panel comercial
+        </span>
+      </section>
+
+      <section className="benefit-section" id="proceso">
+        <div className="section-title compact-title">
+          <span>Proceso comercial</span>
+          <h2>Del primer mensaje a una oportunidad revisable</h2>
+        </div>
+        <div className="benefit-grid">
+          {companyBenefits.map((benefit) => {
+            const Icon = benefit.icon;
+
+            return (
+              <article className="benefit-card" key={benefit.title}>
+                <Icon size={22} aria-hidden="true" />
+                <strong>{benefit.title}</strong>
+                <p>{benefit.text}</p>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="demo-copilot-section demo-workbench" id="copiloto">
         <div className="demo-section-title">
-          <span className="eyebrow">Demo interactiva</span>
-          <h2>Prueba el copiloto comercial</h2>
+          <span className="eyebrow">Herramienta interactiva</span>
+          <h2>Prueba la experiencia del cliente</h2>
           <p>
-            Este módulo es la parte funciónal de la demo. Puedes simular una consulta, generar
-            una solicitud comercial y verla después en el panel interno.
+            Usa un caso rapido o escribe una consulta libre. El copiloto pregunta lo necesario,
+            clasifica la solicitud y genera una ficha para el panel interno.
           </p>
         </div>
 
         <div className="demo-copilot-layout">
-          <aside className="demo-guide-card" aria-label="Guía breve de uso">
-            <strong>Cómo probarlo</strong>
+          <aside className="demo-guide-card polished-guide" aria-label="Guia de presentacion">
+            <strong>Guion de presentacion</strong>
             <ol>
-              <li>Usa un caso rápido o escribe una consulta libre.</li>
-              <li>Responde las preguntas guiadas con datos de demo.</li>
-              <li>Genera el resumen comercial.</li>
-              <li>Abre el panel interno para revisar la solicitud.</li>
+              <li>El cliente describe su necesidad en lenguaje natural.</li>
+              <li>El copiloto orienta familia, prioridad y datos faltantes.</li>
+              <li>Las dudas tecnicas sensibles se derivan sin prometer cumplimiento.</li>
+              <li>La solicitud queda disponible en el panel comercial.</li>
             </ol>
             <a className="button button-secondary" href="/admin-demo">
-              Ver panel comercial demo
+              Ver panel interno
             </a>
+            <p className="guide-note">
+              La memoria academica del proyecto esta separada en <a href="/practicas">/practicas</a>.
+            </p>
           </aside>
 
           <ChatWidget />
+        </div>
+      </section>
+
+      <section className="panel-preview-section">
+        <div className="panel-preview-copy">
+          <span className="eyebrow">Vista interna</span>
+          <h2>El equipo no recibe una conversacion suelta, recibe una ficha</h2>
+          <p>
+            El panel agrupa solicitudes, estados, prioridades, riesgo tecnico y resumen comercial
+            para que la demo muestre el ciclo completo.
+          </p>
+          <a className="button button-primary" href="/admin-demo">
+            Abrir panel <ArrowRight size={17} aria-hidden="true" />
+          </a>
+        </div>
+        <div className="panel-preview-card" aria-label="Vista previa del panel">
+          <div className="preview-row preview-head">
+            <span>Familia</span>
+            <span>Prioridad</span>
+            <span>Estado</span>
+          </div>
+          <div className="preview-row">
+            <span>Proteccion provisional</span>
+            <strong>Alta</strong>
+            <em>Nueva</em>
+          </div>
+          <div className="preview-row">
+            <span>Documentacion tecnica</span>
+            <strong>Revision</strong>
+            <em>Tecnica</em>
+          </div>
+          <div className="preview-summary">
+            <FileCheck2 size={20} aria-hidden="true" />
+            <p>Resumen comercial listo para seguimiento y respuesta.</p>
+          </div>
         </div>
       </section>
     </main>

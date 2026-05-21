@@ -1,4 +1,5 @@
 import type { AIEnvelope, AIHealth } from "../../types/ai";
+import { buildApiUrl } from "../apiBase";
 
 const AI_ENABLED_KEY = "protecciones-toledo-ai-enabled";
 
@@ -72,7 +73,7 @@ async function fetchJson<T>(url: string, init: RequestInit, timeoutMs: number): 
   const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const response = await fetch(url, { ...init, signal: controller.signal });
+    const response = await fetch(buildApiUrl(url), { ...init, signal: controller.signal });
     const payload = (await response.json()) as T;
 
     if (!response.ok) {

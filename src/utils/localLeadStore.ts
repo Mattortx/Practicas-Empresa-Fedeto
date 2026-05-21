@@ -1,5 +1,6 @@
 import { mockLeads } from "../data/mockLeads";
 import type { CommercialLead } from "../types/commercialCopilot";
+import { buildApiUrl } from "../services/apiBase";
 import { fetchLeads, createLead, updateLead as apiUpdateLead, deleteAllLeads as apiDeleteAllLeads } from "../services/leadApi";
 
 const STORAGE_KEY = "protecciones-toledo-demo-leads";
@@ -8,7 +9,7 @@ const STORAGE_KEY = "protecciones-toledo-demo-leads";
 
 async function apiAvailable(): Promise<boolean> {
   try {
-    const res = await fetch("/api/health/db");
+    const res = await fetch(buildApiUrl("/api/health/db"));
     const body = await res.json();
     return body.available !== false && body.connected !== false;
   } catch {

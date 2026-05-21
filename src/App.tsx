@@ -1,4 +1,5 @@
 import { AdminDemoPage } from "./pages/AdminDemoPage";
+import { PracticasPage } from "./pages/PracticasPage";
 import { PublicDemoPage } from "./pages/PublicDemoPage";
 
 function App() {
@@ -6,6 +7,10 @@ function App() {
 
   if (path === "/admin-demo") {
     return <AdminDemoPage />;
+  }
+
+  if (path === "/practicas" || path === "/practicas/tecnica") {
+    return <PracticasPage />;
   }
 
   return <PublicDemoPage />;

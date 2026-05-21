@@ -99,7 +99,8 @@ function serveStatic(request, response) {
 
   const requestPath = new URL(request.url ?? "/", `http://localhost:${port}`).pathname;
   const relativePath = requestPath.replace(/^\/+/, "");
-  const filePath = requestPath === "/" || requestPath === "/admin-demo"
+  const spaRoutes = new Set(["/", "/admin-demo", "/practicas", "/practicas/tecnica"]);
+  const filePath = spaRoutes.has(requestPath)
     ? join(distDir, "index.html")
     : join(distDir, relativePath);
 
