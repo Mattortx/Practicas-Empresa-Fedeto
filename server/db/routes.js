@@ -1,4 +1,8 @@
-import { isSupabaseConfigured, supabase } from "./supabase.js";
+import { getSupabase, isSupabaseConfigured } from "./supabase.js";
+
+function db() {
+  return getSupabase();
+}
 
 /**
  * Endpoints DB para leads y eventos del copiloto.
@@ -88,7 +92,7 @@ export async function handleDbRoute(request, response, sendJson) {
 
 async function handleDbHealth(_request, response, sendJson) {
   try {
-    const { data, error } = await supabase.from("leads").select("id", { count: "exact", head: true });
+    const { data, error } = await db().from("leads").select("id", { count: "exact", head: true });
 
     sendJson(response, 200, {
       ok: true,
@@ -98,6 +102,8 @@ async function handleDbHealth(_request, response, sendJson) {
   } catch (error) {
     sendJson(response, 500, { ok: false, connected: false, error: error.message });
   }
+
+  return true;
 }
 
 async function handleListLeads(_request, response, sendJson, url) {
@@ -107,7 +113,7 @@ async function handleListLeads(_request, response, sendJson, url) {
     const limit = Math.min(Number(url.searchParams.get("limit") ?? 100), 500);
     const offset = Math.max(Number(url.searchParams.get("offset") ?? 0), 0);
 
-    let query = supabase
+    let query = db()
       .from("leads")
       .select("*", { count: "exact" })
       .order("created_at", { ascending: false })
@@ -125,7 +131,7 @@ async function handleListLeads(_request, response, sendJson, url) {
 
     if (error) {
       sendJson(response, 500, { available: false, error: error.message });
-      return;
+      return true;
     }
 
     sendJson(response, 200, {
@@ -138,11 +144,13 @@ async function handleListLeads(_request, response, sendJson, url) {
   } catch (error) {
     sendJson(response, 500, { available: false, error: error.message });
   }
+
+  return true;
 }
 
 async function handleGetLead(_request, response, sendJson, leadId) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db()
       .from("leads")
       .select("*")
       .eq("id", leadId)
@@ -153,13 +161,15 @@ async function handleGetLead(_request, response, sendJson, leadId) {
         available: false,
         error: error.code === "PGRST116" ? "not_found" : error.message
       });
-      return;
+      return true;
     }
 
     sendJson(response, 200, { available: true, lead: mapLeadFromDb(data) });
   } catch (error) {
     sendJson(response, 500, { available: false, error: error.message });
   }
+
+  return true;
 }
 
 async function handleCreateLead(request, response, sendJson) {
@@ -167,7 +177,7 @@ async function handleCreateLead(request, response, sendJson) {
     const body = await readJsonBody(request);
     const lead = mapLeadToDb(body);
 
-    const { data, error } = await supabase
+    const { data, error } = await db()
       .from("leads")
       .insert([lead])
       .select()
@@ -175,13 +185,15 @@ async function handleCreateLead(request, response, sendJson) {
 
     if (error) {
       sendJson(response, 500, { available: false, error: error.message });
-      return;
+      return true;
     }
 
     sendJson(response, 201, { available: true, lead: mapLeadFromDb(data) });
   } catch (error) {
     sendJson(response, 500, { available: false, error: error.message });
   }
+
+  return true;
 }
 
 async function handleUpdateLead(request, response, sendJson, leadId) {
@@ -207,10 +219,10 @@ async function handleUpdateLead(request, response, sendJson, leadId) {
 
     if (Object.keys(updates).length === 0) {
       sendJson(response, 400, { available: false, error: "no_fields_to_update" });
-      return;
+      return true;
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await db()
       .from("leads")
       .update(updates)
       .eq("id", leadId)
@@ -222,54 +234,60 @@ async function handleUpdateLead(request, response, sendJson, leadId) {
         available: false,
         error: error.code === "PGRST116" ? "not_found" : error.message
       });
-      return;
+      return true;
     }
 
     sendJson(response, 200, { available: true, lead: mapLeadFromDb(data) });
   } catch (error) {
     sendJson(response, 500, { available: false, error: error.message });
   }
+
+  return true;
 }
 
 async function handleDeleteLead(_request, response, sendJson, leadId) {
   try {
-    const { error } = await supabase
+    const { error } = await db()
       .from("leads")
       .delete()
       .eq("id", leadId);
 
     if (error) {
       sendJson(response, 500, { available: false, error: error.message });
-      return;
+      return true;
     }
 
     sendJson(response, 200, { available: true, deleted: true });
   } catch (error) {
     sendJson(response, 500, { available: false, error: error.message });
   }
+
+  return true;
 }
 
 async function handleDeleteAllLeads(_request, response, sendJson) {
   try {
-    const { error } = await supabase
+    const { error } = await db()
       .from("leads")
       .delete()
       .neq("id", "00000000-0000-0000-0000-000000000000");
 
     if (error) {
       sendJson(response, 500, { available: false, error: error.message });
-      return;
+      return true;
     }
 
     sendJson(response, 200, { available: true, deleted: true });
   } catch (error) {
     sendJson(response, 500, { available: false, error: error.message });
   }
+
+  return true;
 }
 
 async function handleListLeadEvents(_request, response, sendJson, leadId) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db()
       .from("conversation_events")
       .select("*")
       .eq("lead_id", leadId)
@@ -278,13 +296,15 @@ async function handleListLeadEvents(_request, response, sendJson, leadId) {
 
     if (error) {
       sendJson(response, 500, { available: false, error: error.message });
-      return;
+      return true;
     }
 
     sendJson(response, 200, { available: true, events: data });
   } catch (error) {
     sendJson(response, 500, { available: false, error: error.message });
   }
+
+  return true;
 }
 
 async function handleCreateEvent(request, response, sendJson) {
@@ -293,10 +313,10 @@ async function handleCreateEvent(request, response, sendJson) {
 
     if (!body.event_type) {
       sendJson(response, 400, { available: false, error: "missing_event_type" });
-      return;
+      return true;
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await db()
       .from("conversation_events")
       .insert([{
         lead_id: body.lead_id ?? null,
@@ -308,13 +328,15 @@ async function handleCreateEvent(request, response, sendJson) {
 
     if (error) {
       sendJson(response, 500, { available: false, error: error.message });
-      return;
+      return true;
     }
 
     sendJson(response, 201, { available: true, event: data });
   } catch (error) {
     sendJson(response, 500, { available: false, error: error.message });
   }
+
+  return true;
 }
 
 // ── Mappers ────────────────────────────────────────────────────
@@ -348,8 +370,10 @@ function mapLeadFromDb(row) {
 }
 
 function mapLeadToDb(lead) {
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
   return {
-    id: lead.id,
+    ...(lead.id && isUuid.test(lead.id) ? { id: lead.id } : {}),
     status: lead.status ?? "nueva",
     priority: lead.priority ?? "media",
     technical_risk: lead.technicalRisk ?? false,
