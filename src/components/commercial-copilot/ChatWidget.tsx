@@ -26,7 +26,7 @@ import type {
   TechnicalRiskFlag
 } from "../../types/commercialCopilot";
 import { buildCommercialLead } from "../../utils/leadSummary";
-import { saveLocalLead } from "../../utils/localLeadStore";
+import { saveLeadToApi, saveLocalLead } from "../../utils/localLeadStore";
 import { detectTechnicalRisk } from "../../utils/technicalRisk";
 import { logDemoEvent } from "../../utils/demoEvents";
 import { Button } from "../ui/Button";
@@ -390,7 +390,7 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
       summaryText: buildLeadSummaryText(lead.summaryText, aiSummary, summaryResult.available)
     } as CommercialLead;
 
-    saveLocalLead(lead);
+    saveLeadToApi(lead);
     onLeadGenerated?.(lead);
     logDemoEvent("lead_generado", {
       leadId: lead.id,

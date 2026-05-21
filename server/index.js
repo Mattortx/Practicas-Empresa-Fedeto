@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { handleAiRoute } from "./ai/routes.js";
+import { handleDbRoute } from "./db/routes.js";
 import { handleTwilioRoute } from "./twilio/routes.js";
 
 const rootDir = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -49,6 +50,10 @@ const server = createServer(async (request, response) => {
     }
 
     if (await handleAiRoute(request, response, aiConfig, sendJson)) {
+      return;
+    }
+
+    if (await handleDbRoute(request, response, sendJson)) {
       return;
     }
 

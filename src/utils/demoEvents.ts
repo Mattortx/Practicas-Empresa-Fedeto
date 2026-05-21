@@ -1,3 +1,5 @@
+import { createEvent } from "../services/leadApi";
+
 const STORAGE_KEY = "protecciones-toledo-demo-events";
 
 export type DemoEventName =
@@ -24,10 +26,16 @@ export function logDemoEvent(name: DemoEventName, details?: Record<string, unkno
     details
   };
 
+  // Guardar local (siempre, como fallback)
   if (typeof window !== "undefined") {
     const current = readDemoEvents();
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify([event, ...current].slice(0, 120)));
   }
+
+  // Intentar enviar a la API (fire-and-forget)
+  createEvent(name, details?.leadId as string | undefined, details).catch(() => {
+    // silencioso — el localStorage ya lo guardó
+  });
 
   console.info("[demo-event]", event);
 }

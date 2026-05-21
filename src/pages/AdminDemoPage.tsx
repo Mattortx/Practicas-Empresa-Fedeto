@@ -18,7 +18,8 @@ export function AdminDemoPage() {
 
       <Notice tone="info">
         <strong>Vista simulada para demo de prácticas.</strong> Esta vista no tiene autenticación
-        real. Las solicitudes locales se guardan en el navegador mediante localStorage.
+        real. Las solicitudes se guardan en la base de datos (Supabase) si el backend está
+        configurado, o en localStorage como fallback.
       </Notice>
 
       <AdminLeadDashboard />

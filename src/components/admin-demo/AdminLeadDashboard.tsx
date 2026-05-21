@@ -1,7 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Trash2 } from "lucide-react";
 import type { CommercialLead, LeadStatus } from "../../types/commercialCopilot";
-import { clearLocalLeads, readLocalLeads, replaceLocalLeads } from "../../utils/localLeadStore";
+import {
+  clearLocalLeads,
+  clearLeadsViaApi,
+  fetchLeadsFromApi,
+  readLocalLeads,
+  replaceLocalLeads,
+  updateLeadViaApi
+} from "../../utils/localLeadStore";
 import { Button } from "../ui/Button";
 import { AdminAnalyticsPanel } from "./AdminAnalyticsPanel";
 import { LeadDetailCard } from "./LeadDetailCard";
@@ -42,20 +49,31 @@ export function AdminLeadDashboard() {
   );
   const activeFilterLabel = filters.find((filter) => filter.id === activeFilter)?.label ?? "Todas";
 
+  // Cargar leads desde la API al montar el componente
+  useEffect(() => {
+    fetchLeadsFromApi().then((apiLeads) => {
+      if (apiLeads.length > 0) {
+        setLeads(apiLeads);
+        setSelectedId(apiLeads[0]?.id);
+      }
+    });
+  }, []);
+
   useEffect(() => {
     if (!filteredLeads.some((lead) => lead.id === selectedId)) {
       setSelectedId(filteredLeads[0]?.id);
     }
   }, [filteredLeads, selectedId]);
 
-  function clearDemoLeads() {
-    clearLocalLeads();
+  async function clearDemoLeads() {
+    await clearLeadsViaApi();
     const refreshed = readLocalLeads();
     setLeads(refreshed);
     setSelectedId(refreshed[0]?.id);
   }
 
   function updateLeadStatus(leadId: string, status: LeadStatus) {
+    updateLeadViaApi(leadId, { status });
     setLeads((current) => {
       const updated = current.map((lead) => (lead.id === leadId ? { ...lead, status } : lead));
       replaceLocalLeads(updated);
@@ -64,6 +82,7 @@ export function AdminLeadDashboard() {
   }
 
   function updateLead(updatedLead: CommercialLead) {
+    updateLeadViaApi(updatedLead.id, updatedLead);
     setLeads((current) => {
       const updated = current.map((lead) => (lead.id === updatedLead.id ? updatedLead : lead));
       replaceLocalLeads(updated);
