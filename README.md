@@ -44,6 +44,8 @@ El objetivo no es sustituir al equipo técnico, sino preparar mejores primeras c
 - Endpoints IA para clasificar leads, detectar riesgo, responder FAQ, resumir solicitudes y generar borradores comerciales.
 - Modo IA activado/desactivado desde la interfaz.
 - Registro local de eventos de demo para auditoría y defensa.
+- Análisis asistido durante los pasos guiados: la IA reajusta prioridad, riesgo técnico, datos pendientes y pregunta siguiente sin enviar datos personales de contacto.
+- Enriquecimiento de la ficha final con datos extraídos de la conversación cuando están disponibles.
 
 ## Ejecución
 
@@ -54,15 +56,39 @@ npm.cmd install
 npm.cmd run dev
 ```
 
-Para activar la IA opcional durante el desarrollo, abre una segunda terminal y ejecuta:
+Para trabajar con la IA durante el desarrollo, lo más cómodo es levantar frontend y backend juntos:
+
+```bash
+npm.cmd run dev:full
+```
+
+También puedes hacerlo en dos terminales. En una terminal:
+
+```bash
+npm.cmd run dev
+```
+
+Y en otra:
 
 ```bash
 npm.cmd run dev:api
 ```
 
-Después crea un archivo `.env.local` a partir de `.env.example` e indica tu clave:
+Después crea un archivo `.env.local` a partir de `.env.example` e indica tu clave. Para Groq:
 
 ```bash
+AI_PROVIDER=groq
+GROQ_API_KEY=tu_clave
+GROQ_MODEL=llama-3.3-70b-versatile
+AI_ENABLED=true
+AI_TIMEOUT_MS=10000
+PORT=8787
+```
+
+O para OpenAI:
+
+```bash
+AI_PROVIDER=openai
 OPENAI_API_KEY=tu_clave
 OPENAI_MODEL=gpt-5-mini
 OPENAI_SUMMARY_MODEL=
@@ -163,7 +189,7 @@ El copiloto no:
 
 ## IA opcional
 
-La demo funciona aunque no haya IA configurada. En ese caso, el copiloto utiliza reglas, FAQs y flujos guiados. Si existe `OPENAI_API_KEY` o `GROQ_API_KEY` y `AI_ENABLED=true`, el frontend consulta endpoints `/api/ai/*` para interpretar mensajes libres o ambiguos.
+La demo funciona aunque no haya IA configurada. En ese caso, el copiloto utiliza reglas, FAQs y flujos guiados. Si existe `OPENAI_API_KEY` o `GROQ_API_KEY` y `AI_ENABLED=true`, el frontend consulta endpoints `/api/ai/*` para interpretar mensajes libres o ambiguos, responder FAQ con base de conocimiento controlada, analizar respuestas intermedias del flujo, detectar riesgo técnico, enriquecer la ficha comercial y generar resúmenes o borradores para el panel interno.
 
 Para preproducción se puede usar Groq configurando:
 
@@ -183,7 +209,7 @@ Arquitectura de la capa IA:
 - `server/ai/schemas.js`: JSON Schemas para salidas estructuradas.
 - `server/ai/fallbacks.js`: respuestas locales si la IA no está activa, no hay clave, hay timeout o falla la validación.
 - `src/services/ai/*`: cliente frontend, validadores, fallbacks y funciones por caso de uso.
-- `ChatWidget.tsx`: combina reglas locales, clasificación IA y resumen IA sin bloquear la conversación.
+- `ChatWidget.tsx`: combina reglas locales, clasificación IA, análisis IA de pasos guiados y resumen IA sin bloquear la conversación.
 - `LeadDetailCard.tsx`: permite generar resumen y borrador comercial desde el panel interno.
 
 Esta separación permite defender el MVP como una herramienta estable sin dependencia externa y, al mismo tiempo, preparada para evolucionar hacia IA real con guardrails.

@@ -11,9 +11,10 @@ import {
   technicalGuardrail
 } from "../../data/responseLibrary";
 import { getAiHealth, isAiEnabled as readAiEnabled, setAiEnabled as persistAiEnabled } from "../../services/ai/aiClient";
+import { answerWithKnowledgeBase } from "../../services/ai/answerWithKnowledgeBase";
 import { classifyLeadWithAi } from "../../services/ai/classifyLead";
 import { summarizeLeadWithAi } from "../../services/ai/summarizeLead";
-import type { AILeadClassification, AILeadSummary, AIProductFamily } from "../../types/ai";
+import type { AIFaqAnswer, AILeadClassification, AILeadSummary, AIProductFamily, ExtractedLeadData } from "../../types/ai";
 import type {
   ChatAction,
   ChatMessage,
@@ -204,6 +205,17 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     );
 
     if (faq) {
+      if (aiEnabled) {
+        setAiStatus("thinking");
+        const aiFaq = await answerWithKnowledgeBase(redactPersonalData(value));
+        setAiStatus(aiFaq.available ? "available" : "unavailable");
+        appendAssistant({
+          text: buildFaqAssistantText(aiFaq.data, aiFaq.available),
+          actions: buildFaqActions(aiFaq.data)
+        });
+        return;
+      }
+
       appendAssistant({
         text: faq.answer,
         actions: [
@@ -237,7 +249,7 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     }
 
     setAiStatus("thinking");
-    const aiResponse = await classifyLeadWithAi(value, {
+    const aiResponse = await classifyLeadWithAi(redactPersonalData(value), {
       activeFlow: contextOverride?.activeFlowId ?? activeFlow?.id ?? null,
       currentStep: contextOverride?.currentStepId ?? currentStep?.id ?? null,
       localFamily: localFamily?.id ?? "",
@@ -308,48 +320,63 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
 
     const nextDraft = { ...draft, [step.field]: validation.value };
     const nextFlags = Array.from(new Set([...technicalFlags, ...detectTechnicalRisk(value)]));
+    const stepAnalysis = await analyzeStepWithAi(flow, step, validation.value, nextDraft, nextFlags);
+    const nextClassification = mergeAiClassifications(activeAiClassification, stepAnalysis?.classification);
+    const finalFlags = mergeFlagsWithAi(nextFlags, stepAnalysis?.classification);
     const nextIndex = currentStepIndex + 1;
 
     setDraft(nextDraft);
-    setTechnicalFlags(nextFlags);
+    setTechnicalFlags(finalFlags);
     setCurrentStepIndex(nextIndex);
+    setActiveAiClassification(nextClassification);
+
+    if (nextClassification) {
+      setLastAiClassification(nextClassification);
+    }
 
     const nextStep = flow.steps[nextIndex];
 
     if (!nextStep) {
-      await completeFlow(flow, nextDraft, nextFlags);
+      await completeFlow(flow, nextDraft, finalFlags, nextClassification);
       return;
     }
+
+    const nextPrompt = buildPromptWithAiNote(
+      buildContextualStepPrompt(flow, nextStep, nextDraft, finalFlags),
+      stepAnalysis
+    );
 
     if (!privacyShown && isContactStep(nextStep)) {
       setPrivacyShown(true);
       appendAssistant({
-        text: `${privacyNotice}\n\n${buildContextualStepPrompt(flow, nextStep, nextDraft, nextFlags)}`
+        text: `${privacyNotice}\n\n${nextPrompt}`
       });
       return;
     }
 
-    appendAssistant({ text: buildContextualStepPrompt(flow, nextStep, nextDraft, nextFlags) });
+    appendAssistant({ text: nextPrompt });
   }
 
   async function completeFlow(
     flow: ConversationFlow,
     completedDraft: LeadDraft,
-    completedFlags: TechnicalRiskFlag[]
+    completedFlags: TechnicalRiskFlag[],
+    aiClassification = activeAiClassification
   ) {
     setAiStatus(aiEnabled ? "thinking" : "idle");
-    const baseLead = buildCommercialLead(completedDraft, flow, completedFlags);
+    const enrichedDraft = applyExtractedDataToDraft(completedDraft, aiClassification?.extractedData, flow);
+    const baseLead = buildCommercialLead(enrichedDraft, flow, completedFlags);
     let lead: CommercialLead = {
       ...baseLead,
-      aiClassification: activeAiClassification,
-      extractedLeadData: activeAiClassification?.extractedData,
-      priority: activeAiClassification?.priority ?? baseLead.priority,
-      technicalRisk: baseLead.technicalRisk || Boolean(activeAiClassification?.requiresTechnicalReview),
+      aiClassification,
+      extractedLeadData: aiClassification?.extractedData,
+      priority: aiClassification?.priority ?? baseLead.priority,
+      technicalRisk: baseLead.technicalRisk || Boolean(aiClassification?.requiresTechnicalReview),
       summary: {
         ...baseLead.summary,
-        priority: activeAiClassification?.priority ?? baseLead.summary.priority,
+        priority: aiClassification?.priority ?? baseLead.summary.priority,
         requiresTechnicalReview:
-          baseLead.summary.requiresTechnicalReview || Boolean(activeAiClassification?.requiresTechnicalReview)
+          baseLead.summary.requiresTechnicalReview || Boolean(aiClassification?.requiresTechnicalReview)
       }
     };
 
@@ -395,6 +422,34 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
     setPrivacyShown(false);
     setActiveAiClassification(undefined);
     setAiStatus(summaryResult.available ? "available" : "unavailable");
+  }
+
+  async function analyzeStepWithAi(
+    flow: ConversationFlow,
+    step: ConversationStep,
+    value: string,
+    nextDraft: LeadDraft,
+    nextFlags: TechnicalRiskFlag[]
+  ): Promise<{ classification: AILeadClassification; available: boolean } | undefined> {
+    if (!aiEnabled || !value.trim() || isContactStep(step)) {
+      return undefined;
+    }
+
+    setAiStatus("thinking");
+    const analysisMessage = buildStepAnalysisMessage(flow, step, value, nextDraft);
+    const result = await classifyLeadWithAi(analysisMessage, {
+      activeFlow: flow.id,
+      currentStep: step.id,
+      localFamily: flow.productFamily ?? "",
+      localRiskFlags: nextFlags
+    });
+
+    setAiStatus(result.available ? "available" : "unavailable");
+
+    return {
+      classification: result.data,
+      available: result.available
+    };
   }
 
   function toggleAiMode() {
@@ -632,6 +687,221 @@ function buildAiActions(classification: AILeadClassification): ChatAction[] {
   actions.push({ label: "Volver al menú", value: "restart", variant: "secondary" });
 
   return actions;
+}
+
+function buildFaqAssistantText(answer: AIFaqAnswer, generatedWithAi: boolean) {
+  return [
+    generatedWithAi
+      ? "Respuesta generada con IA sobre la base de conocimiento controlada de la demo."
+      : "Respuesta local de demo basada en contenidos controlados.",
+    answer.answer,
+    answer.safetyWarning ? `Aviso: ${answer.safetyWarning}` : "",
+    answer.requiresTechnicalReview
+      ? "Esta consulta queda marcada para revisión técnica antes de confirmar documentación, montaje, resistencia o cumplimiento."
+      : ""
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+function buildFaqActions(answer: AIFaqAnswer): ChatAction[] {
+  const actions: ChatAction[] = [];
+
+  if (answer.suggestedFlowId && answer.suggestedFlowId !== "none") {
+    actions.push({
+      label: answer.requiresTechnicalReview ? "Preparar consulta técnica" : "Abrir flujo recomendado",
+      value: `flow:${answer.suggestedFlowId}`,
+      variant: answer.requiresTechnicalReview ? "warning" : "primary"
+    });
+  }
+
+  actions.push({ label: "Solicitar presupuesto", value: "flow:presupuesto", variant: "secondary" });
+  actions.push({ label: "Ver opciones", value: "restart", variant: "secondary" });
+
+  return actions;
+}
+
+function buildPromptWithAiNote(
+  prompt: string,
+  stepAnalysis?: { classification: AILeadClassification; available: boolean }
+) {
+  if (!stepAnalysis) {
+    return prompt;
+  }
+
+  const classification = stepAnalysis.classification;
+  const source = stepAnalysis.available ? "IA asistida" : "Análisis local";
+  const risk = classification.requiresTechnicalReview ? "revisión técnica marcada" : "sin revisión técnica nueva";
+  const confidence = Math.round(classification.confidence * 100);
+  const nextQuestion = classification.suggestedNextQuestion
+    ? `\nPregunta sugerida por el análisis: ${classification.suggestedNextQuestion}`
+    : "";
+
+  return `${source}: familia ${aiFamilyLabel(classification.family)}, prioridad ${classification.priority}, confianza ${confidence}%, ${risk}.${nextQuestion}\n\n${prompt}`;
+}
+
+function buildStepAnalysisMessage(
+  flow: ConversationFlow,
+  step: ConversationStep,
+  value: string,
+  draft: LeadDraft
+) {
+  const nonPersonalDraft = Object.entries(draft)
+    .filter(([field]) => !isPersonalField(field))
+    .map(([field, fieldValue]) => `${field}: ${fieldValue}`)
+    .join(" | ");
+
+  return [
+    `Flujo comercial actual: ${flow.label}.`,
+    `Campo respondido: ${step.field}.`,
+    `Respuesta del usuario: ${value}.`,
+    nonPersonalDraft ? `Datos comerciales no personales ya recogidos: ${nonPersonalDraft}.` : "",
+    "Analiza solo la cualificación comercial, riesgo técnico, prioridad, datos pendientes y siguiente pregunta. No inventes datos técnicos."
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+function mergeAiClassifications(
+  current: AILeadClassification | undefined,
+  incoming: AILeadClassification | undefined
+): AILeadClassification | undefined {
+  if (!incoming) {
+    return current;
+  }
+
+  if (!current) {
+    return incoming;
+  }
+
+  const useIncomingFamily =
+    incoming.family !== "desconocida" &&
+    (current.family === "desconocida" || incoming.confidence >= current.confidence || incoming.requiresTechnicalReview);
+
+  return {
+    ...current,
+    ...incoming,
+    family: useIncomingFamily ? incoming.family : current.family,
+    needType: incoming.needType !== "Necesidad por determinar" ? incoming.needType : current.needType,
+    confidence: Math.max(current.confidence, incoming.confidence),
+    priority: safestPriority(current.priority, incoming.priority),
+    requiresTechnicalReview: current.requiresTechnicalReview || incoming.requiresTechnicalReview,
+    missingFields: Array.from(new Set([...current.missingFields, ...incoming.missingFields])),
+    safetyWarning: incoming.safetyWarning || current.safetyWarning,
+    suggestedNextQuestion: incoming.suggestedNextQuestion || current.suggestedNextQuestion,
+    suggestedReply: incoming.suggestedReply || current.suggestedReply,
+    intent: incoming.intent !== "otra" ? incoming.intent : current.intent,
+    extractedData: mergeExtractedData(current.extractedData, incoming.extractedData)
+  };
+}
+
+function mergeExtractedData(current: ExtractedLeadData = {}, incoming: ExtractedLeadData = {}) {
+  return {
+    ...current,
+    ...Object.fromEntries(
+      Object.entries(incoming).filter(([, value]) => {
+        if (value === undefined || value === null || value === "" || value === "desconocido") {
+          return false;
+        }
+
+        return true;
+      })
+    )
+  };
+}
+
+function mergeFlagsWithAi(flags: TechnicalRiskFlag[], classification?: AILeadClassification) {
+  const merged = [...flags];
+
+  if (classification?.requiresTechnicalReview && !merged.includes("documentacion_tecnica")) {
+    merged.push("documentacion_tecnica");
+  }
+
+  if (
+    classification?.safetyWarning &&
+    normalize(classification.safetyWarning).includes("normativa") &&
+    !merged.includes("normativa")
+  ) {
+    merged.push("normativa");
+  }
+
+  return Array.from(new Set(merged));
+}
+
+function applyExtractedDataToDraft(
+  draft: LeadDraft,
+  extractedData: ExtractedLeadData | undefined,
+  flow: ConversationFlow
+): LeadDraft {
+  if (!extractedData) {
+    return draft;
+  }
+
+  const next = { ...draft };
+
+  assignIfEmpty(next, "name", extractedData.name);
+  assignIfEmpty(next, "company", extractedData.company);
+  assignIfEmpty(next, "email", extractedData.email);
+  assignIfEmpty(next, "phone", extractedData.phone);
+  assignIfEmpty(next, "location", extractedData.approximateLocation);
+  assignIfEmpty(next, "workType", extractedData.workType);
+  assignIfEmpty(next, "approximateLength", extractedData.approximateLength);
+  assignIfEmpty(next, "urgency", extractedData.urgency);
+  assignIfEmpty(next, "needType", extractedData.needDescription);
+  assignIfEmpty(next, "canDrill", booleanLabel(extractedData.canDrill));
+  assignIfEmpty(next, "solutionDuration", extractedData.temporaryOrPermanent);
+  assignIfEmpty(next, "documentationAvailable", booleanLabel(extractedData.hasPlansOrDocumentation));
+
+  if (!next.productFamily && extractedData.productFamily && extractedData.productFamily !== "desconocida") {
+    next.productFamily = aiFamilyLabel(extractedData.productFamily);
+  }
+
+  const technicalNotes = [extractedData.technicalRestriction, extractedData.notes].filter(Boolean).join(" | ");
+
+  if (technicalNotes) {
+    next.observations = next.observations
+      ? `${next.observations} | Datos inferidos por IA: ${technicalNotes}`
+      : `Datos inferidos por IA: ${technicalNotes}`;
+  }
+
+  if (flow.productFamily === "bases-casquillos" || flow.productFamily === "consumibles") {
+    assignIfEmpty(next, "quantity", extractedData.approximateLength);
+  }
+
+  return next;
+}
+
+function assignIfEmpty(draft: LeadDraft, field: keyof LeadDraft, value: string | undefined | null) {
+  if (!draft[field] && value && value !== "desconocido") {
+    draft[field] = value;
+  }
+}
+
+function booleanLabel(value: boolean | null | undefined) {
+  if (value === true) {
+    return "Sí";
+  }
+
+  if (value === false) {
+    return "No";
+  }
+
+  return undefined;
+}
+
+function safestPriority(current: AILeadClassification["priority"], incoming: AILeadClassification["priority"]) {
+  const order = { baja: 0, media: 1, alta: 2 };
+  return order[incoming] > order[current] ? incoming : current;
+}
+
+function isPersonalField(field: string) {
+  return ["name", "company", "email", "phone"].includes(field);
+}
+
+function redactPersonalData(value: string) {
+  return value
+    .replace(/[^\s@]+@[^\s@]+\.[^\s@]+/g, "[correo indicado]")
+    .replace(/(?:\+34\s*)?(?:\d[\s-]?){9,}/g, "[telefono indicado]");
 }
 
 function resolveFlowFromClassification(classification: AILeadClassification): FlowId {

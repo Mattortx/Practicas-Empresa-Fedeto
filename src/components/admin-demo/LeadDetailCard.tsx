@@ -1,5 +1,19 @@
-import { CalendarDays, ClipboardCheck, ClipboardList, FileText, MessageSquareText, ShieldAlert } from "lucide-react";
-import { useState } from "react";
+import {
+  AlertTriangle,
+  Building2,
+  CalendarDays,
+  ClipboardCheck,
+  ClipboardList,
+  FileText,
+  Gauge,
+  Mail,
+  MessageSquareText,
+  Phone,
+  ShieldAlert,
+  Sparkles,
+  UserRound
+} from "lucide-react";
+import { useState, type ReactNode } from "react";
 import { generateCommercialReplyWithAi } from "../../services/ai/generateCommercialReply";
 import { summarizeLeadWithAi } from "../../services/ai/summarizeLead";
 import type { CommercialLead, LeadStatus } from "../../types/commercialCopilot";
@@ -27,12 +41,27 @@ export function LeadDetailCard({ lead, onStatusChange, onLeadUpdate }: LeadDetai
 
   if (!lead) {
     return (
-      <aside className="lead-detail empty-state">
+      <aside className="lead-detail empty-state lead-detail-empty">
+        <ClipboardList size={30} aria-hidden="true" />
         <strong>Selecciona una solicitud</strong>
-        <p>El detalle mostrara el resumen comercial generado por el copiloto.</p>
+        <p>El detalle mostrará la ficha comercial generada por el copiloto.</p>
       </aside>
     );
   }
+
+  const createdDate = new Intl.DateTimeFormat("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  }).format(new Date(lead.createdAt));
+  const detectedSignals = formatList(lead.summary.detectedSignals, "No indicadas");
+  const missingInformation = formatList(lead.summary.missingInformation, "No indicada");
+  const technicalFlags = formatList(lead.technicalRiskFlags, "Sin señales técnicas sensibles");
+  const aiConfidence = lead.aiClassification
+    ? `${Math.round(lead.aiClassification.confidence * 100)}%`
+    : "No aplicada";
 
   async function generateAiSummary() {
     if (!lead) {
@@ -98,120 +127,132 @@ export function LeadDetailCard({ lead, onStatusChange, onLeadUpdate }: LeadDetai
 
   return (
     <aside className="lead-detail">
-      <div className="lead-detail-head">
-        <div>
+      <div className="lead-detail-accent" aria-hidden="true" />
+
+      <header className="lead-detail-head">
+        <div className="lead-detail-title">
           <span>Detalle de solicitud</span>
-          <h2>{lead.summary.company}</h2>
+          <h2>{fallbackText(lead.summary.name)}</h2>
+          <p>{fallbackText(lead.summary.company)}</p>
         </div>
-        <StatusBadge status={lead.status} />
-      </div>
+        <div className="lead-detail-status-stack">
+          <StatusBadge status={lead.status} />
+          <PriorityBadge priority={lead.priority} />
+        </div>
+      </header>
 
       <div className="detail-meta">
         <span>
           <CalendarDays size={16} aria-hidden="true" />
-          {new Intl.DateTimeFormat("es-ES", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-          }).format(new Date(lead.createdAt))}
+          {createdDate}
         </span>
-        <PriorityBadge priority={lead.priority} />
         <Badge tone={lead.source === "demo" ? "neutral" : "blue"}>
           {lead.source === "demo" ? "Dato simulado" : "Generada por el copiloto"}
         </Badge>
         {lead.aiClassification && <Badge tone="blue">Clasificación automática</Badge>}
         {lead.aiSummarySource === "ai" && <Badge tone="green">Resumen generado con IA</Badge>}
-        {lead.technicalRisk && (
-          <Badge tone="orange">Revisión técnica necesaria</Badge>
-        )}
+        {lead.technicalRisk && <Badge tone="orange">Revisión técnica necesaria</Badge>}
       </div>
 
-      <label className="status-control">
-        <span>Estado de seguimiento</span>
-        <select
-          value={lead.status}
-          onChange={(event) => onStatusChange?.(lead.id, event.target.value as LeadStatus)}
-        >
-          {statusOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </label>
+      <section className="detail-contact-strip" aria-label="Datos principales del cliente">
+        <ContactItem icon={<UserRound size={17} />} label="Cliente" value={lead.summary.name} />
+        <ContactItem icon={<Building2 size={17} />} label="Empresa" value={lead.summary.company} />
+        <ContactItem icon={<Mail size={17} />} label="Correo" value={lead.summary.email} />
+        <ContactItem icon={<Phone size={17} />} label="Teléfono" value={lead.summary.phone} />
+      </section>
 
-      <div className="ai-action-panel">
-        <Button variant="secondary" onClick={generateAiSummary} disabled={busyAction === "summary"}>
-          <FileText size={16} aria-hidden="true" />
-          {busyAction === "summary" ? "Generando..." : "Generar resumen con IA"}
-        </Button>
-        <Button variant="secondary" onClick={generateReply} disabled={busyAction === "reply"}>
-          <MessageSquareText size={16} aria-hidden="true" />
-          {busyAction === "reply" ? "Preparando..." : "Generar borrador"}
-        </Button>
-        <Button variant="ghost" onClick={markTechnicalReview}>
-          <ShieldAlert size={16} aria-hidden="true" />
-          Marcar revisión técnica
-        </Button>
-      </div>
-
-      <div className="detail-grid">
-        <Info label="Cliente" value={lead.summary.name} />
-        <Info label="Empresa" value={lead.summary.company} />
-        <Info label="Correo" value={lead.summary.email} />
-        <Info label="Teléfono" value={lead.summary.phone} />
-        <div className="info-pair">
-          <span>Familia</span>
-          <strong>
-            <LeadFamilyBadge familyId={lead.productFamilyId} label={lead.summary.productFamily} />
-          </strong>
+      <section className="detail-panel detail-panel-commercial">
+        <div className="detail-section-title">
+          <ClipboardList size={18} aria-hidden="true" />
+          <div>
+            <span>Clasificación comercial</span>
+            <strong>{lead.summary.needType}</strong>
+          </div>
         </div>
-        <Info label="Subcategoría / enfoque" value={lead.summary.subcategory ?? "Por determinar"} />
-        <Info label="Necesidad" value={lead.summary.needType} />
-        <Info label="Urgencia" value={lead.summary.urgency} />
-        <Info label="Revisión técnica" value={lead.technicalRisk ? "Sí" : "No"} />
-        <Info label="Ubicación" value={lead.summary.location} />
-        <Info
-          label="Señales detectadas"
-          value={
-            lead.summary.detectedSignals && lead.summary.detectedSignals.length > 0
-              ? lead.summary.detectedSignals.join(" | ")
-              : "No indicadas"
-          }
-        />
-        <Info
-          label="Datos pendientes"
-          value={
-            lead.summary.missingInformation && lead.summary.missingInformation.length > 0
-              ? lead.summary.missingInformation.join(", ")
-              : "No indicados"
-          }
-        />
-        {lead.aiClassification && (
-          <>
-            <Info label="Intencion IA" value={lead.aiClassification.intent} />
-            <Info label="Confianza IA" value={`${Math.round(lead.aiClassification.confidence * 100)}%`} />
-          </>
-        )}
-      </div>
 
-      {lead.summary.classificationReason && (
-        <section className="classification-reason-card">
-          <strong>Lectura comercial del copiloto</strong>
-          <p>{lead.summary.classificationReason}</p>
-        </section>
-      )}
+        <div className="detail-grid">
+          <Info
+            label="Familia"
+            value={<LeadFamilyBadge familyId={lead.productFamilyId} label={lead.summary.productFamily} />}
+          />
+          <Info label="Subcategoría / enfoque" value={lead.summary.subcategory ?? "Por determinar"} />
+          <Info label="Tipo de obra" value={lead.summary.workType} />
+          <Info label="Ubicación aproximada" value={lead.summary.location} />
+          <Info label="Urgencia" value={lead.summary.urgency} />
+          <Info label="Revisión técnica" value={lead.technicalRisk ? "Sí" : "No"} />
+          <Info label="Señales detectadas" value={detectedSignals} wide />
+          <Info label="Datos pendientes" value={missingInformation} wide />
+        </div>
+      </section>
+
+      <section className="detail-panel detail-panel-tracking">
+        <div className="detail-section-title">
+          <Gauge size={18} aria-hidden="true" />
+          <div>
+            <span>Seguimiento interno</span>
+            <strong>Estado y acciones de la demo</strong>
+          </div>
+        </div>
+
+        <label className="status-control">
+          <span>Estado de seguimiento</span>
+          <select
+            value={lead.status}
+            onChange={(event) => onStatusChange?.(lead.id, event.target.value as LeadStatus)}
+          >
+            {statusOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <div className="ai-action-panel">
+          <Button variant="secondary" onClick={generateAiSummary} disabled={busyAction === "summary"}>
+            <FileText size={16} aria-hidden="true" />
+            {busyAction === "summary" ? "Generando..." : "Generar resumen con IA"}
+          </Button>
+          <Button variant="secondary" onClick={generateReply} disabled={busyAction === "reply"}>
+            <MessageSquareText size={16} aria-hidden="true" />
+            {busyAction === "reply" ? "Preparando..." : "Generar borrador"}
+          </Button>
+          <Button variant="ghost" onClick={markTechnicalReview}>
+            <ShieldAlert size={16} aria-hidden="true" />
+            Marcar revisión técnica
+          </Button>
+        </div>
+      </section>
+
+      <section className="detail-panel detail-panel-ai">
+        <div className="detail-section-title">
+          <Sparkles size={18} aria-hidden="true" />
+          <div>
+            <span>Lectura del copiloto</span>
+            <strong>Señales, intención y prudencia técnica</strong>
+          </div>
+        </div>
+
+        <div className="detail-grid">
+          <Info label="Intención IA" value={lead.aiClassification?.intent ?? "No aplicada"} />
+          <Info label="Confianza IA" value={aiConfidence} />
+          <Info label="Indicadores técnicos" value={technicalFlags} wide />
+          <Info
+            label="Motivo de clasificación"
+            value={lead.summary.classificationReason ?? "Clasificación generada con reglas de demo."}
+            wide
+          />
+        </div>
+      </section>
 
       {lead.technicalRisk && (
         <div className="technical-risk-panel">
-          <ShieldAlert size={18} aria-hidden="true" />
+          <AlertTriangle size={18} aria-hidden="true" />
           <div>
             <strong>Consulta técnica sensible</strong>
             <p>
-              Revisar documentacion, soporte, uso previsto y requisitos aplicables antes de
-              responder al cliente.
+              Revisar documentación, soporte, uso previsto y requisitos aplicables antes de
+              responder al cliente. El copiloto no confirma normativa, cálculos ni montaje.
             </p>
           </div>
         </div>
@@ -285,11 +326,39 @@ export function LeadDetailCard({ lead, onStatusChange, onLeadUpdate }: LeadDetai
   );
 }
 
-function Info({ label, value }: { label: string; value: string }) {
+function ContactItem({
+  icon,
+  label,
+  value
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+}) {
   return (
-    <div className="info-pair">
-      <span>{label}</span>
-      <strong>{value}</strong>
+    <div className="detail-contact-item">
+      <span aria-hidden="true">{icon}</span>
+      <div>
+        <small>{label}</small>
+        <strong>{fallbackText(value)}</strong>
+      </div>
     </div>
   );
+}
+
+function Info({ label, value, wide = false }: { label: string; value: ReactNode; wide?: boolean }) {
+  return (
+    <div className={wide ? "info-pair info-pair-wide" : "info-pair"}>
+      <span>{label}</span>
+      <strong>{typeof value === "string" ? fallbackText(value) : value}</strong>
+    </div>
+  );
+}
+
+function formatList(values: string[] | undefined, fallback: string) {
+  return values && values.length > 0 ? values.join(" · ") : fallback;
+}
+
+function fallbackText(value: string | undefined) {
+  return value?.trim() ? value : "No indicado";
 }

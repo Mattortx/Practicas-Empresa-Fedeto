@@ -1,231 +1,618 @@
-import type { CommercialLead } from "../types/commercialCopilot";
+import type {
+  CommercialLead,
+  LeadPriority,
+  LeadStatus,
+  ProductFamilyId,
+  TechnicalRiskFlag
+} from "../types/commercialCopilot";
 
-export const mockLeads: CommercialLead[] = [
+type MockLeadSeed = {
+  id: string;
+  createdAt: string;
+  status: LeadStatus;
+  priority: LeadPriority;
+  technicalRiskFlags: TechnicalRiskFlag[];
+  productFamilyId: ProductFamilyId;
+  needType: string;
+  name: string;
+  company: string;
+  email: string;
+  phone: string;
+  workType: string;
+  location: string;
+  urgency: string;
+  observations: string;
+};
+
+const familyLabels: Record<ProductFamilyId, string> = {
+  provisional: "Protección provisional de borde",
+  definitiva: "Protección definitiva de borde",
+  "bases-casquillos": "Bases y casquillos",
+  auxiliares: "Auxiliares para la construcción",
+  consumibles: "Consumibles",
+  medida: "Soluciones a medida"
+};
+
+const nextActions: Record<ProductFamilyId, string> = {
+  provisional: "Derivar al equipo comercial con revisión técnica inicial.",
+  definitiva: "Solicitar revisión técnica y propuesta comercial.",
+  "bases-casquillos": "Revisar compatibilidad y preparar respuesta comercial.",
+  auxiliares: "Preparar respuesta comercial de suministro.",
+  consumibles: "Preparar respuesta comercial de consumibles.",
+  medida: "Derivar a revisión técnica personalizada y contacto comercial."
+};
+
+const warningByFamily: Record<ProductFamilyId, string> = {
+  provisional:
+    "La protección provisional debe revisarse según soporte, uso previsto y documentación técnica aplicable.",
+  definitiva: "La solución definitiva debe validarse por personal competente.",
+  "bases-casquillos":
+    "La compatibilidad debe confirmarse con referencias, soporte y documentación técnica.",
+  auxiliares: "Las referencias y compatibilidades deben confirmarse antes de suministro definitivo.",
+  consumibles: "Las cantidades y referencias deben validarse antes de confirmar suministro.",
+  medida: "Las soluciones a medida requieren revisión técnica personalizada."
+};
+
+const seeds: MockLeadSeed[] = [
   {
     id: "demo-001",
-    createdAt: new Date("2026-05-15T09:20:00").toISOString(),
+    createdAt: "2026-05-13T08:30:00",
     status: "pendiente_revision_tecnica",
     priority: "alta",
-    technicalRisk: true,
     technicalRiskFlags: ["documentacion_tecnica"],
     productFamilyId: "definitiva",
-    productFamilyLabel: "Protección definitiva de borde",
     needType: "Protección definitiva de borde",
-    source: "demo",
-    summary: {
-      name: "Laura Martinez",
-      company: "Mantenimiento Industrial Toledo",
-      email: "laura@example.com",
-      phone: "No indicado",
-      needType: "Protección definitiva de borde",
-      productFamily: "Protección definitiva de borde",
-      workType: "Cubierta técnica industrial",
-      location: "Toledo",
-      urgency: "Alta",
-      observations:
-        "Necesitan revisar una solución permanente para cubierta con mantenimiento recurrente.",
-      priority: "alta",
-      requiresTechnicalReview: true,
-      nextAction: "Solicitar revisión técnica y propuesta comercial.",
-      technicalWarnings: [
-        "La solución definitiva debe validarse por personal competente.",
-        "No se realizan cálculos estructurales automáticos."
-      ]
-    },
-    summaryText:
-      "Solicitud demo: protección definitiva de borde en cubierta técnica industrial. Requiere revisión técnica."
+    name: "Laura Martínez",
+    company: "Mantenimiento Industrial Toledo",
+    email: "laura@example.com",
+    phone: "No indicado",
+    workType: "Cubierta técnica industrial",
+    location: "Toledo",
+    urgency: "Alta",
+    observations: "Solución permanente para cubierta con mantenimiento recurrente."
   },
   {
     id: "demo-002",
-    createdAt: new Date("2026-05-15T10:05:00").toISOString(),
+    createdAt: "2026-05-13T09:45:00",
     status: "nueva",
     priority: "media",
-    technicalRisk: false,
     technicalRiskFlags: [],
     productFamilyId: "bases-casquillos",
-    productFamilyLabel: "Bases y casquillos",
     needType: "Bases, casquillos o elementos de fijación",
-    source: "demo",
-    summary: {
-      name: "Carlos Ruiz",
-      company: "Construcciones Demo SL",
-      email: "carlos@example.com",
-      phone: "No indicado",
-      needType: "Bases, casquillos o elementos de fijación",
-      productFamily: "Bases y casquillos",
-      workType: "Edificación",
-      location: "Madrid",
-      urgency: "Media",
-      observations: "Consulta sobre cantidades aproximadas de casquillos para proyecto asociado.",
-      priority: "media",
-      requiresTechnicalReview: false,
-      nextAction: "Revisar compatibilidad y preparar respuesta comercial.",
-      technicalWarnings: ["La compatibilidad debe confirmarse con referencias o documentación técnica."]
-    },
-    summaryText:
-      "Solicitud demo: bases y casquillos para edificacion. Pendiente de contacto comercial."
+    name: "Carlos Ruiz",
+    company: "Construcciones Demo SL",
+    email: "carlos@example.com",
+    phone: "No indicado",
+    workType: "Edificación",
+    location: "Madrid",
+    urgency: "Media",
+    observations: "Consulta sobre casquillos para proyecto asociado. Cantidad pendiente."
   },
   {
     id: "demo-003",
-    createdAt: new Date("2026-05-15T11:35:00").toISOString(),
+    createdAt: "2026-05-13T11:20:00",
     status: "nueva",
     priority: "media",
-    technicalRisk: false,
     technicalRiskFlags: [],
     productFamilyId: "provisional",
-    productFamilyLabel: "Protección provisional de borde",
     needType: "Protección provisional de borde",
-    source: "demo",
-    summary: {
-      name: "Marta Garcia",
-      company: "Obras Centro Demo",
-      email: "marta.garcia@example.com",
-      phone: "600 123 456",
-      needType: "Protección provisional de borde",
-      productFamily: "Protección provisional de borde",
-      workType: "Forjado en edificacion",
-      location: "Talavera de la Reina",
-      urgency: "Media",
-      observations:
-        "Necesitan orientar una solución temporal para borde de forjado. Longitud aproximada: 85 metros. Fijación pendiente de confirmar.",
-      priority: "media",
-      requiresTechnicalReview: false,
-      nextAction: "Derivar al equipo comercial con revisión técnica inicial.",
-      technicalWarnings: [
-        "La protección provisional debe revisarse según soporte, uso previsto y documentación técnica aplicable."
-      ]
-    },
-    summaryText:
-      "Solicitud demo: protección provisional de borde para forjado en edificacion. Pendiente confirmar soporte y fijación."
+    name: "Marta García",
+    company: "Obras Centro Demo",
+    email: "marta.garcia@example.com",
+    phone: "600 123 456",
+    workType: "Forjado en edificación",
+    location: "Talavera de la Reina",
+    urgency: "Media",
+    observations: "Borde de forjado de 85 metros. Fijación pendiente de confirmar."
   },
   {
     id: "demo-004",
-    createdAt: new Date("2026-05-15T12:10:00").toISOString(),
+    createdAt: "2026-05-13T13:10:00",
     status: "pendiente_contacto_comercial",
     priority: "baja",
-    technicalRisk: false,
     technicalRiskFlags: [],
     productFamilyId: "auxiliares",
-    productFamilyLabel: "Auxiliares para la construcción",
     needType: "Auxiliares para construcción",
-    source: "demo",
-    summary: {
-      name: "Javier Lopez",
-      company: "Suministros de Obra La Mancha",
-      email: "javier.lopez@example.com",
-      phone: "925 000 111",
-      needType: "Auxiliares para construcción",
-      productFamily: "Auxiliares para la construcción",
-      workType: "Reposición de material auxiliar",
-      location: "Ciudad Real",
-      urgency: "Baja",
-      observations:
-        "Consulta de suministro puntual para material auxiliar asociado a obra. Cantidades pendientes de cerrar.",
-      priority: "baja",
-      requiresTechnicalReview: false,
-      nextAction: "Preparar respuesta comercial de suministro.",
-      technicalWarnings: ["Las referencias y compatibilidades deben confirmarse antes de suministro definitivo."]
-    },
-    summaryText:
-      "Solicitud demo: auxiliares para construcción. Interés comercial de suministro puntual."
+    name: "Javier López",
+    company: "Suministros de Obra La Mancha",
+    email: "javier.lopez@example.com",
+    phone: "925 000 111",
+    workType: "Reposición de material auxiliar",
+    location: "Ciudad Real",
+    urgency: "Baja",
+    observations: "Suministro puntual para material auxiliar asociado a obra."
   },
   {
     id: "demo-005",
-    createdAt: new Date("2026-05-15T13:25:00").toISOString(),
+    createdAt: "2026-05-14T08:55:00",
     status: "nueva",
     priority: "media",
-    technicalRisk: false,
     technicalRiskFlags: [],
     productFamilyId: "consumibles",
-    productFamilyLabel: "Consumibles",
     needType: "Consumibles o recambios",
-    source: "demo",
-    summary: {
-      name: "Ana Serrano",
-      company: "Mantenimientos Cubiertas Demo",
-      email: "ana.serrano@example.com",
-      phone: "610 222 333",
-      needType: "Consumibles o recambios",
-      productFamily: "Consumibles",
-      workType: "Mantenimiento recurrente",
-      location: "Guadalajara",
-      urgency: "Media",
-      observations:
-        "Busca recambios y consumibles para mantenimiento. Solicita cantidades orientativas para reposición mensual.",
-      priority: "media",
-      requiresTechnicalReview: false,
-      nextAction: "Preparar respuesta comercial de consumibles.",
-      technicalWarnings: ["Las cantidades y referencias deben validarse antes de confirmar suministro."]
-    },
-    summaryText:
-      "Solicitud demo: consumibles y recambios para mantenimiento recurrente."
+    name: "Ana Serrano",
+    company: "Mantenimientos Cubiertas Demo",
+    email: "ana.serrano@example.com",
+    phone: "610 222 333",
+    workType: "Mantenimiento recurrente",
+    location: "Guadalajara",
+    urgency: "Media",
+    observations: "Recambios para mantenimiento. Reposición mensual orientativa."
   },
   {
     id: "demo-006",
-    createdAt: new Date("2026-05-15T15:05:00").toISOString(),
+    createdAt: "2026-05-14T10:05:00",
     status: "pendiente_revision_tecnica",
     priority: "alta",
-    technicalRisk: true,
     technicalRiskFlags: ["calculo", "anclaje", "documentacion_tecnica"],
     productFamilyId: "medida",
-    productFamilyLabel: "Soluciones a medida",
     needType: "Solución a medida u obra singular",
-    source: "demo",
-    summary: {
-      name: "Sergio Molina",
-      company: "Ingeniería Industrial Demo",
-      email: "sergio.molina@example.com",
-      phone: "615 444 555",
-      needType: "Solución a medida u obra singular",
-      productFamily: "Soluciones a medida",
-      workType: "Pasarela técnica en silo",
-      location: "Albacete",
-      urgency: "Alta",
-      observations:
-        "Necesidad singular en silo con restricciones de soporte. Indican que pueden aportar planos y fotografías. Requiere revisión técnica personalizada.",
-      priority: "alta",
-      requiresTechnicalReview: true,
-      nextAction: "Derivar a revisión técnica personalizada y contacto comercial.",
-      technicalWarnings: [
-        "Las soluciones a medida requieren revisión técnica personalizada.",
-        "El copiloto no propone cálculos, ensayos ni instrucciones definitivas."
-      ]
-    },
-    summaryText:
-      "Solicitud demo: solución a medida para pasarela técnica en silo. Alta prioridad y revisión técnica necesaria."
+    name: "Sergio Molina",
+    company: "Ingeniería Industrial Demo",
+    email: "sergio.molina@example.com",
+    phone: "615 444 555",
+    workType: "Pasarela técnica en silo",
+    location: "Albacete",
+    urgency: "Alta",
+    observations: "Necesidad singular en silo con restricciones de soporte y planos disponibles."
   },
   {
     id: "demo-007",
-    createdAt: new Date("2026-05-16T08:45:00").toISOString(),
+    createdAt: "2026-05-14T12:30:00",
     status: "nueva",
     priority: "alta",
-    technicalRisk: true,
     technicalRiskFlags: ["normativa", "certificacion", "documentacion_tecnica"],
     productFamilyId: "definitiva",
-    productFamilyLabel: "Protección definitiva de borde",
     needType: "Documentación, normativa o consulta técnica sensible",
-    source: "demo",
-    summary: {
-      name: "Raul Navarro",
-      company: "Facility Services Demo",
-      email: "raul.navarro@example.com",
-      phone: "No indicado",
-      needType: "Documentación, normativa o consulta técnica sensible",
-      productFamily: "Protección definitiva de borde",
-      workType: "Cubierta industrial",
-      location: "Toledo",
-      urgency: "Alta",
-      observations:
-        "Consulta sobre documentación técnica para barandilla definitiva en cubierta. No se confirma normativa desde el copiloto.",
-      priority: "alta",
-      requiresTechnicalReview: true,
-      nextAction: "Derivar al equipo técnico para respuesta documentada.",
-      technicalWarnings: [
-        "No se confirma cumplimiento normativo desde el copiloto.",
-        "La respuesta debe apoyarse en documentación técnica oficial y revisión del equipo competente."
-      ]
-    },
-    summaryText:
-      "Solicitud demo: consulta documental sobre protección definitiva. Requiere respuesta técnica documentada."
+    name: "Raúl Navarro",
+    company: "Facility Services Demo",
+    email: "raul.navarro@example.com",
+    phone: "No indicado",
+    workType: "Cubierta industrial",
+    location: "Toledo",
+    urgency: "Alta",
+    observations: "Consulta sobre documentación técnica para barandilla definitiva en cubierta."
+  },
+  {
+    id: "demo-008",
+    createdAt: "2026-05-14T16:15:00",
+    status: "cerrada_demo",
+    priority: "baja",
+    technicalRiskFlags: [],
+    productFamilyId: "consumibles",
+    needType: "Consumibles o recambios",
+    name: "Elena Prieto",
+    company: "Servicios Generales Demo",
+    email: "elena.prieto@example.com",
+    phone: "612 800 441",
+    workType: "Reposición de almacén",
+    location: "Cuenca",
+    urgency: "Baja",
+    observations: "Pedido pequeño de recambios para reposición de almacén."
+  },
+  {
+    id: "demo-009",
+    createdAt: "2026-05-15T09:05:00",
+    status: "pendiente_contacto_comercial",
+    priority: "media",
+    technicalRiskFlags: [],
+    productFamilyId: "provisional",
+    needType: "Protección provisional de borde",
+    name: "Diego Herranz",
+    company: "Reformas Técnicas Centro",
+    email: "diego.herranz@example.com",
+    phone: "611 310 224",
+    workType: "Cubierta en rehabilitación",
+    location: "Ávila",
+    urgency: "Media",
+    observations: "Protección temporal para cubierta durante intervención de mantenimiento."
+  },
+  {
+    id: "demo-010",
+    createdAt: "2026-05-15T09:50:00",
+    status: "nueva",
+    priority: "media",
+    technicalRiskFlags: [],
+    productFamilyId: "bases-casquillos",
+    needType: "Bases, casquillos o elementos de fijación",
+    name: "Patricia León",
+    company: "Estructuras Norte Demo",
+    email: "patricia.leon@example.com",
+    phone: "No indicado",
+    workType: "Proyecto de naves",
+    location: "Burgos",
+    urgency: "Media",
+    observations: "Solicitan orientación para bases atornillables y compatibilidad con soporte."
+  },
+  {
+    id: "demo-011",
+    createdAt: "2026-05-15T10:35:00",
+    status: "pendiente_revision_tecnica",
+    priority: "alta",
+    technicalRiskFlags: ["instalacion", "anclaje"],
+    productFamilyId: "definitiva",
+    needType: "Protección definitiva de borde",
+    name: "Óscar Cano",
+    company: "Cubiertas Industriales Levante",
+    email: "oscar.cano@example.com",
+    phone: "620 445 910",
+    workType: "Cubierta sin perforación",
+    location: "Valencia",
+    urgency: "Alta",
+    observations: "Buscan solución permanente en cubierta donde no se puede perforar."
+  },
+  {
+    id: "demo-012",
+    createdAt: "2026-05-15T11:40:00",
+    status: "nueva",
+    priority: "media",
+    technicalRiskFlags: [],
+    productFamilyId: "auxiliares",
+    needType: "Auxiliares para construcción",
+    name: "Silvia Campos",
+    company: "Montajes Seguros Demo",
+    email: "silvia.campos@example.com",
+    phone: "633 113 221",
+    workType: "Material auxiliar para obra",
+    location: "Madrid",
+    urgency: "Media",
+    observations: "Consulta de suministro para varias obras con referencias pendientes."
+  },
+  {
+    id: "demo-013",
+    createdAt: "2026-05-15T13:20:00",
+    status: "pendiente_revision_tecnica",
+    priority: "alta",
+    technicalRiskFlags: ["calculo", "resistencia"],
+    productFamilyId: "medida",
+    needType: "Solución a medida u obra singular",
+    name: "Fernando Sanz",
+    company: "Infraestructuras Demo",
+    email: "fernando.sanz@example.com",
+    phone: "629 777 010",
+    workType: "Puente con zona de mantenimiento",
+    location: "Toledo",
+    urgency: "Alta",
+    observations: "Zona elevada en infraestructura con geometría singular y documentación pendiente."
+  },
+  {
+    id: "demo-014",
+    createdAt: "2026-05-15T17:00:00",
+    status: "nueva",
+    priority: "baja",
+    technicalRiskFlags: [],
+    productFamilyId: "consumibles",
+    needType: "Consumibles o recambios",
+    name: "Nuria Beltrán",
+    company: "Almacenes Técnicos Demo",
+    email: "nuria.beltran@example.com",
+    phone: "No indicado",
+    workType: "Compra puntual",
+    location: "Segovia",
+    urgency: "Baja",
+    observations: "Consulta informativa sobre recambios y disponibilidad comercial."
+  },
+  {
+    id: "demo-015",
+    createdAt: "2026-05-16T08:25:00",
+    status: "nueva",
+    priority: "media",
+    technicalRiskFlags: [],
+    productFamilyId: "provisional",
+    needType: "Protección provisional de borde",
+    name: "Miguel Pardo",
+    company: "Construcciones Tajo Demo",
+    email: "miguel.pardo@example.com",
+    phone: "680 442 118",
+    workType: "Canto de forjado",
+    location: "Toledo",
+    urgency: "Media",
+    observations: "Consulta para 120 metros de borde provisional con obra en planificación."
+  },
+  {
+    id: "demo-016",
+    createdAt: "2026-05-16T09:15:00",
+    status: "pendiente_contacto_comercial",
+    priority: "media",
+    technicalRiskFlags: [],
+    productFamilyId: "bases-casquillos",
+    needType: "Bases, casquillos o elementos de fijación",
+    name: "Teresa Ramos",
+    company: "Promociones Centro Demo",
+    email: "teresa.ramos@example.com",
+    phone: "617 331 902",
+    workType: "Edificio residencial",
+    location: "Madrid",
+    urgency: "Media",
+    observations: "Presupuesto para 200 casquillos atornillables. Uso previsto por confirmar."
+  },
+  {
+    id: "demo-017",
+    createdAt: "2026-05-16T10:40:00",
+    status: "pendiente_revision_tecnica",
+    priority: "alta",
+    technicalRiskFlags: ["documentacion_tecnica", "normativa"],
+    productFamilyId: "definitiva",
+    needType: "Protección definitiva de borde",
+    name: "Iván Robles",
+    company: "Energía Solar Demo",
+    email: "ivan.robles@example.com",
+    phone: "621 909 332",
+    workType: "Cubierta con placas solares",
+    location: "Guadalajara",
+    urgency: "Alta",
+    observations: "Necesitan barandilla definitiva y documentación técnica asociada."
+  },
+  {
+    id: "demo-018",
+    createdAt: "2026-05-16T12:05:00",
+    status: "nueva",
+    priority: "baja",
+    technicalRiskFlags: [],
+    productFamilyId: "auxiliares",
+    needType: "Auxiliares para construcción",
+    name: "Lucía Torres",
+    company: "Obra Civil Demo",
+    email: "lucia.torres@example.com",
+    phone: "No indicado",
+    workType: "Suministro auxiliar",
+    location: "Cuenca",
+    urgency: "Baja",
+    observations: "Consulta genérica de material auxiliar para planificación de compras."
+  },
+  {
+    id: "demo-019",
+    createdAt: "2026-05-16T15:45:00",
+    status: "pendiente_revision_tecnica",
+    priority: "alta",
+    technicalRiskFlags: ["instalacion", "resistencia"],
+    productFamilyId: "medida",
+    needType: "Solución a medida u obra singular",
+    name: "Tomás Ortega",
+    company: "Mantenimiento Portuario Demo",
+    email: "tomas.ortega@example.com",
+    phone: "625 212 700",
+    workType: "Instalación industrial exterior",
+    location: "Valencia",
+    urgency: "Alta",
+    observations: "Entorno exterior agresivo con restricciones de soporte y acceso."
+  },
+  {
+    id: "demo-020",
+    createdAt: "2026-05-17T08:50:00",
+    status: "nueva",
+    priority: "media",
+    technicalRiskFlags: [],
+    productFamilyId: "provisional",
+    needType: "Protección provisional de borde",
+    name: "Beatriz Fuentes",
+    company: "Rehabilitaciones Urbanas Demo",
+    email: "beatriz.fuentes@example.com",
+    phone: "639 440 221",
+    workType: "Huecos interiores",
+    location: "Madrid",
+    urgency: "Media",
+    observations: "Protección temporal de huecos interiores durante rehabilitación."
+  },
+  {
+    id: "demo-021",
+    createdAt: "2026-05-17T10:10:00",
+    status: "cerrada_demo",
+    priority: "media",
+    technicalRiskFlags: [],
+    productFamilyId: "bases-casquillos",
+    needType: "Bases, casquillos o elementos de fijación",
+    name: "Andrés Gil",
+    company: "Metalúrgica Demo",
+    email: "andres.gil@example.com",
+    phone: "No indicado",
+    workType: "Compatibilidad de base",
+    location: "Toledo",
+    urgency: "Media",
+    observations: "Consulta cerrada en demo tras orientar compatibilidad de bases."
+  },
+  {
+    id: "demo-022",
+    createdAt: "2026-05-17T11:55:00",
+    status: "pendiente_contacto_comercial",
+    priority: "media",
+    technicalRiskFlags: [],
+    productFamilyId: "definitiva",
+    needType: "Protección definitiva de borde",
+    name: "Clara Vidal",
+    company: "Gestión de Cubiertas Demo",
+    email: "clara.vidal@example.com",
+    phone: "622 451 030",
+    workType: "Terraza técnica",
+    location: "Barcelona",
+    urgency: "Media",
+    observations: "Consulta sobre recorrido permanente en terraza técnica con equipos."
+  },
+  {
+    id: "demo-023",
+    createdAt: "2026-05-17T16:30:00",
+    status: "nueva",
+    priority: "baja",
+    technicalRiskFlags: [],
+    productFamilyId: "consumibles",
+    needType: "Consumibles o recambios",
+    name: "Héctor Martín",
+    company: "Compras Industriales Demo",
+    email: "hector.martin@example.com",
+    phone: "690 010 113",
+    workType: "Stock de mantenimiento",
+    location: "Albacete",
+    urgency: "Baja",
+    observations: "Solicitud informativa de consumibles para stock trimestral."
+  },
+  {
+    id: "demo-024",
+    createdAt: "2026-05-18T08:35:00",
+    status: "pendiente_revision_tecnica",
+    priority: "alta",
+    technicalRiskFlags: ["anclaje", "instalacion"],
+    productFamilyId: "provisional",
+    needType: "Protección provisional de borde",
+    name: "Paula Medina",
+    company: "Obras Singulares Demo",
+    email: "paula.medina@example.com",
+    phone: "634 778 020",
+    workType: "Muro perimetral en obra",
+    location: "Toledo",
+    urgency: "Alta",
+    observations: "Necesidad urgente en obra activa con dudas sobre anclaje y perforación."
+  },
+  {
+    id: "demo-025",
+    createdAt: "2026-05-18T09:25:00",
+    status: "nueva",
+    priority: "media",
+    technicalRiskFlags: [],
+    productFamilyId: "bases-casquillos",
+    needType: "Bases, casquillos o elementos de fijación",
+    name: "Alberto Navas",
+    company: "Instalaciones Técnicas Demo",
+    email: "alberto.navas@example.com",
+    phone: "No indicado",
+    workType: "Suministro de anclajes",
+    location: "Valladolid",
+    urgency: "Media",
+    observations: "Necesitan orientación para anclajes y cantidades aproximadas."
+  },
+  {
+    id: "demo-026",
+    createdAt: "2026-05-18T11:10:00",
+    status: "pendiente_contacto_comercial",
+    priority: "media",
+    technicalRiskFlags: [],
+    productFamilyId: "auxiliares",
+    needType: "Auxiliares para construcción",
+    name: "Marina Pascual",
+    company: "Distribución Obra Demo",
+    email: "marina.pascual@example.com",
+    phone: "640 551 003",
+    workType: "Pedido recurrente",
+    location: "Madrid",
+    urgency: "Media",
+    observations: "Posible pedido recurrente de auxiliares para varias delegaciones."
+  },
+  {
+    id: "demo-027",
+    createdAt: "2026-05-18T12:50:00",
+    status: "pendiente_revision_tecnica",
+    priority: "alta",
+    technicalRiskFlags: ["calculo", "documentacion_tecnica"],
+    productFamilyId: "medida",
+    needType: "Solución a medida u obra singular",
+    name: "Víctor Salas",
+    company: "Ingeniería de Procesos Demo",
+    email: "victor.salas@example.com",
+    phone: "682 441 770",
+    workType: "Zona elevada en planta industrial",
+    location: "Ciudad Real",
+    urgency: "Alta",
+    observations: "Caso singular con documentación disponible y solicitud de revisión técnica."
+  },
+  {
+    id: "demo-028",
+    createdAt: "2026-05-19T08:15:00",
+    status: "nueva",
+    priority: "media",
+    technicalRiskFlags: [],
+    productFamilyId: "provisional",
+    needType: "Protección provisional de borde",
+    name: "Rocío Vega",
+    company: "Edificación Sur Demo",
+    email: "rocio.vega@example.com",
+    phone: "No indicado",
+    workType: "Borde de forjado",
+    location: "Sevilla",
+    urgency: "Media",
+    observations: "Consulta inicial para obra de edificación. Longitud estimada: 60 metros."
+  },
+  {
+    id: "demo-029",
+    createdAt: "2026-05-19T10:40:00",
+    status: "pendiente_revision_tecnica",
+    priority: "alta",
+    technicalRiskFlags: ["normativa", "documentacion_tecnica"],
+    productFamilyId: "definitiva",
+    needType: "Documentación, normativa o consulta técnica sensible",
+    name: "Álvaro Benito",
+    company: "Prevención y Seguridad Demo",
+    email: "alvaro.benito@example.com",
+    phone: "618 903 221",
+    workType: "Cubierta de edificio logístico",
+    location: "Zaragoza",
+    urgency: "Alta",
+    observations: "Piden documentación técnica y orientación prudente sobre normativa aplicable."
+  },
+  {
+    id: "demo-030",
+    createdAt: "2026-05-19T13:05:00",
+    status: "nueva",
+    priority: "media",
+    technicalRiskFlags: [],
+    productFamilyId: "provisional",
+    needType: "Protección provisional de borde",
+    name: "Isabel Ríos",
+    company: "Construcción Modular Demo",
+    email: "isabel.rios@example.com",
+    phone: "619 228 140",
+    workType: "Cubierta temporal de nave",
+    location: "Toledo",
+    urgency: "Media",
+    observations: "Necesitan orientar protección temporal y ubicación de puntos de riesgo."
   }
 ];
+
+export const mockLeads: CommercialLead[] = seeds.map(createMockLead);
+
+function createMockLead(seed: MockLeadSeed): CommercialLead {
+  const technicalRisk = seed.technicalRiskFlags.length > 0;
+  const productFamilyLabel = familyLabels[seed.productFamilyId];
+  const technicalWarnings = [
+    warningByFamily[seed.productFamilyId],
+    ...(technicalRisk
+      ? ["Consulta marcada para revisión técnica antes de confirmar solución, normativa o documentación."]
+      : [])
+  ];
+
+  const summary = {
+    name: seed.name,
+    company: seed.company,
+    email: seed.email,
+    phone: seed.phone,
+    needType: seed.needType,
+    productFamily: productFamilyLabel,
+    workType: seed.workType,
+    location: seed.location,
+    urgency: seed.urgency,
+    observations: seed.observations,
+    priority: seed.priority,
+    requiresTechnicalReview: technicalRisk,
+    nextAction: nextActions[seed.productFamilyId],
+    technicalWarnings
+  };
+
+  return {
+    id: seed.id,
+    createdAt: new Date(seed.createdAt).toISOString(),
+    status: seed.status,
+    priority: seed.priority,
+    technicalRisk,
+    technicalRiskFlags: seed.technicalRiskFlags,
+    productFamilyId: seed.productFamilyId,
+    productFamilyLabel,
+    needType: seed.needType,
+    source: "demo",
+    summary,
+    summaryText: [
+      `Solicitud demo: ${seed.needType}.`,
+      `Empresa: ${seed.company}.`,
+      `Ubicación: ${seed.location}.`,
+      `Urgencia: ${seed.urgency}.`,
+      technicalRisk ? "Requiere revisión técnica." : "Consulta comercial inicial."
+    ].join(" ")
+  };
+}

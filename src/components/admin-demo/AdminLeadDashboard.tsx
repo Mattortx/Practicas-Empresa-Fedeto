@@ -3,6 +3,7 @@ import { Trash2 } from "lucide-react";
 import type { CommercialLead, LeadStatus } from "../../types/commercialCopilot";
 import { clearLocalLeads, readLocalLeads, replaceLocalLeads } from "../../utils/localLeadStore";
 import { Button } from "../ui/Button";
+import { AdminAnalyticsPanel } from "./AdminAnalyticsPanel";
 import { LeadDetailCard } from "./LeadDetailCard";
 import { LeadTable } from "./LeadTable";
 
@@ -39,6 +40,7 @@ export function AdminLeadDashboard() {
     () => filteredLeads.find((lead) => lead.id === selectedId) ?? filteredLeads[0],
     [filteredLeads, selectedId]
   );
+  const activeFilterLabel = filters.find((filter) => filter.id === activeFilter)?.label ?? "Todas";
 
   useEffect(() => {
     if (!filteredLeads.some((lead) => lead.id === selectedId)) {
@@ -101,6 +103,12 @@ export function AdminLeadDashboard() {
           value={String(leads.filter((lead) => lead.priority === "alta").length)}
         />
       </div>
+
+      <AdminAnalyticsPanel
+        leads={leads}
+        filteredLeads={filteredLeads}
+        activeFilterLabel={activeFilterLabel}
+      />
 
       <div className="admin-filters" aria-label="Filtros de solicitudes">
         {filters.map((filter) => (
