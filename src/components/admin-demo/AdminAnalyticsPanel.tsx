@@ -32,9 +32,11 @@ const priorityLabels: Record<LeadPriority, string> = {
 
 const statusLabels: Record<LeadStatus, string> = {
   nueva: "Nueva",
-  pendiente_revision_tecnica: "Revisión técnica",
+  calificada: "Calificada",
   pendiente_contacto_comercial: "Contacto comercial",
-  cerrada_demo: "Cerrada demo"
+  pendiente_revision_tecnica: "Revisión técnica",
+  cerrada_demo: "Cerrada demo",
+  cerrada_no_oportunidad: "Cerrada"
 };
 
 const familyOrder: FamilyBucket[] = [
@@ -305,7 +307,7 @@ function buildAnalyticsInsights(leads: CommercialLead[], familyData: ChartDatum[
     });
   const technicalReviewCount = leads.filter((lead) => lead.technicalRisk).length;
   const highPriorityCount = leads.filter((lead) => lead.priority === "alta").length;
-  const openCount = leads.filter((lead) => lead.status !== "cerrada_demo").length;
+  const openCount = leads.filter((lead) => lead.status !== "cerrada_demo" && lead.status !== "cerrada_no_oportunidad").length;
 
   return [
     {
@@ -362,8 +364,10 @@ function buildPriorityData(leads: CommercialLead[]): ChartDatum[] {
 function buildStatusData(leads: CommercialLead[]): ChartDatum[] {
   const statusOrder: LeadStatus[] = [
     "nueva",
-    "pendiente_revision_tecnica",
+    "calificada",
     "pendiente_contacto_comercial",
+    "pendiente_revision_tecnica",
+    "cerrada_no_oportunidad",
     "cerrada_demo"
   ];
 
@@ -374,7 +378,7 @@ function buildStatusData(leads: CommercialLead[]): ChartDatum[] {
     tone:
       status === "pendiente_revision_tecnica"
         ? "orange"
-        : status === "cerrada_demo"
+        : status === "cerrada_demo" || status === "cerrada_no_oportunidad"
           ? "green"
           : status === "nueva"
             ? "blue"

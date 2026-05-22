@@ -26,17 +26,52 @@ const academicMetrics = [
 ];
 
 const objectives = [
-  "Construir una prueba de concepto util para cualificar consultas comerciales.",
-  "Separar la experiencia de cliente de la memoria academica del proyecto.",
+  "Construir una prueba de concepto útil para cualificar consultas comerciales.",
+  "Separar la experiencia de cliente de la memoria académica del proyecto.",
   "Integrar IA generativa con reglas locales y validaciones prudentes.",
   "Persistir solicitudes y eventos para simular un flujo comercial completo."
+];
+
+const projectNarrative = [
+  {
+    title: "Problema de partida",
+    text:
+      "Una consulta sobre protección en altura suele llegar incompleta: falta tipo de obra, soporte, longitud, urgencia, documentación o datos de contacto. El MVP ordena esa entrada sin sustituir al equipo técnico."
+  },
+  {
+    title: "Hipótesis del MVP",
+    text:
+      "Un chatbot integrado en la web puede funcionar como copiloto comercial si combina conversación guiada, clasificación por familias de producto y resumen interno para seguimiento."
+  },
+  {
+    title: "Criterio profesional",
+    text:
+      "La demo evita prometer cumplimiento normativo, cálculos, montaje o resistencia. Cuando aparecen términos sensibles, deriva la consulta para revisión técnica."
+  }
+];
+
+const demoDeliverables = [
+  "Vista pública con explicación del copiloto y caso de uso.",
+  "Chatbot con flujos comerciales, entrada libre e IA opcional.",
+  "Generación de solicitudes con prioridad y revisión técnica.",
+  "Panel interno con filtros, detalle, estados y resumen comercial.",
+  "Analíticas de demo con distribución, prioridad, estado y evolución.",
+  "Documentación de arquitectura, límites, seguridad y despliegue."
+];
+
+const evaluationPoints = [
+  "La aplicación se puede ejecutar localmente y desplegar como POC.",
+  "Las claves de IA no se exponen en el frontend.",
+  "El sistema funciona con IA y también con fallback local.",
+  "Los textos mantienen tono técnico, comercial y prudente.",
+  "El panel muestra cómo la empresa aprovecharía las solicitudes."
 ];
 
 const architectureLayers = [
   {
     icon: Layers3,
     title: "Experiencia",
-    text: "React y Vite organizan demo funcional, panel interno y memoria de practicas."
+    text: "React y Vite organizan demo funcional, panel interno, analíticas y memoria de prácticas."
   },
   {
     icon: ServerCog,
@@ -46,40 +81,40 @@ const architectureLayers = [
   {
     icon: DatabaseZap,
     title: "Datos",
-    text: "Supabase guarda solicitudes, estados y trazabilidad basica de eventos."
+    text: "Supabase guarda solicitudes, estados y trazabilidad básica de eventos."
   },
   {
     icon: Sparkles,
     title: "IA",
-    text: "Groq asiste en clasificacion, resumen y respuesta, con fallback local."
+    text: "Groq asiste en clasificación, resumen y respuesta, con fallback local."
   }
 ];
 
 const methodology = [
   {
-    title: "Analisis del dominio",
-    text: "Se identificaron familias comerciales, datos necesarios y situaciones que requieren revision tecnica."
+    title: "Análisis del dominio",
+    text: "Se identificaron familias comerciales, datos necesarios y situaciones que requieren revisión técnica."
   },
   {
     title: "Prototipado funcional",
-    text: "Se desarrollo una conversacion guiada capaz de convertir mensajes libres en solicitudes estructuradas."
+    text: "Se desarrolló una conversación guiada capaz de convertir mensajes libres en solicitudes estructuradas."
   },
   {
-    title: "Integracion y despliegue",
-    text: "Se separo frontend, backend, base de datos y variables secretas para preparar una demo online."
+    title: "Integración y despliegue",
+    text: "Se separó frontend, backend, base de datos y variables secretas para preparar una demo online."
   },
   {
-    title: "Validacion de seguridad",
-    text: "Se anadieron guardrails para no confirmar normativa, calculos, montaje ni resistencia desde IA."
+    title: "Validación de seguridad",
+    text: "Se añadieron guardrails para no confirmar normativa, cálculos, montaje ni resistencia desde IA."
   }
 ];
 
 const familyCardDetails: Record<ProductFamilyId, string[]> = {
-  provisional: ["soporte", "perforacion", "longitud", "urgencia"],
-  definitiva: ["entorno", "fijacion", "uso permanente", "documentacion"],
+  provisional: ["soporte", "perforación", "longitud", "urgencia"],
+  definitiva: ["entorno", "fijación", "uso permanente", "documentación"],
   "bases-casquillos": ["tipo de pieza", "soporte", "cantidad", "compatibilidad"],
   auxiliares: ["producto", "uso previsto", "cantidad", "entrega"],
-  consumibles: ["referencia", "cantidad", "reposicion", "suministro"],
+  consumibles: ["referencia", "cantidad", "reposición", "suministro"],
   medida: ["problema", "restricciones", "planos", "plazo"]
 };
 
@@ -90,11 +125,11 @@ export function PracticasPage() {
 
       <section className="academic-hero">
         <div className="academic-hero-copy">
-          <span className="eyebrow">Proyecto de practicas FEDETO</span>
-          <h1>Memoria academica del copiloto comercial</h1>
+          <span className="eyebrow">Proyecto de prácticas FEDETO</span>
+          <h1>Memoria académica del copiloto comercial</h1>
           <p>
-            Documentacion visual del prototipo: problema abordado, decisiones tecnicas,
-            arquitectura, metodologia, limites de IA y evidencias de funcionamiento.
+            Documentación visual del prototipo: problema abordado, decisiones técnicas,
+            arquitectura, metodología, límites de IA y evidencias de funcionamiento.
           </p>
           <div className="hero-actions">
             <a className="button button-primary" href="/">
@@ -103,12 +138,15 @@ export function PracticasPage() {
             <a className="button button-secondary" href="/admin-demo">
               Ver panel interno
             </a>
+            <a className="button button-secondary" href="/admin-demo/analytics">
+              Ver analíticas
+            </a>
           </div>
         </div>
 
         <div className="academic-cover" aria-label="Resumen del proyecto">
           <div className="report-sheet">
-            <span>Informe tecnico</span>
+            <span>Informe técnico</span>
             <strong>Copiloto Comercial Protecciones Toledo</strong>
             <p>POC web con IA, backend, Supabase y despliegue online.</p>
             <div className="report-lines" aria-hidden="true">
@@ -135,8 +173,8 @@ export function PracticasPage() {
             <span className="eyebrow">Resumen ejecutivo</span>
             <h2>De una consulta informal a un flujo comercial medible</h2>
             <p>
-              El proyecto demuestra como una interfaz conversacional puede ordenar la entrada
-              de informacion, orientar al cliente, detectar riesgos tecnicos y preparar una
+              El proyecto demuestra cómo una interfaz conversacional puede ordenar la entrada
+              de información, orientar al cliente, detectar riesgos técnicos y preparar una
               ficha revisable por el equipo de Protecciones Toledo.
             </p>
           </div>
@@ -146,6 +184,60 @@ export function PracticasPage() {
             <div key={objective}>
               <CheckCircle2 size={18} aria-hidden="true" />
               <span>{objective}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="academic-section project-explainer-section">
+        <div className="section-title compact-title">
+          <span>Alcance del proyecto</span>
+          <h2>Una POC pensada para defender valor técnico y valor empresarial</h2>
+          <p>
+            La aplicación se ha planteado como un MVP realista para prácticas: una sola web,
+            una experiencia de cliente, un panel interno simulado y una capa de IA segura que
+            ayuda a clasificar sin inventar información técnica.
+          </p>
+        </div>
+
+        <div className="project-narrative-grid reveal-group">
+          {projectNarrative.map((item, index) => (
+            <article className="project-narrative-card" key={item.title}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong>{item.title}</strong>
+              <p>{item.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="academic-section project-deliverables-section">
+        <div className="deliverables-panel">
+          <div>
+            <span className="eyebrow">Entregables demostrables</span>
+            <h2>Qué se puede enseñar en una defensa de prácticas</h2>
+            <p>
+              La demo cubre el ciclo completo: captación, conversación, cualificación, generación
+              de ficha, revisión interna y lectura analítica de oportunidades.
+            </p>
+          </div>
+          <div className="deliverables-grid">
+            {demoDeliverables.map((item) => (
+              <span key={item}>
+                <CheckCircle2 size={17} aria-hidden="true" />
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="evaluation-panel">
+          <span className="eyebrow">Criterios de evaluación</span>
+          <h2>Por qué la solución es defendible</h2>
+          {evaluationPoints.map((item) => (
+            <div key={item}>
+              <ClipboardCheck size={17} aria-hidden="true" />
+              <span>{item}</span>
             </div>
           ))}
         </div>
@@ -179,8 +271,8 @@ export function PracticasPage() {
 
       <section className="academic-section methodology-section">
         <div className="section-title compact-title">
-          <span>Metodologia</span>
-          <h2>Fases de trabajo y criterios de validacion</h2>
+          <span>Metodología</span>
+          <h2>Fases de trabajo y criterios de validación</h2>
         </div>
         <div className="methodology-timeline">
           {methodology.map((item, index) => (
@@ -221,7 +313,7 @@ export function PracticasPage() {
           </div>
         </div>
         <Notice>
-          <strong>Buenas practicas aplicadas.</strong> Las claves se configuran como secretos del
+          <strong>Buenas prácticas aplicadas.</strong> Las claves se configuran como secretos del
           entorno online. El frontend consume la API mediante URL de entorno y no expone claves
           de Groq ni Supabase.
         </Notice>
@@ -258,17 +350,17 @@ export function PracticasPage() {
       <section className="academic-section safety-section">
         <div>
           <span className="eyebrow">Seguridad y alcance</span>
-          <h2>El sistema asiste, pero no sustituye la revision tecnica</h2>
+          <h2>El sistema asiste, pero no sustituye la revisión técnica</h2>
           <p>
-            La aplicacion esta disenada para preparar contexto comercial. Las decisiones sobre
-            normativa, certificacion, calculo, montaje, anclaje o resistencia se derivan a
+            La aplicación está diseñada para preparar contexto comercial. Las decisiones sobre
+            normativa, certificación, cálculo, montaje, anclaje o resistencia se derivan a
             personal competente.
           </p>
         </div>
         <div className="safety-grid">
           <span>
             <ShieldAlert size={18} aria-hidden="true" />
-            Deteccion de riesgo tecnico
+            Detección de riesgo técnico
           </span>
           <span>
             <GitBranch size={18} aria-hidden="true" />
@@ -276,7 +368,7 @@ export function PracticasPage() {
           </span>
           <span>
             <Workflow size={18} aria-hidden="true" />
-            Flujo trazable para presentacion
+            Flujo trazable para presentación
           </span>
           <span>
             <ClipboardCheck size={18} aria-hidden="true" />

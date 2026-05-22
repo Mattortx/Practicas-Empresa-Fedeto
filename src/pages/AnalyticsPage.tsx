@@ -22,9 +22,12 @@ export function AnalyticsPage() {
           <ArrowLeft size={17} aria-hidden="true" />
           Panel comercial
         </a>
+        <a className="button button-secondary" href="/practicas">
+          Proyecto de prácticas
+        </a>
         <span>
           <Download size={17} aria-hidden="true" />
-          Informes
+          Analíticas
         </span>
       </header>
 

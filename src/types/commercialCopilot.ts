@@ -16,9 +16,11 @@ export type LeadPriority = "baja" | "media" | "alta";
 
 export type LeadStatus =
   | "nueva"
-  | "pendiente_revision_tecnica"
+  | "calificada"
   | "pendiente_contacto_comercial"
-  | "cerrada_demo";
+  | "pendiente_revision_tecnica"
+  | "cerrada_demo"
+  | "cerrada_no_oportunidad";
 
 export type TechnicalRiskFlag =
   | "normativa"

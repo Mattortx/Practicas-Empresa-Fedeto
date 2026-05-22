@@ -59,12 +59,12 @@ const companyBenefits = [
   {
     icon: Gauge,
     title: "Prioridad visible",
-    text: "Cada solicitud llega con familia probable, urgencia, riesgo tecnico y siguiente accion."
+    text: "Cada solicitud llega con familia probable, urgencia, riesgo técnico y siguiente acción."
   },
   {
     icon: UsersRound,
     title: "Mejor traspaso interno",
-    text: "Comercial y tecnico revisan una ficha comun en vez de reconstruir el contexto desde cero."
+    text: "Comercial y técnico revisan una ficha común en vez de reconstruir el contexto desde cero."
   }
 ];
 
@@ -117,6 +117,9 @@ export function PublicDemoPage() {
             <a className="button button-secondary" href="/admin-demo">
               Abrir panel interno
             </a>
+            <a className="button button-secondary" href="/admin-demo/analytics">
+              Ver analíticas
+            </a>
           </div>
           <div className="status-rack" aria-label="Estado operativo de la demo">
             {operatingStats.map((item) => (
@@ -141,7 +144,7 @@ export function PublicDemoPage() {
             <span>Consulta</span>
             <span>Clasificación</span>
             <span>Ficha</span>
-            <span>Revision</span>
+            <span>Revisión</span>
           </div>
           <div className="console-result">
             <div>
@@ -154,7 +157,7 @@ export function PublicDemoPage() {
               <strong>{activeScenario.priority}</strong>
             </div>
           </div>
-          <div className="console-actions" aria-label="Escenarios de presentacion">
+          <div className="console-actions" aria-label="Escenarios de presentación">
             {scenarioCards.map((scenario) => (
               <button
                 className={scenario.id === activeScenario.id ? "active" : ""}

@@ -30,8 +30,10 @@ interface LeadDetailCardProps {
 
 const statusOptions: Array<{ value: LeadStatus; label: string }> = [
   { value: "nueva", label: "Nueva" },
-  { value: "pendiente_revision_tecnica", label: "Pendiente revisión técnica" },
+  { value: "calificada", label: "Calificada" },
   { value: "pendiente_contacto_comercial", label: "Pendiente contacto comercial" },
+  { value: "pendiente_revision_tecnica", label: "Pendiente revisión técnica" },
+  { value: "cerrada_no_oportunidad", label: "Cerrada — no oportunidad" },
   { value: "cerrada_demo", label: "Cerrada en demo" }
 ];
 

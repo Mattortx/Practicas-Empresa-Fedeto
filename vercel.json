@@ -5,6 +5,7 @@
   "outputDirectory": "dist",
   "rewrites": [
     { "source": "/admin-demo", "destination": "/index.html" },
+    { "source": "/admin-demo/analytics", "destination": "/index.html" },
     { "source": "/practicas", "destination": "/index.html" },
     { "source": "/practicas/tecnica", "destination": "/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
@@ -21,6 +22,15 @@
     },
     {
       "source": "/admin-demo",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
+    },
+    {
+      "source": "/admin-demo/analytics",
       "headers": [
         {
           "key": "Cache-Control",

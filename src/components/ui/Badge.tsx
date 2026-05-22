@@ -18,11 +18,13 @@ export function PriorityBadge({ priority }: { priority: LeadPriority }) {
 export function StatusBadge({ status }: { status: LeadStatus }) {
   const labels: Record<LeadStatus, string> = {
     nueva: "Nueva",
-    pendiente_revision_tecnica: "Pendiente revisión técnica",
+    calificada: "Calificada",
     pendiente_contacto_comercial: "Pendiente contacto comercial",
-    cerrada_demo: "Cerrada en demo"
+    pendiente_revision_tecnica: "Pendiente revisión técnica",
+    cerrada_demo: "Cerrada en demo",
+    cerrada_no_oportunidad: "Cerrada"
   };
 
-  const tone = status === "pendiente_revision_tecnica" ? "orange" : status === "cerrada_demo" ? "green" : "blue";
+  const tone = status === "pendiente_revision_tecnica" ? "orange" : status === "cerrada_demo" || status === "cerrada_no_oportunidad" ? "green" : "blue";
   return <Badge tone={tone}>{labels[status]}</Badge>;
 }

@@ -10,11 +10,11 @@ export function AdminDemoPage() {
           Demo funcional
         </a>
         <a className="button button-secondary" href="/practicas">
-          Proyecto de practicas
+          Proyecto de prácticas
         </a>
         <a className="button button-ghost" href="/admin-demo/analytics">
           <BarChart3 size={17} aria-hidden="true" />
-          Informes
+          Analíticas
         </a>
       </header>
 

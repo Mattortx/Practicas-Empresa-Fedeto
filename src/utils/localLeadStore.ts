@@ -65,7 +65,7 @@ export async function updateLeadViaApi(id: string, updates: Partial<CommercialLe
     return false;
   }
 
-  const result = await apiUpdateLead(id, updates as unknown as Record<string, unknown>);
+  const result = await apiUpdateLead(id, mapCommercialUpdatesToApi(updates));
   return result.available && !result.error;
 }
 
@@ -139,10 +139,16 @@ function safeParse(value: string): CommercialLead[] {
 }
 
 function mapApiLeadToCommercial(apiLead: Record<string, unknown>): CommercialLead {
+  const summary =
+    typeof apiLead.summary === "object" && apiLead.summary !== null
+      ? (apiLead.summary as CommercialLead["summary"])
+      : undefined;
+  const status = normalizeLeadStatus(apiLead.status);
+
   return {
     id: apiLead.id as string,
     createdAt: (apiLead.createdAt ?? apiLead.created_at) as string,
-    status: (apiLead.status ?? "nueva") as CommercialLead["status"],
+    status,
     priority: (apiLead.priority ?? "media") as CommercialLead["priority"],
     technicalRisk: (apiLead.technicalRisk ?? apiLead.technical_risk) as boolean,
     technicalRiskFlags: (apiLead.technicalRiskFlags ?? apiLead.technical_risk_flags ?? []) as CommercialLead["technicalRiskFlags"],
@@ -151,22 +157,25 @@ function mapApiLeadToCommercial(apiLead: Record<string, unknown>): CommercialLea
     needType: (apiLead.needType ?? apiLead.need_type ?? "") as string,
     source: "demo",
     summary: {
-      name: (apiLead.contactName ?? "") as string,
-      company: (apiLead.company ?? "") as string,
-      email: (apiLead.email ?? "") as string,
-      phone: (apiLead.phone ?? "") as string,
-      needType: (apiLead.needType ?? "") as string,
-      productFamily: (apiLead.productFamilyLabel ?? "") as string,
-      workType: "",
-      location: "",
-      urgency: "",
-      observations: "",
-      priority: (apiLead.priority ?? "media") as CommercialLead["priority"],
-      requiresTechnicalReview: (apiLead.technicalRisk ?? false) as boolean,
-      nextAction: "",
-      technicalWarnings: []
+      name: summary?.name ?? (apiLead.contactName ?? "") as string,
+      company: summary?.company ?? (apiLead.company ?? "") as string,
+      email: summary?.email ?? (apiLead.email ?? "") as string,
+      phone: summary?.phone ?? (apiLead.phone ?? "") as string,
+      needType: summary?.needType ?? (apiLead.needType ?? "") as string,
+      productFamily: summary?.productFamily ?? (apiLead.productFamilyLabel ?? "") as string,
+      workType: summary?.workType ?? "",
+      location: summary?.location ?? "",
+      urgency: summary?.urgency ?? "",
+      observations: summary?.observations ?? "",
+      classificationReason: summary?.classificationReason,
+      detectedSignals: summary?.detectedSignals ?? [],
+      missingInformation: summary?.missingInformation ?? [],
+      priority: summary?.priority ?? (apiLead.priority ?? "media") as CommercialLead["priority"],
+      requiresTechnicalReview: summary?.requiresTechnicalReview ?? (apiLead.technicalRisk ?? false) as boolean,
+      nextAction: summary?.nextAction ?? "",
+      technicalWarnings: summary?.technicalWarnings ?? []
     },
-    summaryText: "",
+    summaryText: (apiLead.summaryText ?? apiLead.summary_text ?? summary?.observations ?? "") as string,
     aiClassification: apiLead.aiClassification as CommercialLead["aiClassification"],
     aiSummary: apiLead.aiSummary as CommercialLead["aiSummary"],
     aiSummarySource: apiLead.aiSummarySource as CommercialLead["aiSummarySource"],
@@ -174,4 +183,46 @@ function mapApiLeadToCommercial(apiLead: Record<string, unknown>): CommercialLea
     aiGeneratedAt: apiLead.aiGeneratedAt as string,
     extractedLeadData: apiLead.extractedLeadData as CommercialLead["extractedLeadData"]
   };
+}
+
+function mapCommercialUpdatesToApi(updates: Partial<CommercialLead>): Record<string, unknown> {
+  const apiUpdates: Record<string, unknown> = {};
+
+  if (updates.status !== undefined) apiUpdates.status = updates.status;
+  if (updates.priority !== undefined) apiUpdates.priority = updates.priority;
+  if (updates.technicalRisk !== undefined) apiUpdates.technical_risk = updates.technicalRisk;
+  if (updates.technicalRiskFlags !== undefined) apiUpdates.technical_risk_flags = updates.technicalRiskFlags;
+  if (updates.productFamilyId !== undefined) apiUpdates.product_family_id = updates.productFamilyId;
+  if (updates.productFamilyLabel !== undefined) apiUpdates.product_family_label = updates.productFamilyLabel;
+  if (updates.needType !== undefined) apiUpdates.need_type = updates.needType;
+  if (updates.summary !== undefined) {
+    apiUpdates.summary = updates.summary;
+    apiUpdates.contact_name = updates.summary.name;
+    apiUpdates.company = updates.summary.company;
+    apiUpdates.email = updates.summary.email;
+    apiUpdates.phone = updates.summary.phone;
+  }
+  if (updates.aiClassification !== undefined) apiUpdates.ai_classification = updates.aiClassification;
+  if (updates.aiSummary !== undefined) apiUpdates.ai_summary = updates.aiSummary;
+  if (updates.aiSummarySource !== undefined) apiUpdates.ai_summary_source = updates.aiSummarySource;
+  if (updates.aiCommercialReply !== undefined) apiUpdates.ai_commercial_reply = updates.aiCommercialReply;
+  if (updates.aiGeneratedAt !== undefined) apiUpdates.ai_generated_at = updates.aiGeneratedAt;
+  if (updates.extractedLeadData !== undefined) apiUpdates.extracted_lead_data = updates.extractedLeadData;
+
+  return apiUpdates;
+}
+
+function normalizeLeadStatus(value: unknown): CommercialLead["status"] {
+  const allowed: CommercialLead["status"][] = [
+    "nueva",
+    "calificada",
+    "pendiente_contacto_comercial",
+    "pendiente_revision_tecnica",
+    "cerrada_demo",
+    "cerrada_no_oportunidad"
+  ];
+
+  return allowed.includes(value as CommercialLead["status"])
+    ? (value as CommercialLead["status"])
+    : "nueva";
 }

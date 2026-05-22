@@ -93,7 +93,7 @@ export function AdminLeadDashboard() {
     <section className="admin-dashboard">
       <div className="admin-toolbar">
         <div>
-          <span>Panel comercial</span>
+          <span>Panel comercial · Vista simulada para demo de prácticas</span>
           <h1>Solicitudes de clientes</h1>
           <p>
             Solicitudes cualificadas por el copiloto, listas para revisión y seguimiento
@@ -130,7 +130,8 @@ export function AdminLeadDashboard() {
             type="button"
             onClick={() => setActiveFilter(filter.id)}
           >
-            {filter.label}
+            <span>{filter.label}</span>
+            <strong>{leads.filter((lead) => matchesFilter(lead, filter.id)).length}</strong>
           </button>
         ))}
       </div>

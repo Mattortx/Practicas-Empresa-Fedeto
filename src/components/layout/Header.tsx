@@ -6,6 +6,8 @@ interface HeaderProps {
 
 export function Header({ section = "demo" }: HeaderProps) {
   const isPracticas = section === "practicas";
+  const currentPath = window.location.pathname;
+  const isAnalytics = currentPath === "/admin-demo/analytics";
 
   return (
     <header className="site-header">
@@ -16,19 +18,21 @@ export function Header({ section = "demo" }: HeaderProps) {
           <small>{isPracticas ? "Proyecto de prácticas" : "Copiloto Comercial"}</small>
         </span>
       </a>
-      <nav className="header-nav" aria-label="Navegacion principal">
+      <nav className="header-nav" aria-label="Navegación principal">
         {isPracticas ? (
           <>
-            <a href="/">Demo funcional</a>
+            <a href="/" className={currentPath === "/" ? "active" : ""}>Demo funcional</a>
             <a href="#arquitectura">Arquitectura</a>
             <a href="#familias">Familias</a>
             <a href="/admin-demo">Panel interno</a>
+            <a href="/admin-demo/analytics" className={isAnalytics ? "active" : ""}>Analíticas</a>
           </>
         ) : (
           <>
             <a href="#copiloto">Copiloto</a>
-            <a href="/admin-demo">Panel interno</a>
-            <a href="/practicas">Proyecto de practicas</a>
+            <a href="/admin-demo" className={currentPath === "/admin-demo" ? "active" : ""}>Panel interno</a>
+            <a href="/admin-demo/analytics" className={isAnalytics ? "active" : ""}>Analíticas</a>
+            <a href="/practicas" className={currentPath.startsWith("/practicas") ? "active" : ""}>Proyecto de prácticas</a>
           </>
         )}
         <a href="https://proteccionestoledo.com/" target="_blank" rel="noreferrer">

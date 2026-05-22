@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS leads (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   status TEXT NOT NULL DEFAULT 'nueva'
-    CHECK (status IN ('nueva','pendiente_revision_tecnica','pendiente_contacto_comercial','cerrada_demo')),
+    CHECK (status IN ('nueva','calificada','pendiente_revision_tecnica','pendiente_contacto_comercial','cerrada_demo','cerrada_no_oportunidad')),
   priority TEXT NOT NULL DEFAULT 'media'
     CHECK (priority IN ('baja','media','alta')),
   technical_risk BOOLEAN NOT NULL DEFAULT false,
@@ -41,6 +41,12 @@ CREATE TABLE IF NOT EXISTS leads (
 CREATE INDEX IF NOT EXISTS idx_leads_created_at ON leads(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_leads_status ON leads(status);
 CREATE INDEX IF NOT EXISTS idx_leads_priority ON leads(priority);
+
+-- Compatibilidad para instalaciones previas de la POC donde el CHECK de estados ya existía.
+ALTER TABLE leads DROP CONSTRAINT IF EXISTS leads_status_check;
+ALTER TABLE leads
+  ADD CONSTRAINT leads_status_check
+  CHECK (status IN ('nueva','calificada','pendiente_revision_tecnica','pendiente_contacto_comercial','cerrada_demo','cerrada_no_oportunidad'));
 
 -- ── conversation_events ───────────────────────────────────────
 -- Auditoría de eventos del copiloto
