@@ -111,12 +111,18 @@ function serveStatic(request, response) {
   }
 
   const contentType = getContentType(filePath);
-  response.writeHead(200, { "Content-Type": contentType });
+  response.writeHead(200, {
+    "Content-Type": contentType,
+    "Cache-Control": getCacheControl(filePath)
+  });
   response.end(readFileSync(filePath));
 }
 
 function sendJson(response, status, payload) {
-  response.writeHead(status, { "Content-Type": "application/json" });
+  response.writeHead(status, {
+    "Content-Type": "application/json",
+    "Cache-Control": "no-store, max-age=0"
+  });
   response.end(JSON.stringify(payload));
 }
 
@@ -175,4 +181,18 @@ function getContentType(filePath) {
   }
 
   return "application/octet-stream";
+}
+
+function getCacheControl(filePath) {
+  const extension = extname(filePath);
+
+  if (extension === ".html") {
+    return "no-store, max-age=0";
+  }
+
+  if (extension === ".js" || extension === ".css") {
+    return "public, max-age=31536000, immutable";
+  }
+
+  return "public, max-age=3600";
 }
