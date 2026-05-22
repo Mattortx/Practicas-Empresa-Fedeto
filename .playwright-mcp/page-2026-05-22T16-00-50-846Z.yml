@@ -1,0 +1,259 @@
+- main [ref=e3]:
+  - generic [ref=e4]:
+    - link "Ir a la demo funcional" [ref=e5] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e6]: PT
+      - generic [ref=e7]:
+        - strong [ref=e8]: Protecciones Toledo
+        - generic [ref=e9]: Copiloto Comercial
+    - navigation "Navegacion principal" [ref=e10]:
+      - link "Copiloto" [ref=e11] [cursor=pointer]:
+        - /url: "#copiloto"
+      - link "Panel interno" [ref=e12] [cursor=pointer]:
+        - /url: /admin-demo
+      - link "Proyecto de practicas" [ref=e13] [cursor=pointer]:
+        - /url: /practicas
+      - link "Web real" [ref=e14] [cursor=pointer]:
+        - /url: https://proteccionestoledo.com/
+        - text: Web real
+        - img [ref=e15]
+    - generic [ref=e19]:
+      - img [ref=e20]
+      - text: POC online
+  - generic [ref=e23]:
+    - generic [ref=e24]:
+      - generic [ref=e25]: Demo funcional para presentación
+      - heading "Copiloto Comercial Protecciones Toledo" [level=1] [ref=e26]
+      - paragraph [ref=e27]: Una experiencia conversacional para cualificar consultas de protección en altura, ordenar datos comerciales y entregar una ficha revisable por el equipo interno.
+      - generic [ref=e28]:
+        - link "Probar copiloto" [ref=e29] [cursor=pointer]:
+          - /url: "#copiloto"
+          - text: Probar copiloto
+          - img [ref=e30]
+        - link "Abrir panel interno" [ref=e32] [cursor=pointer]:
+          - /url: /admin-demo
+      - generic "Estado operativo de la demo" [ref=e33]:
+        - generic [ref=e34]:
+          - generic [ref=e35]: IA
+          - strong [ref=e36]: Groq preparado
+        - generic [ref=e37]:
+          - generic [ref=e38]: Datos
+          - strong [ref=e39]: Demo local
+        - generic [ref=e40]:
+          - generic [ref=e41]: Salida
+          - strong [ref=e42]: Ficha comercial
+        - generic [ref=e43]:
+          - generic [ref=e44]: Riesgo
+          - strong [ref=e45]: Guardrails técnicos
+    - generic "Vista previa comercial" [ref=e46]:
+      - generic [ref=e47]:
+        - generic [ref=e48]: Lead intake
+        - strong [ref=e49]: Solicitud cualificada
+      - generic [ref=e50]:
+        - img [ref=e51]
+        - paragraph [ref=e53]: Necesito proteger el borde de un forjado durante una obra en Toledo.
+      - generic [ref=e54]:
+        - generic [ref=e55]: Consulta
+        - generic [ref=e56]: Clasificación
+        - generic [ref=e57]: Ficha
+        - generic [ref=e58]: Revision
+      - generic [ref=e59]:
+        - generic [ref=e60]:
+          - text: Resultado esperado
+          - strong [ref=e61]: Protección provisional
+          - paragraph [ref=e62]: "Familia probable: protección provisional. Pide soporte, longitud, urgencia y contacto."
+        - generic [ref=e63]:
+          - generic [ref=e64]: Prioridad
+          - strong [ref=e65]: Media
+      - generic "Escenarios de presentacion" [ref=e66]:
+        - button "Protección provisional" [ref=e67] [cursor=pointer]
+        - button "Cubierta industrial" [ref=e68] [cursor=pointer]
+        - button "Consulta normativa" [ref=e69] [cursor=pointer]
+  - region "Resumen de valor" [ref=e70]:
+    - generic [ref=e71]:
+      - img [ref=e72]
+      - text: Contexto industrial
+    - generic [ref=e74]:
+      - img [ref=e75]
+      - text: IA asistida
+    - generic [ref=e77]:
+      - img [ref=e78]
+      - text: Derivación técnica prudente
+    - generic [ref=e80]:
+      - img [ref=e81]
+      - text: Panel comercial
+  - generic [ref=e83]:
+    - generic [ref=e84]:
+      - text: Contexto real de empresa
+      - heading "Un copiloto afinado para protección en altura, no para atención genérica" [level=2] [ref=e85]
+      - paragraph [ref=e86]: "La base de conocimiento se ha ampliado con información pública de Protecciones Toledo: fabricación propia, protección colectiva, sistemas de borde, bases, casquillos y revisión técnica prudente."
+    - generic [ref=e87]:
+      - article [ref=e88]:
+        - img [ref=e89]
+        - strong [ref=e91]: Fabricación y suministro
+        - paragraph [ref=e92]: La demo parte de una empresa industrial que diseña, fabrica y provee sistemas metálicos de protección en altura.
+      - article [ref=e93]:
+        - img [ref=e94]
+        - strong [ref=e97]: Protección colectiva
+        - paragraph [ref=e98]: El copiloto distingue entre protección provisional, definitiva, bases, casquillos, auxiliares y consumibles.
+      - article [ref=e99]:
+        - img [ref=e100]
+        - strong [ref=e104]: Obras con riesgo real
+        - paragraph [ref=e105]: Está pensado para consultas de cubiertas, forjados, terrazas técnicas, puentes, silos, naves y mantenimiento.
+      - article [ref=e106]:
+        - img [ref=e107]
+        - strong [ref=e111]: Revisión documentada
+        - paragraph [ref=e112]: Cuando aparecen normativa, montaje, resistencia o anclajes, la consulta se deriva a revisión técnica.
+  - generic [ref=e113]:
+    - generic [ref=e114]:
+      - text: Proceso comercial
+      - heading "Del primer mensaje a una oportunidad revisable" [level=2] [ref=e115]
+    - generic [ref=e116]:
+      - article [ref=e117]:
+        - img [ref=e118]
+        - strong [ref=e120]: Menos consultas incompletas
+        - paragraph [ref=e121]: "El usuario no abandona una caja de texto abierta: el copiloto guía la primera toma de datos."
+      - article [ref=e122]:
+        - img [ref=e123]
+        - strong [ref=e126]: Prioridad visible
+        - paragraph [ref=e127]: Cada solicitud llega con familia probable, urgencia, riesgo tecnico y siguiente accion.
+      - article [ref=e128]:
+        - img [ref=e129]
+        - strong [ref=e133]: Mejor traspaso interno
+        - paragraph [ref=e134]: Comercial y tecnico revisan una ficha comun en vez de reconstruir el contexto desde cero.
+  - generic [ref=e135]:
+    - generic [ref=e136]:
+      - text: Herramienta interactiva
+      - heading "Prueba la experiencia del cliente" [level=2] [ref=e137]
+      - paragraph [ref=e138]: Elige un caso rápido o escribe tu consulta. El copiloto te guía, clasifica la solicitud y la deja lista para el panel interno.
+    - generic "Cómo funciona" [ref=e139]:
+      - generic [ref=e140]:
+        - img [ref=e142]
+        - strong [ref=e144]: Describe tu necesidad
+        - paragraph [ref=e145]: El cliente explica su caso en lenguaje natural.
+      - generic [ref=e146]:
+        - img [ref=e148]
+        - strong [ref=e150]: El copiloto clasifica
+        - paragraph [ref=e151]: Orienta familia, prioridad y detecta riesgo técnico.
+      - generic [ref=e152]:
+        - img [ref=e154]
+        - strong [ref=e158]: Recibe una ficha
+        - paragraph [ref=e159]: La solicitud queda lista para revisar en el panel interno.
+    - region "Copiloto Comercial" [ref=e160]:
+      - generic [ref=e161]:
+        - generic [ref=e162]:
+          - generic [ref=e163]: Copiloto Comercial
+          - generic [ref=e164]: Demo
+        - generic [ref=e165]:
+          - button "Reiniciar" [ref=e166] [cursor=pointer]:
+            - img [ref=e167]
+            - text: Reiniciar
+          - button "IA asistida" [ref=e170] [cursor=pointer]
+          - button "Cerrar" [ref=e171] [cursor=pointer]:
+            - img [ref=e172]
+            - text: Cerrar
+      - generic [ref=e175]:
+        - img [ref=e176]
+        - generic [ref=e178]: Puedo orientar de forma general, pero no confirmo normativa, certificados, ensayos, resistencias, cálculos ni instrucciones de montaje. Para confirmar la solución adecuada, el equipo técnico debe revisar soporte, uso previsto y documentación oficial.
+      - generic "Menú inicial de necesidades" [ref=e179]:
+        - button "Protección provisional de borde" [ref=e180] [cursor=pointer]
+        - button "Protección definitiva de borde" [ref=e181] [cursor=pointer]
+        - button "Bases o casquillos" [ref=e182] [cursor=pointer]
+        - button "Auxiliares para construcción" [ref=e183] [cursor=pointer]
+        - button "Consumibles" [ref=e184] [cursor=pointer]
+        - button "Solución a medida" [ref=e185] [cursor=pointer]
+        - button "Solicitar presupuesto" [ref=e186] [cursor=pointer]
+        - button "No sé qué necesito" [ref=e187] [cursor=pointer]
+        - button "Documentación o normativa" [ref=e188] [cursor=pointer]
+      - generic "Casos rápidos de prueba" [ref=e189]:
+        - generic [ref=e190]: "Casos rápidos:"
+        - generic [ref=e191]:
+          - button "Obra provisional" [ref=e192] [cursor=pointer]
+          - button "Cubierta definitiva" [ref=e193] [cursor=pointer]
+          - button "Casquillos" [ref=e194] [cursor=pointer]
+          - button "Duda normativa" [ref=e195] [cursor=pointer]
+          - button "No lo tengo claro" [ref=e196] [cursor=pointer]
+      - generic "Estado de cualificación comercial" [ref=e197]:
+        - generic [ref=e198]: Pendiente
+        - generic [ref=e200]: Sin clasificar
+        - generic [ref=e203]: "Prioridad: Por determinar"
+        - generic [ref=e205]: Sin revisión técnica
+      - article [ref=e207]:
+        - img [ref=e209]
+        - generic [ref=e212]:
+          - paragraph [ref=e213]: Hola. Soy el copiloto comercial de Protecciones Toledo. Puedo ayudarte a orientar tu consulta sobre sistemas de protección de borde, bases, casquillos, auxiliares, consumibles o soluciones a medida. Para una solución definitiva, el equipo técnico deberá revisar los datos de obra y la documentación correspondiente.
+          - generic [ref=e214]:
+            - button "Solicitar presupuesto" [ref=e215] [cursor=pointer]
+            - button "No sé qué necesito" [ref=e216] [cursor=pointer]
+            - button "Documentación o normativa" [ref=e217] [cursor=pointer]
+      - generic [ref=e218]:
+        - textbox "Mensaje para el copiloto comercial" [ref=e219]:
+          - /placeholder: Escribe tu consulta o elige una opción...
+        - button "Enviar mensaje" [ref=e220] [cursor=pointer]:
+          - img [ref=e221]
+      - generic [ref=e224]: Comprobando IA...
+  - generic [ref=e225]:
+    - generic [ref=e226]:
+      - generic [ref=e227]: Vista interna
+      - heading "El equipo no recibe una conversación suelta, recibe una ficha" [level=2] [ref=e228]
+      - paragraph [ref=e229]: El panel agrupa solicitudes, estados, prioridades, riesgo técnico y resumen comercial para que la demo muestre el ciclo completo.
+      - link "Abrir panel" [ref=e230] [cursor=pointer]:
+        - /url: /admin-demo
+        - text: Abrir panel
+        - img [ref=e231]
+    - generic "Vista previa del panel" [ref=e233]:
+      - generic [ref=e234]:
+        - generic [ref=e235]: Familia
+        - generic [ref=e236]: Prioridad
+        - generic [ref=e237]: Estado
+      - generic [ref=e238]:
+        - generic [ref=e239]: Protección provisional
+        - strong [ref=e240]: Alta
+        - emphasis [ref=e241]: Nueva
+      - generic [ref=e242]:
+        - generic [ref=e243]: Documentación técnica
+        - strong [ref=e244]: Revisión
+        - emphasis [ref=e245]: Técnica
+      - generic [ref=e246]:
+        - img [ref=e247]
+        - paragraph [ref=e251]: Resumen comercial listo para seguimiento y respuesta.
+  - generic [ref=e252]:
+    - generic [ref=e253]:
+      - generic [ref=e254]: Analíticas
+      - heading "Distribución, prioridad y evolución de las solicitudes" [level=2] [ref=e255]
+      - paragraph [ref=e256]: Los informes agrupan las solicitudes por familia de producto, prioridad comercial, estado de seguimiento y evolución temporal. Ayudan a entender qué tipo de consultas llegan y con qué urgencia.
+      - link "Ver informes" [ref=e257] [cursor=pointer]:
+        - /url: /admin-demo/analytics
+        - text: Ver informes
+        - img [ref=e258]
+    - generic "Vista previa de analíticas" [ref=e260]:
+      - generic [ref=e261]:
+        - img [ref=e262]
+        - generic [ref=e264]: Lectura comercial
+      - generic [ref=e265]:
+        - generic [ref=e266]:
+          - generic [ref=e267]: Familia dominante
+          - strong [ref=e268]: Provisional
+        - generic [ref=e269]:
+          - generic [ref=e270]: Carga técnica
+          - strong [ref=e271]: 42%
+        - generic [ref=e272]:
+          - generic [ref=e273]: Prioridad alta
+          - strong [ref=e274]: "8"
+        - generic [ref=e275]:
+          - generic [ref=e276]: Seguimiento
+          - strong [ref=e277]: 12 abiertas
+      - generic [ref=e278]:
+        - generic [ref=e279]:
+          - generic [ref=e280]: Por familia
+          - generic [ref=e281]:
+            - generic [ref=e282]: Provisional
+            - generic [ref=e283]: Definitiva
+            - generic [ref=e284]: Bases
+        - generic [ref=e285]:
+          - generic [ref=e286]: Prioridad
+          - strong [ref=e291]: "24"
+      - generic [ref=e292]:
+        - img [ref=e293]
+        - generic [ref=e296]: Evolución temporal y tabla resumen disponibles en informes
+        - img [ref=e297]

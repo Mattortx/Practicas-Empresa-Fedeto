@@ -10,7 +10,6 @@ import {
   updateLeadViaApi
 } from "../../utils/localLeadStore";
 import { Button } from "../ui/Button";
-import { AdminAnalyticsPanel } from "./AdminAnalyticsPanel";
 import { LeadDetailCard } from "./LeadDetailCard";
 import { LeadTable } from "./LeadTable";
 
@@ -94,21 +93,21 @@ export function AdminLeadDashboard() {
     <section className="admin-dashboard">
       <div className="admin-toolbar">
         <div>
-          <span>Vista interna simulada</span>
-          <h1>Panel comercial de demostración</h1>
+          <span>Panel comercial</span>
+          <h1>Solicitudes de clientes</h1>
           <p>
-            Panel de demostración para ver cómo la empresa podría recibir y revisar las
-            consultas cualificadas por el copiloto.
+            Solicitudes cualificadas por el copiloto, listas para revisión y seguimiento
+            comercial.
           </p>
         </div>
         <Button variant="ghost" onClick={clearDemoLeads}>
           <Trash2 size={16} aria-hidden="true" />
-          Limpiar locales
+          Limpiar
         </Button>
       </div>
 
       <div className="admin-metrics">
-        <Metric label="Total de solicitudes" value={String(leads.length)} />
+        <Metric label="Total" value={String(leads.length)} />
         <Metric
           label="Nuevas"
           value={String(leads.filter((lead) => lead.status === "nueva").length)}
@@ -122,12 +121,6 @@ export function AdminLeadDashboard() {
           value={String(leads.filter((lead) => lead.priority === "alta").length)}
         />
       </div>
-
-      <AdminAnalyticsPanel
-        leads={leads}
-        filteredLeads={filteredLeads}
-        activeFilterLabel={activeFilterLabel}
-      />
 
       <div className="admin-filters" aria-label="Filtros de solicitudes">
         {filters.map((filter) => (

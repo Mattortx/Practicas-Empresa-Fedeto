@@ -2,11 +2,14 @@ import { useState } from "react";
 import {
   ArrowRight,
   BarChart3,
+  ChartColumn,
+  ChartLine,
   ClipboardCheck,
   Factory,
   FileCheck2,
   Gauge,
   MessageSquareText,
+  PieChart,
   Route,
   ShieldAlert,
   ShieldCheck,
@@ -195,7 +198,7 @@ export function PublicDemoPage() {
             técnica prudente.
           </p>
         </div>
-        <div className="context-card-grid">
+        <div className="context-card-grid reveal-group">
           {companyContextCards.map((item) => {
             const Icon = item.icon;
 
@@ -215,7 +218,7 @@ export function PublicDemoPage() {
           <span>Proceso comercial</span>
           <h2>Del primer mensaje a una oportunidad revisable</h2>
         </div>
-        <div className="benefit-grid">
+        <div className="benefit-grid reveal-group">
           {companyBenefits.map((benefit) => {
             const Icon = benefit.icon;
 
@@ -230,32 +233,68 @@ export function PublicDemoPage() {
         </div>
       </section>
 
-      <section className="demo-copilot-section demo-workbench" id="copiloto">
+      <section className="demo-copilot-section" id="copiloto">
         <div className="demo-section-title">
           <span className="eyebrow">Herramienta interactiva</span>
           <h2>Prueba la experiencia del cliente</h2>
           <p>
-            Usa un caso rapido o escribe una consulta libre. El copiloto pregunta lo necesario,
-            clasifica la solicitud y genera una ficha para el panel interno.
+            Elige un caso rápido o escribe tu consulta. El copiloto te guía, clasifica la solicitud
+            y la deja lista para el panel interno.
           </p>
         </div>
 
         <div className="demo-copilot-layout">
-          <aside className="demo-guide-card polished-guide" aria-label="Guia de presentacion">
-            <strong>Guion de presentacion</strong>
-            <ol>
-              <li>El cliente describe su necesidad en lenguaje natural.</li>
-              <li>El copiloto orienta familia, prioridad y datos faltantes.</li>
-              <li>Las dudas técnicas sensibles se derivan sin prometer cumplimiento.</li>
-              <li>La solicitud queda disponible en el panel comercial.</li>
-            </ol>
-            <a className="button button-secondary" href="/admin-demo">
-              Ver panel interno
-            </a>
-            <p className="guide-note">
-              La memoria académica del proyecto está separada en <a href="/practicas">/practicas</a>.
-            </p>
-          </aside>
+          <div className="how-it-works reveal-group" aria-label="Cómo funciona">
+            <div className="how-step">
+              <span className="how-step-icon">
+                <MessageSquareText size={22} aria-hidden="true" />
+              </span>
+              <strong>Describe tu necesidad</strong>
+              <p>El cliente explica su caso en lenguaje natural.</p>
+            </div>
+            <div className="how-step">
+              <span className="how-step-icon">
+                <Sparkles size={22} aria-hidden="true" />
+              </span>
+              <strong>El copiloto clasifica</strong>
+              <p>Orienta familia, prioridad y detecta riesgo técnico.</p>
+            </div>
+            <div className="how-step">
+              <span className="how-step-icon">
+                <ClipboardCheck size={22} aria-hidden="true" />
+              </span>
+              <strong>Recibe una ficha</strong>
+              <p>La solicitud queda lista para revisar en el panel interno.</p>
+            </div>
+            <div className="how-step">
+              <span className="how-step-icon">
+                <ShieldAlert size={22} aria-hidden="true" />
+              </span>
+              <strong>Derivación técnica</strong>
+              <p>Si hay normativa, montaje o cálculos, se marca para revisión del equipo técnico.</p>
+            </div>
+            <div className="how-step">
+              <span className="how-step-icon">
+                <UsersRound size={22} aria-hidden="true" />
+              </span>
+              <strong>Seguimiento comercial</strong>
+              <p>El equipo revisa la ficha y responde con la información ya estructurada.</p>
+            </div>
+            <div className="how-step">
+              <span className="how-step-icon">
+                <FileCheck2 size={22} aria-hidden="true" />
+              </span>
+              <strong>Historial en panel</strong>
+              <p>Cada conversación deja una ficha disponible en el panel interno para su consulta.</p>
+            </div>
+            <div className="how-step">
+              <span className="how-step-icon">
+                <BarChart3 size={22} aria-hidden="true" />
+              </span>
+              <strong>Análisis de patrones</strong>
+              <p>Los datos agregados revelan tendencias y ayudan a anticipar oportunidades comerciales.</p>
+            </div>
+          </div>
 
           <ChatWidget />
         </div>
@@ -292,6 +331,69 @@ export function PublicDemoPage() {
           <div className="preview-summary">
             <FileCheck2 size={20} aria-hidden="true" />
             <p>Resumen comercial listo para seguimiento y respuesta.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="analytics-preview-section">
+        <div className="analytics-preview-copy">
+          <span className="eyebrow">Analíticas</span>
+          <h2>Distribución, prioridad y evolución de las solicitudes</h2>
+          <p>
+            Los informes agrupan las solicitudes por familia de producto, prioridad comercial,
+            estado de seguimiento y evolución temporal. Ayudan a entender qué tipo de consultas
+            llegan y con qué urgencia.
+          </p>
+          <a className="button button-primary" href="/admin-demo/analytics">
+            Ver informes <ArrowRight size={17} aria-hidden="true" />
+          </a>
+        </div>
+        <div className="analytics-preview-card" aria-label="Vista previa de analíticas">
+          <div className="analytics-preview-header">
+            <ChartColumn size={20} aria-hidden="true" />
+            <span>Lectura comercial</span>
+          </div>
+          <div className="analytics-preview-grid">
+            <div className="analytics-preview-metric">
+              <span>Familia dominante</span>
+              <strong>Provisional</strong>
+            </div>
+            <div className="analytics-preview-metric">
+              <span>Carga técnica</span>
+              <strong>42%</strong>
+            </div>
+            <div className="analytics-preview-metric">
+              <span>Prioridad alta</span>
+              <strong>8</strong>
+            </div>
+            <div className="analytics-preview-metric">
+              <span>Seguimiento</span>
+              <strong>12 abiertas</strong>
+            </div>
+          </div>
+          <div className="analytics-preview-charts">
+            <div className="preview-chart-bar">
+              <span className="preview-chart-label">Por familia</span>
+              <div className="preview-bar-track">
+                <span className="preview-bar-fill" style={{ width: "48%" }}>Provisional</span>
+                <span className="preview-bar-fill" style={{ width: "32%" }}>Definitiva</span>
+                <span className="preview-bar-fill" style={{ width: "20%" }}>Bases</span>
+              </div>
+            </div>
+            <div className="preview-chart-donut">
+              <span className="preview-chart-label">Prioridad</span>
+              <div className="preview-donut-track">
+                <span className="preview-donut-segment alta" />
+                <span className="preview-donut-segment media" />
+                <span className="preview-donut-segment baja" />
+                <strong>24</strong>
+              </div>
+            </div>
+          </div>
+          <div className="analytics-preview-footer">
+            <ChartLine size={16} aria-hidden="true" />
+            <span>Evolución temporal y tabla resumen disponibles en informes</span>
+            <PieChart size={16} aria-hidden="true" />
           </div>
         </div>
       </section>

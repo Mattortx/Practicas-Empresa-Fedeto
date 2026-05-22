@@ -1,12 +1,14 @@
 const technicalMatchers = [
-  ["normativa", ["normativa", "norma", "une", "en 13374", "iso", "cumple", "cumplimiento", "legal"]],
+  ["normativa", ["normativa", "norma", "une", "en 13374", "une-en 13374", "13374", "iso", "cumple", "cumplimiento", "legal"]],
   ["certificacion", ["certificado", "certificacion", "homologado", "ensayo"]],
   ["calculo", ["calculo", "calcular", "dimensionamiento", "dimensionar", "carga"]],
   ["instalacion", ["instalacion", "instalar", "montaje", "montar", "manual"]],
   ["resistencia", ["resistencia", "resiste", "viento", "empuje", "seguridad estructural"]],
   ["anclaje", ["anclaje", "anclar", "atornillar", "fijacion", "soldadura", "hormigon"]],
   ["documentacion_tecnica", ["ficha tecnica", "documentacion", "instrucciones", "planos"]],
-  ["riesgo_caida", ["riesgo de caida", "altura", "cubierta", "autoportante", "perforacion"]]
+  ["riesgo_caida", ["riesgo de caida", "altura", "cubierta", "autoportante", "perforacion"]],
+  ["clase_proteccion", ["clase a", "clase b", "clase c", "clase proteccion", "clasificacion proteccion", "sppb", "sdpb"]],
+  ["carga_dinamica", ["carga dinamica", "carga estatica", "resistencia carga", "pendiente cubierta", "inclinacion cubierta"]]
 ];
 
 const promptInjectionMatchers = [
@@ -20,7 +22,12 @@ const promptInjectionMatchers = [
   "sin tecnico",
   "sin revision tecnica",
   "haz el calculo rapido",
-  "confirma que cumple"
+  "confirma que cumple",
+  "eres un tecnico certificado",
+  "actua como ingeniero",
+  "dime que clase",
+  "calcula la pendiente",
+  "haz la clasificacion"
 ];
 
 export function detectLocalRisk(text) {

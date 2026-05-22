@@ -517,9 +517,9 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
   return (
     <section className="copilot-shell" id="copiloto" aria-label="Copiloto Comercial">
       <header className="copilot-header">
-        <div>
+        <div className="copilot-title-area">
           <span>Copiloto Comercial</span>
-          <h2>Protecciones Toledo - Demo comercial</h2>
+          <span className="copilot-badge">Demo</span>
         </div>
         <div className="copilot-header-actions">
           <Button variant="ghost" onClick={restart}>
@@ -536,23 +536,21 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
         </div>
       </header>
 
-      <div className="copilot-alert">
-        <ShieldAlert size={18} aria-hidden="true" />
-        <p>{technicalGuardrail}</p>
+      <div className="copilot-notice">
+        <ShieldAlert size={15} aria-hidden="true" />
+        <span>{technicalGuardrail}</span>
       </div>
 
       <NeedSelector onSelect={handleAction} />
 
-      <div className="quick-demo-panel" aria-label="Casos rápidos de prueba">
-        <div>
-          <span>Casos rápidos</span>
-          <strong>Simular consulta</strong>
-        </div>
-        <div className="quick-demo-actions">
+      <div className="quick-chips" aria-label="Casos rápidos de prueba">
+        <span className="quick-chips-label">Casos rápidos:</span>
+        <div className="quick-chips-actions">
           {quickDemoCases.map((item) => (
             <button
               key={item.label}
               type="button"
+              className="quick-chip-btn"
               onClick={() => handleQuickDemoCase(item.text)}
               disabled={aiStatus === "thinking"}
             >
@@ -562,22 +560,21 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
         </div>
       </div>
 
-      <div className="qualification-panel" aria-label="Estado de cualificación comercial">
-        <div className="qualification-item">
-          <span>Estado</span>
-          <strong>{qualificationState.stage}</strong>
+      <div className="qual-bar" aria-label="Estado de cualificación comercial">
+        <div className="qual-bar-item">
+          <span>{qualificationState.stage}</span>
         </div>
-        <div className="qualification-item">
-          <span>Familia</span>
-          <strong>{qualificationState.family}</strong>
+        <div className="qual-bar-divider" />
+        <div className="qual-bar-item">
+          <span>{qualificationState.family}</span>
         </div>
-        <div className="qualification-item">
-          <span>Prioridad</span>
-          <strong>{qualificationState.priority}</strong>
+        <div className="qual-bar-divider" />
+        <div className={`qual-bar-item ${qualificationState.technicalReview ? "qual-bar-warn" : ""}`}>
+          <span>Prioridad: {qualificationState.priority}</span>
         </div>
-        <div className={`qualification-item ${qualificationState.technicalReview ? "qualification-warning" : ""}`}>
-          <span>Revisión técnica</span>
-          <strong>{qualificationState.technicalReview ? "Necesaria" : "No marcada"}</strong>
+        <div className="qual-bar-divider" />
+        <div className={`qual-bar-item ${qualificationState.technicalReview ? "qual-bar-warn" : ""}`}>
+          <span>{qualificationState.technicalReview ? "⚠ Revisión técnica" : "Sin revisión técnica"}</span>
         </div>
       </div>
 
@@ -592,7 +589,6 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
       />
 
       <footer className="copilot-footer">
-        <span>{helperText}</span>
         <span className={`ai-status-pill ${aiHealthLabel.startsWith("IA disponible") ? "ai-status-on" : ""}`}>
           {aiHealthLabel}
         </span>

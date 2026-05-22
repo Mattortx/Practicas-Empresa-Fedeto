@@ -29,9 +29,37 @@ export const productFamilies: ProductFamily[] = [
         description: "Necesidad temporal alrededor de huecos, patios, zonas abiertas o pasos de obra.",
         keywords: ["hueco", "patio", "perimetro", "abertura", "paso"],
         followUpQuestion: "¿Se trata de un borde exterior, un hueco interior o una combinación de ambos?"
+      },
+      {
+        id: "barandilla-contrapesada",
+        label: "Barandilla contrapesada (sin perforación)",
+        description: "Sistema de protección provisional sin fijación al soporte, ideal para cubiertas donde no se puede perforar.",
+        keywords: ["contrapesada", "sin perforar", "autoportante", "lastre"],
+        followUpQuestion: "¿La cubierta tiene limitación de carga o acceso restringido?"
+      },
+      {
+        id: "balaustre-une",
+        label: "Balaustre UNE 1200/1500",
+        description: "Balaustre certificado UNE-EN 13374 para protección provisional en forjados y bordes.",
+        keywords: ["balaustre", "une", "1200", "1500", "poste"],
+        followUpQuestion: "¿Necesita balaustre de 1200 mm o 1500 mm de altura?"
+      },
+      {
+        id: "sargento-mordaza",
+        label: "Sargento y mordazas",
+        description: "Sistemas de fijación sin perforación tipo sargento, mordaza peto, mordaza P4 metálica y mordaza P4 rígida.",
+        keywords: ["sargento", "mordaza", "peto", "p4", "fijacion sin perforar"],
+        followUpQuestion: "¿Qué tipo de soporte tiene el borde a proteger?"
+      },
+      {
+        id: "rodapie",
+        label: "Rodapié",
+        description: "Elemento de protección complementario para protección provisional de borde.",
+        keywords: ["rodapie", "rodapié"],
+        followUpQuestion: "¿El rodapié es para obra nueva o reposición?"
       }
     ],
-    keywords: ["provisional", "temporal", "forjado", "hueco", "obra", "borde", "barandilla"],
+    keywords: ["provisional", "temporal", "forjado", "hueco", "obra", "borde", "barandilla", "mordaza", "balaustre", "contrapesada"],
     accent: "red"
   },
   {
@@ -83,9 +111,30 @@ export const productFamilies: ProductFamily[] = [
         description: "Consulta que puede requerir valorar alternativas cuando no se desea fijar al soporte.",
         keywords: ["autoportante", "sin perforar", "no se puede perforar", "sin fijación", "lastre"],
         followUpQuestion: "¿La restricción de no perforar afecta a toda la cubierta o solo a zonas concretas?"
+      },
+      {
+        id: "barandilla-acero",
+        label: "Barandilla de acero",
+        description: "Barandilla definitiva de acero para protección permanente en cubiertas, terrazas y zonas industriales.",
+        keywords: ["acero", "barandilla acero", "metalica", "hierro"],
+        followUpQuestion: "¿La instalación es en interior o exterior?"
+      },
+      {
+        id: "barandilla-autoportante",
+        label: "Barandilla de aluminio autoportante",
+        description: "Sistema de aluminio sin necesidad de perforación para cubiertas con impermeabilización.",
+        keywords: ["autoportante aluminio", "aluminio autoportante", "sin perforar aluminio"],
+        followUpQuestion: "¿La cubierta tiene aislamiento o impermeabilización?"
+      },
+      {
+        id: "soporte-z",
+        label: "Soporte Z",
+        description: "Soporte tipo Z para fijación de barandilla definitiva a cubierta de chapa o estructuras metálicas.",
+        keywords: ["soporte z", "soporte z", "fijacion chapa", "chapa"],
+        followUpQuestion: "¿La cubierta es de chapa grecada o chapa seca?"
       }
     ],
-    keywords: ["definitiva", "permanente", "cubierta", "terraza", "pasillo", "autoportante"],
+    keywords: ["definitiva", "permanente", "cubierta", "terraza", "pasillo", "autoportante", "acero", "aluminio", "soporte z"],
     accent: "blue"
   },
   {
@@ -130,9 +179,23 @@ export const productFamilies: ProductFamily[] = [
         description: "Caso que puede requerir revisión de compatibilidad, soporte o referencias.",
         keywords: ["especial", "anclaje", "anclaje inox", "fijación", "compatible", "referencia"],
         followUpQuestion: "¿Dispone de referencia, plano o fotografía de la pieza o soporte?"
+      },
+      {
+        id: "base-2",
+        label: "Base 2",
+        description: "Base de fijación para sistemas de protección de borde, modelo base 2.",
+        keywords: ["base 2", "base2", "base dos"],
+        followUpQuestion: "¿La Base 2 es para uso provisional o definitivo?"
+      },
+      {
+        id: "base-60x40-60x60",
+        label: "Base 60×40 y 60×60",
+        description: "Bases de apoyo para protección en superficies de paso y plataformas.",
+        keywords: ["60x40", "60x60", "60×40", "60×60", "base apoyo"],
+        followUpQuestion: "¿Qué medidas de base necesita? ¿60×40 o 60×60?"
       }
     ],
-    keywords: ["base", "bases", "casquillo", "casquillos", "anclaje", "fijación", "atornillable"],
+    keywords: ["base", "bases", "casquillo", "casquillos", "anclaje", "fijación", "atornillable", "base 2", "60x40"],
     accent: "orange"
   },
   {
@@ -163,9 +226,23 @@ export const productFamilies: ProductFamily[] = [
         description: "Consulta comercial de suministro puntual para obra o mantenimiento.",
         keywords: ["suministro", "obra", "pedido", "entrega", "stock"],
         followUpQuestion: "¿La entrega se necesita de forma urgente o puede programarse?"
+      },
+      {
+        id: "escaleras-plegables",
+        label: "Escaleras plegables",
+        description: "Escaleras plegables auxiliares para acceso y trabajos en altura.",
+        keywords: ["escalera", "plegable", "acceso", "auxiliar escalera"],
+        followUpQuestion: "¿Qué altura de trabajo necesita?"
+      },
+      {
+        id: "marquesina",
+        label: "Marquesina de entrada",
+        description: "Marquesina de protección para entrada de edificios o zonas de paso.",
+        keywords: ["marquesina", "entrada", "proteccion entrada", "acceso edificio"],
+        followUpQuestion: "¿La marquesina es para entrada peatonal o vehicular?"
       }
     ],
-    keywords: ["auxiliar", "auxiliares", "montaje", "mantenimiento", "repuesto", "instalacion"],
+    keywords: ["auxiliar", "auxiliares", "montaje", "mantenimiento", "repuesto", "instalacion", "escalera", "marquesina"],
     accent: "slate"
   },
   {
@@ -196,9 +273,16 @@ export const productFamilies: ProductFamily[] = [
         description: "Pedido concreto con cantidad, ubicación y urgencia de entrega.",
         keywords: ["pedido", "suministro", "entrega", "cantidad", "urgente"],
         followUpQuestion: "¿Qué cantidad aproximada y plazo de entrega necesita?"
+      },
+      {
+        id: "cartucho-guardacuerpos",
+        label: "Cartucho guardacuerpos",
+        description: "Cartucho consumible para sistemas guardacuerpos de protección individual.",
+        keywords: ["cartucho", "guardacuerpos", "consumible guardacuerpos"],
+        followUpQuestion: "¿Tiene referencia del cartucho o del sistema guardacuerpos?"
       }
     ],
-    keywords: ["consumible", "consumibles", "cartucho", "recambio", "suministro"],
+    keywords: ["consumible", "consumibles", "cartucho", "recambio", "suministro", "guardacuerpos"],
     accent: "slate"
   },
   {
