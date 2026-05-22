@@ -7,6 +7,7 @@ on:
 
 env:
   NODE_VERSION: 20
+  IMAGE_NAME: ghcr.io/mattortx/practicas-empresa-fedeto
 
 jobs:
   build:
@@ -46,5 +47,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ lower(github.repository) }}:latest
-            ghcr.io/${{ lower(github.repository) }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
