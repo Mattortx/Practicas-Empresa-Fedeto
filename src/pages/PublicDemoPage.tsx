@@ -17,33 +17,33 @@ import { ChatWidget } from "../components/commercial-copilot/ChatWidget";
 import { Header } from "../components/layout/Header";
 
 const operatingStats = [
-  { label: "IA", value: "Groq activo", tone: "green" },
-  { label: "Datos", value: "Supabase conectado", tone: "blue" },
+  { label: "IA", value: "Groq preparado", tone: "green" },
+  { label: "Datos", value: "Demo local", tone: "blue" },
   { label: "Salida", value: "Ficha comercial", tone: "red" },
-  { label: "Riesgo", value: "Guardrails tecnicos", tone: "orange" }
+  { label: "Riesgo", value: "Guardrails técnicos", tone: "orange" }
 ];
 
 const scenarioCards = [
   {
     id: "provisional",
-    title: "Proteccion provisional",
+    title: "Protección provisional",
     prompt: "Necesito proteger el borde de un forjado durante una obra en Toledo.",
-    result: "Familia probable: proteccion provisional. Pide soporte, longitud, urgencia y contacto.",
+    result: "Familia probable: protección provisional. Pide soporte, longitud, urgencia y contacto.",
     priority: "Media"
   },
   {
     id: "definitiva",
     title: "Cubierta industrial",
     prompt: "Busco una barandilla definitiva para una cubierta donde no se puede perforar.",
-    result: "Familia probable: proteccion definitiva. Marca revision por entorno y fijacion.",
+    result: "Familia probable: protección definitiva. Marca revisión por entorno y fijación.",
     priority: "Alta"
   },
   {
     id: "normativa",
     title: "Consulta normativa",
     prompt: "Cumple la UNE EN 13374?",
-    result: "Consulta sensible. No confirma cumplimiento y deriva a revision tecnica.",
-    priority: "Revision"
+    result: "Consulta sensible. No confirma cumplimiento y deriva a revisión técnica.",
+    priority: "Revisión"
   }
 ];
 
@@ -51,7 +51,7 @@ const companyBenefits = [
   {
     icon: MessageSquareText,
     title: "Menos consultas incompletas",
-    text: "El usuario no abandona una caja de texto abierta: el copiloto guia la primera toma de datos."
+    text: "El usuario no abandona una caja de texto abierta: el copiloto guía la primera toma de datos."
   },
   {
     icon: Gauge,
@@ -65,6 +65,33 @@ const companyBenefits = [
   }
 ];
 
+const companyContextCards = [
+  {
+    icon: Factory,
+    title: "Fabricación y suministro",
+    text:
+      "La demo parte de una empresa industrial que diseña, fabrica y provee sistemas metálicos de protección en altura."
+  },
+  {
+    icon: ShieldCheck,
+    title: "Protección colectiva",
+    text:
+      "El copiloto distingue entre protección provisional, definitiva, bases, casquillos, auxiliares y consumibles."
+  },
+  {
+    icon: Route,
+    title: "Obras con riesgo real",
+    text:
+      "Está pensado para consultas de cubiertas, forjados, terrazas técnicas, puentes, silos, naves y mantenimiento."
+  },
+  {
+    icon: ClipboardCheck,
+    title: "Revisión documentada",
+    text:
+      "Cuando aparecen normativa, montaje, resistencia o anclajes, la consulta se deriva a revisión técnica."
+  }
+];
+
 export function PublicDemoPage() {
   const [activeScenario, setActiveScenario] = useState(scenarioCards[0]);
 
@@ -74,10 +101,10 @@ export function PublicDemoPage() {
 
       <section className="product-hero">
         <div className="product-hero-copy">
-          <span className="eyebrow">Demo funcional para presentacion</span>
-          <h1>Copiloto comercial Protecciones Toledo</h1>
+          <span className="eyebrow">Demo funcional para presentación</span>
+          <h1>Copiloto Comercial Protecciones Toledo</h1>
           <p>
-            Una experiencia conversacional para cualificar consultas de proteccion en altura,
+            Una experiencia conversacional para cualificar consultas de protección en altura,
             ordenar datos comerciales y entregar una ficha revisable por el equipo interno.
           </p>
           <div className="hero-actions">
@@ -109,7 +136,7 @@ export function PublicDemoPage() {
           </div>
           <div className="console-pipeline">
             <span>Consulta</span>
-            <span>Clasificacion</span>
+            <span>Clasificación</span>
             <span>Ficha</span>
             <span>Revision</span>
           </div>
@@ -150,12 +177,37 @@ export function PublicDemoPage() {
         </span>
         <span>
           <ShieldAlert size={17} aria-hidden="true" />
-          Derivacion tecnica prudente
+          Derivación técnica prudente
         </span>
         <span>
           <BarChart3 size={17} aria-hidden="true" />
           Panel comercial
         </span>
+      </section>
+
+      <section className="company-context-section">
+        <div className="section-title compact-title">
+          <span>Contexto real de empresa</span>
+          <h2>Un copiloto afinado para protección en altura, no para atención genérica</h2>
+          <p>
+            La base de conocimiento se ha ampliado con información pública de Protecciones Toledo:
+            fabricación propia, protección colectiva, sistemas de borde, bases, casquillos y revisión
+            técnica prudente.
+          </p>
+        </div>
+        <div className="context-card-grid">
+          {companyContextCards.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <article className="context-card" key={item.title}>
+                <Icon size={22} aria-hidden="true" />
+                <strong>{item.title}</strong>
+                <p>{item.text}</p>
+              </article>
+            );
+          })}
+        </div>
       </section>
 
       <section className="benefit-section" id="proceso">
@@ -194,14 +246,14 @@ export function PublicDemoPage() {
             <ol>
               <li>El cliente describe su necesidad en lenguaje natural.</li>
               <li>El copiloto orienta familia, prioridad y datos faltantes.</li>
-              <li>Las dudas tecnicas sensibles se derivan sin prometer cumplimiento.</li>
+              <li>Las dudas técnicas sensibles se derivan sin prometer cumplimiento.</li>
               <li>La solicitud queda disponible en el panel comercial.</li>
             </ol>
             <a className="button button-secondary" href="/admin-demo">
               Ver panel interno
             </a>
             <p className="guide-note">
-              La memoria academica del proyecto esta separada en <a href="/practicas">/practicas</a>.
+              La memoria académica del proyecto está separada en <a href="/practicas">/practicas</a>.
             </p>
           </aside>
 
@@ -212,9 +264,9 @@ export function PublicDemoPage() {
       <section className="panel-preview-section">
         <div className="panel-preview-copy">
           <span className="eyebrow">Vista interna</span>
-          <h2>El equipo no recibe una conversacion suelta, recibe una ficha</h2>
+          <h2>El equipo no recibe una conversación suelta, recibe una ficha</h2>
           <p>
-            El panel agrupa solicitudes, estados, prioridades, riesgo tecnico y resumen comercial
+            El panel agrupa solicitudes, estados, prioridades, riesgo técnico y resumen comercial
             para que la demo muestre el ciclo completo.
           </p>
           <a className="button button-primary" href="/admin-demo">
@@ -228,14 +280,14 @@ export function PublicDemoPage() {
             <span>Estado</span>
           </div>
           <div className="preview-row">
-            <span>Proteccion provisional</span>
+            <span>Protección provisional</span>
             <strong>Alta</strong>
             <em>Nueva</em>
           </div>
           <div className="preview-row">
-            <span>Documentacion tecnica</span>
-            <strong>Revision</strong>
-            <em>Tecnica</em>
+            <span>Documentación técnica</span>
+            <strong>Revisión</strong>
+            <em>Técnica</em>
           </div>
           <div className="preview-summary">
             <FileCheck2 size={20} aria-hidden="true" />

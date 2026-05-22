@@ -64,6 +64,20 @@ export const productFamilies: ProductFamily[] = [
         followUpQuestion: "¿El recorrido requiere continuidad perimetral o puntos concretos de protección?"
       },
       {
+        id: "fijacion-suelo",
+        label: "Fijación a suelo",
+        description: "Consulta de barandilla definitiva fijada a soporte, losa, estructura o zona técnica.",
+        keywords: ["fijacion suelo", "fijada", "suelo", "losa", "parapeto", "base z"],
+        followUpQuestion: "¿La fijación sería a suelo, pared, parapeto, cubierta de chapa u otro soporte?"
+      },
+      {
+        id: "cubierta-chapa",
+        label: "Cubierta de chapa",
+        description: "Caso asociado a cubiertas metálicas, grecas o zonas donde la impermeabilización condiciona la solución.",
+        keywords: ["chapa", "greca", "impermeabilizada", "impermeabilizar", "cubierta metalica"],
+        followUpQuestion: "¿La cubierta es de chapa seca, impermeabilizada o tiene otro sistema constructivo?"
+      },
+      {
         id: "autoportante",
         label: "Solución sin perforación",
         description: "Consulta que puede requerir valorar alternativas cuando no se desea fijar al soporte.",
@@ -90,6 +104,13 @@ export const productFamilies: ProductFamily[] = [
         followUpQuestion: "¿La base irá sobre hormigón, estructura metálica u otro soporte?"
       },
       {
+        id: "perfiles-pt",
+        label: "Perfiles PT",
+        description: "Consulta asociada a superficies de paso, plataformas, pasarelas o escaleras en obra o industria.",
+        keywords: ["perfil pt", "perfiles pt", "pasarela", "plataforma", "escalera", "superficie de paso"],
+        followUpQuestion: "¿El perfil se necesita para pasarela, plataforma, escalera o superficie de paso?"
+      },
+      {
         id: "casquillo-recto",
         label: "Casquillo recto",
         description: "Elemento de alojamiento para poste o balaustre en configuraciones habituales.",
@@ -107,7 +128,7 @@ export const productFamilies: ProductFamily[] = [
         id: "fijacion-especial",
         label: "Fijación especial",
         description: "Caso que puede requerir revisión de compatibilidad, soporte o referencias.",
-        keywords: ["especial", "anclaje", "fijación", "compatible", "referencia"],
+        keywords: ["especial", "anclaje", "anclaje inox", "fijación", "compatible", "referencia"],
         followUpQuestion: "¿Dispone de referencia, plano o fotografía de la pieza o soporte?"
       }
     ],

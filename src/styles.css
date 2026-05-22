@@ -264,6 +264,45 @@ body {
   }
 }
 
+@keyframes float-console {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes accent-run {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  100% {
+    transform: translateX(220%);
+  }
+}
+
+@keyframes soft-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes row-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 button,
 input {
   font: inherit;
@@ -2649,7 +2688,9 @@ p {
 
 .lead-table {
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
+  max-height: min(72vh, 780px);
+  scroll-behavior: smooth;
 }
 
 .lead-detail {
@@ -2685,10 +2726,16 @@ p {
   background: #ffffff;
   color: var(--ink);
   text-align: left;
+  animation: row-enter 260ms ease both;
+  transition:
+    background 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
 }
 
 .lead-table-row:not(.lead-table-head):hover {
   background: #f9fbfc;
+  transform: translateX(2px);
 }
 
 .lead-table-row > span {
@@ -3371,6 +3418,8 @@ p {
 }
 
 .status-tile {
+  position: relative;
+  overflow: hidden;
   display: grid;
   gap: 6px;
   min-height: 82px;
@@ -3585,6 +3634,8 @@ p {
 }
 
 .presentation-strip span {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3596,9 +3647,47 @@ p {
   color: #2f3a45;
   font-weight: 850;
   box-shadow: 0 10px 24px rgba(23, 27, 34, 0.045);
+  transition:
+    transform 170ms ease,
+    border-color 170ms ease,
+    box-shadow 170ms ease;
+}
+
+.presentation-strip span::after,
+.status-tile::after,
+.benefit-card::after,
+.context-card::after,
+.panel-preview-card::after {
+  position: absolute;
+  inset: 0;
+  width: 34%;
+  pointer-events: none;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+  opacity: 0;
+  transform: translateX(-120%);
+}
+
+.presentation-strip span:hover,
+.status-tile:hover,
+.benefit-card:hover,
+.context-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--line-strong);
+  box-shadow: 0 18px 38px rgba(23, 27, 34, 0.08);
+}
+
+.presentation-strip span:hover::after,
+.status-tile:hover::after,
+.benefit-card:hover::after,
+.context-card:hover::after,
+.panel-preview-card:hover::after {
+  opacity: 0.58;
+  animation: accent-run 780ms ease;
 }
 
 .benefit-section,
+.company-context-section,
 .academic-section,
 .academic-summary,
 .panel-preview-section {
@@ -3616,7 +3705,14 @@ p {
   gap: 14px;
 }
 
+.context-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
 .benefit-card,
+.context-card,
 .abstract-card,
 .objective-list,
 .architecture-node,
@@ -3630,17 +3726,33 @@ p {
 }
 
 .benefit-card {
+  position: relative;
+  overflow: hidden;
   min-height: 180px;
   padding: 20px;
 }
 
+.context-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 190px;
+  padding: 20px;
+  border-top: 4px solid var(--blue);
+  transition:
+    transform 170ms ease,
+    border-color 170ms ease,
+    box-shadow 170ms ease;
+}
+
 .benefit-card svg,
+.context-card svg,
 .architecture-node svg,
 .evidence-grid svg {
   color: var(--red);
 }
 
 .benefit-card strong,
+.context-card strong,
 .architecture-node strong,
 .methodology-timeline strong {
   display: block;
@@ -3650,6 +3762,7 @@ p {
 }
 
 .benefit-card p,
+.context-card p,
 .architecture-node p,
 .methodology-timeline p,
 .panel-preview-copy p,
@@ -3718,6 +3831,7 @@ p {
 }
 
 .panel-preview-card {
+  position: relative;
   overflow: hidden;
 }
 
@@ -4032,6 +4146,7 @@ p {
   }
 
   .presentation-strip,
+  .context-card-grid,
   .architecture-diagram,
   .methodology-timeline,
   .evidence-grid {
@@ -4058,6 +4173,7 @@ p {
   .status-rack,
   .presentation-strip,
   .benefit-grid,
+  .context-card-grid,
   .architecture-diagram,
   .methodology-timeline,
   .evidence-grid,
@@ -4082,5 +4198,136 @@ p {
 
   .abstract-card {
     flex-direction: column;
+  }
+}
+
+@media (min-width: 1081px) {
+  .product-demo-page,
+  .admin-page {
+    width: min(1500px, calc(100% - 56px));
+  }
+
+  .product-hero {
+    grid-template-columns: minmax(0, 1.03fr) minmax(520px, 0.97fr);
+    gap: 34px;
+    align-items: stretch;
+  }
+
+  .product-hero-copy {
+    position: relative;
+    overflow: hidden;
+    min-height: 650px;
+    padding: clamp(44px, 4vw, 64px);
+    border-radius: 16px;
+    background:
+      linear-gradient(90deg, rgba(29, 79, 122, 0.045) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(29, 79, 122, 0.045) 1px, transparent 1px),
+      radial-gradient(circle at 90% 12%, rgba(180, 35, 24, 0.12), transparent 24%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.99), rgba(244, 248, 250, 0.96));
+    background-size: 36px 36px, 36px 36px, auto, auto;
+  }
+
+  .product-hero-copy::before {
+    position: absolute;
+    right: 34px;
+    bottom: 34px;
+    width: 170px;
+    height: 170px;
+    border: 1px solid rgba(29, 79, 122, 0.14);
+    border-radius: 999px;
+    content: "";
+    animation: soft-orbit 24s linear infinite;
+  }
+
+  .product-hero-copy::after {
+    position: absolute;
+    inset: 0;
+    width: 34%;
+    pointer-events: none;
+    content: "";
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.64), transparent);
+    animation: accent-run 8.5s ease-in-out infinite;
+  }
+
+  .product-hero-copy > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .product-hero-copy h1 {
+    max-width: 880px;
+    font-size: clamp(3.4rem, 5.4vw, 6.55rem);
+    letter-spacing: 0;
+  }
+
+  .product-hero-copy p {
+    max-width: 760px;
+    font-size: 1.16rem;
+  }
+
+  .commercial-console {
+    min-height: 650px;
+    border-radius: 16px;
+    animation: float-console 8s ease-in-out infinite;
+  }
+
+  .commercial-console::after {
+    position: absolute;
+    right: -86px;
+    bottom: -86px;
+    width: 250px;
+    height: 250px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    content: "";
+  }
+
+  .status-rack {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: 850px;
+  }
+
+  .presentation-strip,
+  .benefit-grid,
+  .context-card-grid {
+    gap: 16px;
+  }
+
+  .company-context-section,
+  .benefit-section,
+  .panel-preview-section,
+  .demo-copilot-section {
+    margin-block: 42px;
+  }
+
+  .demo-copilot-section {
+    padding: 38px;
+    border-radius: 16px;
+  }
+
+  .demo-copilot-layout {
+    grid-template-columns: minmax(320px, 0.32fr) minmax(760px, 0.68fr);
+    gap: 26px;
+  }
+
+  .demo-guide-card,
+  .copilot-shell,
+  .panel-preview-section,
+  .benefit-card,
+  .context-card {
+    border-radius: 12px;
+  }
+
+  .copilot-thread {
+    height: 620px;
+  }
+
+  .admin-grid {
+    grid-template-columns: minmax(0, 1.18fr) minmax(470px, 0.82fr);
+    gap: 22px;
+  }
+
+  .lead-table {
+    max-height: min(74vh, 820px);
   }
 }

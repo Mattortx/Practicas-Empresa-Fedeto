@@ -13,7 +13,7 @@ export function Header({ section = "demo" }: HeaderProps) {
         <span className="brand-symbol">PT</span>
         <span>
           <strong>Protecciones Toledo</strong>
-          <small>{isPracticas ? "Proyecto de practicas" : "Copiloto comercial"}</small>
+          <small>{isPracticas ? "Proyecto de prácticas" : "Copiloto Comercial"}</small>
         </span>
       </a>
       <nav className="header-nav" aria-label="Navegacion principal">

@@ -500,9 +500,9 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
 
   if (!isOpen) {
     return (
-      <section className="copilot-shell copilot-shell-collapsed" id="copiloto" aria-label="Copiloto comercial cerrado">
+      <section className="copilot-shell copilot-shell-collapsed" id="copiloto" aria-label="Copiloto Comercial cerrado">
         <div>
-          <span>Copiloto comercial</span>
+          <span>Copiloto Comercial</span>
           <strong>Protecciones Toledo</strong>
           <p>Abre el asistente para clasificar una consulta y preparar una solicitud comercial.</p>
         </div>
@@ -515,10 +515,10 @@ export function ChatWidget({ onLeadGenerated }: ChatWidgetProps) {
   }
 
   return (
-    <section className="copilot-shell" id="copiloto" aria-label="Copiloto comercial">
+    <section className="copilot-shell" id="copiloto" aria-label="Copiloto Comercial">
       <header className="copilot-header">
         <div>
-          <span>Copiloto comercial</span>
+          <span>Copiloto Comercial</span>
           <h2>Protecciones Toledo - Demo comercial</h2>
         </div>
         <div className="copilot-header-actions">
