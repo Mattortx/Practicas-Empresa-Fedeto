@@ -11,8 +11,12 @@ El objetivo no es sustituir al equipo técnico, sino mejorar el primer contacto 
 Para empresa, tutor y evaluación del proyecto:
 
 - [Memoria del proyecto para empresa y tutor](docs/memoria-proyecto-empresa-tutor.md)
+- [Memoria del proyecto para empresa y tutor - PDF](docs/memoria-proyecto-empresa-tutor.pdf)
 - [Seguridad y privacidad del proyecto](docs/seguridad-privacidad.md)
+- [Seguridad y privacidad del proyecto - PDF](docs/seguridad-privacidad.pdf)
 - [Documentación para evaluación según rúbrica](docs/rubrica-evaluacion/README.md)
+- [Documentación completa de la rúbrica - PDF](docs/rubrica-evaluacion/documentacion-rubrica-completa.pdf)
+- [Dossier completo del proyecto - PDF](docs/documentacion-completa-proyecto.pdf)
 - [Informe completo del copiloto](docs/informe-copiloto-protecciones-toledo.md)
 - [Guía de preproducción Railway + Twilio + Groq](docs/preproduccion-railway-twilio-groq.md)
 - [Despliegue con Supabase + InsForge](docs/despliegue-supabase-insforge.md)
