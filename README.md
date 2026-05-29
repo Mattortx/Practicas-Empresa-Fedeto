@@ -12,6 +12,7 @@ Para empresa, tutor y evaluación del proyecto:
 
 - [Memoria del proyecto para empresa y tutor](docs/memoria-proyecto-empresa-tutor.md)
 - [Seguridad y privacidad del proyecto](docs/seguridad-privacidad.md)
+- [Documentación para evaluación según rúbrica](docs/rubrica-evaluacion/README.md)
 - [Informe completo del copiloto](docs/informe-copiloto-protecciones-toledo.md)
 - [Guía de preproducción Railway + Twilio + Groq](docs/preproduccion-railway-twilio-groq.md)
 - [Despliegue con Supabase + InsForge](docs/despliegue-supabase-insforge.md)
