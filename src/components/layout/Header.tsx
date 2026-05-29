@@ -26,12 +26,14 @@ export function Header({ section = "demo" }: HeaderProps) {
             <a href="#familias">Familias</a>
             <a href="/admin-demo">Panel interno</a>
             <a href="/admin-demo/analytics" className={isAnalytics ? "active" : ""}>Analíticas</a>
+            <a href="/integracion" className={currentPath === "/integracion" ? "active" : ""}>Integración</a>
           </>
         ) : (
           <>
             <a href="#copiloto">Copiloto</a>
             <a href="/admin-demo" className={currentPath === "/admin-demo" ? "active" : ""}>Panel interno</a>
             <a href="/admin-demo/analytics" className={isAnalytics ? "active" : ""}>Analíticas</a>
+            <a href="/integracion" className={currentPath === "/integracion" ? "active" : ""}>Integración</a>
             <a href="/practicas" className={currentPath.startsWith("/practicas") ? "active" : ""}>Proyecto de prácticas</a>
           </>
         )}

@@ -4,6 +4,7 @@ import { buildApiUrl } from "../services/apiBase";
 import { fetchLeads, createLead, updateLead as apiUpdateLead, deleteAllLeads as apiDeleteAllLeads } from "../services/leadApi";
 
 const STORAGE_KEY = "protecciones-toledo-demo-leads";
+export const LOCAL_LEAD_RETENTION_DAYS = 45;
 
 // ── API mode (backend con Supabase) ──────────────────────────
 
@@ -116,6 +117,44 @@ export function clearLocalLeads() {
   if (typeof window !== "undefined") {
     window.localStorage.removeItem(STORAGE_KEY);
   }
+}
+
+export function purgeExpiredLocalLeads(maxAgeDays = LOCAL_LEAD_RETENTION_DAYS): number {
+  if (typeof window === "undefined") {
+    return 0;
+  }
+
+  const current = readStoredOnly();
+  const cutoff = Date.now() - maxAgeDays * 24 * 60 * 60 * 1000;
+  const retained = current.filter((lead) => {
+    const createdAt = new Date(lead.createdAt).getTime();
+    return Number.isNaN(createdAt) || createdAt >= cutoff;
+  });
+
+  if (retained.length !== current.length) {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(retained));
+  }
+
+  return current.length - retained.length;
+}
+
+export function getLocalLeadPrivacySnapshot() {
+  const localLeads = readStoredOnly();
+  const oldestLocalLead = localLeads.reduce<string | undefined>((oldest, lead) => {
+    if (!oldest) {
+      return lead.createdAt;
+    }
+
+    return new Date(lead.createdAt).getTime() < new Date(oldest).getTime()
+      ? lead.createdAt
+      : oldest;
+  }, undefined);
+
+  return {
+    localLeadCount: localLeads.length,
+    oldestLocalLead,
+    retentionDays: LOCAL_LEAD_RETENTION_DAYS
+  };
 }
 
 // ── Helpers ──────────────────────────────────────────────────

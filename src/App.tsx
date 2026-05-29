@@ -1,5 +1,6 @@
 import { AdminDemoPage } from "./pages/AdminDemoPage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
+import { IntegrationPage } from "./pages/IntegrationPage";
 import { PracticasPage } from "./pages/PracticasPage";
 import { PublicDemoPage } from "./pages/PublicDemoPage";
 
@@ -16,6 +17,10 @@ function App() {
 
   if (path === "/practicas" || path === "/practicas/tecnica") {
     return <PracticasPage />;
+  }
+
+  if (path === "/integracion") {
+    return <IntegrationPage />;
   }
 
   return <PublicDemoPage />;

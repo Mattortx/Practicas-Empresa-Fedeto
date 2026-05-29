@@ -67,9 +67,11 @@ En modo demo local, las solicitudes se guardan principalmente en `localStorage` 
 Esto implica:
 
 - Los datos no se envían a un servidor si no está configurado backend con base de datos.
-- Los datos pueden persistir en el navegador del usuario hasta que se borren.
+- Los datos locales generados en la demo se purgan automáticamente si superan 45 días.
+- Los datos pueden persistir en el navegador del usuario hasta que se borren o expire esa retención local.
 - No es un sistema seguro para almacenar información sensible.
 - La opción `Limpiar` del panel permite borrar datos locales de la demo.
+- El panel interno muestra un bloque de privacidad con número de solicitudes locales, solicitud local más antigua y purgas aplicadas.
 
 En escenarios de preproducción puede existir integración con Supabase. En ese caso, la empresa debe validar:
 

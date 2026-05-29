@@ -12,6 +12,9 @@ export function AdminDemoPage() {
         <a className="button button-secondary" href="/practicas">
           Proyecto de prácticas
         </a>
+        <a className="button button-secondary" href="/integracion">
+          Integración
+        </a>
         <a className="button button-ghost" href="/admin-demo/analytics">
           <BarChart3 size={17} aria-hidden="true" />
           Analíticas

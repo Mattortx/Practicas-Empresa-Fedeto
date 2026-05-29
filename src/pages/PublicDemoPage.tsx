@@ -120,6 +120,9 @@ export function PublicDemoPage() {
             <a className="button button-secondary" href="/admin-demo/analytics">
               Ver analíticas
             </a>
+            <a className="button button-secondary" href="/integracion">
+              Integración
+            </a>
           </div>
           <div className="status-rack" aria-label="Estado operativo de la demo">
             {operatingStats.map((item) => (

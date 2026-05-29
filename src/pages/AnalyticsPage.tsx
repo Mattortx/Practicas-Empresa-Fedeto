@@ -25,6 +25,9 @@ export function AnalyticsPage() {
         <a className="button button-secondary" href="/practicas">
           Proyecto de prácticas
         </a>
+        <a className="button button-secondary" href="/integracion">
+          Integración
+        </a>
         <span>
           <Download size={17} aria-hidden="true" />
           Analíticas

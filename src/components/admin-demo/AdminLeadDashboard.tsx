@@ -1,14 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Download, FileJson, ShieldCheck, Trash2 } from "lucide-react";
 import type { CommercialLead, LeadStatus } from "../../types/commercialCopilot";
 import {
-  clearLocalLeads,
   clearLeadsViaApi,
   fetchLeadsFromApi,
+  getLocalLeadPrivacySnapshot,
+  purgeExpiredLocalLeads,
   readLocalLeads,
   replaceLocalLeads,
   updateLeadViaApi
 } from "../../utils/localLeadStore";
+import { exportLeadsToCsv, exportLeadsToJson } from "../../utils/leadExport";
 import { Button } from "../ui/Button";
 import { LeadDetailCard } from "./LeadDetailCard";
 import { LeadTable } from "./LeadTable";
@@ -36,6 +38,8 @@ export function AdminLeadDashboard() {
   const [leads, setLeads] = useState<CommercialLead[]>(() => readLocalLeads());
   const [activeFilter, setActiveFilter] = useState<LeadFilter>("todas");
   const [selectedId, setSelectedId] = useState(leads[0]?.id);
+  const [purgedCount, setPurgedCount] = useState(0);
+  const [privacySnapshot, setPrivacySnapshot] = useState(() => getLocalLeadPrivacySnapshot());
 
   const filteredLeads = useMemo(
     () => leads.filter((lead) => matchesFilter(lead, activeFilter)),
@@ -50,6 +54,10 @@ export function AdminLeadDashboard() {
 
   // Cargar leads desde la API al montar el componente
   useEffect(() => {
+    const removed = purgeExpiredLocalLeads();
+    setPurgedCount(removed);
+    setPrivacySnapshot(getLocalLeadPrivacySnapshot());
+
     fetchLeadsFromApi().then((apiLeads) => {
       if (apiLeads.length > 0) {
         setLeads(apiLeads);
@@ -69,6 +77,7 @@ export function AdminLeadDashboard() {
     const refreshed = readLocalLeads();
     setLeads(refreshed);
     setSelectedId(refreshed[0]?.id);
+    setPrivacySnapshot(getLocalLeadPrivacySnapshot());
   }
 
   function updateLeadStatus(leadId: string, status: LeadStatus) {
@@ -76,6 +85,7 @@ export function AdminLeadDashboard() {
     setLeads((current) => {
       const updated = current.map((lead) => (lead.id === leadId ? { ...lead, status } : lead));
       replaceLocalLeads(updated);
+      setPrivacySnapshot(getLocalLeadPrivacySnapshot());
       return updated;
     });
   }
@@ -85,8 +95,17 @@ export function AdminLeadDashboard() {
     setLeads((current) => {
       const updated = current.map((lead) => (lead.id === updatedLead.id ? updatedLead : lead));
       replaceLocalLeads(updated);
+      setPrivacySnapshot(getLocalLeadPrivacySnapshot());
       return updated;
     });
+  }
+
+  function handleExportCsv() {
+    exportLeadsToCsv(leads);
+  }
+
+  function handleExportJson() {
+    exportLeadsToJson(leads);
   }
 
   return (
@@ -100,10 +119,20 @@ export function AdminLeadDashboard() {
             comercial.
           </p>
         </div>
-        <Button variant="ghost" onClick={clearDemoLeads}>
-          <Trash2 size={16} aria-hidden="true" />
-          Limpiar
-        </Button>
+        <div className="admin-toolbar-actions">
+          <Button variant="secondary" onClick={handleExportCsv} disabled={leads.length === 0}>
+            <Download size={16} aria-hidden="true" />
+            CSV
+          </Button>
+          <Button variant="secondary" onClick={handleExportJson} disabled={leads.length === 0}>
+            <FileJson size={16} aria-hidden="true" />
+            JSON
+          </Button>
+          <Button variant="ghost" onClick={clearDemoLeads}>
+            <Trash2 size={16} aria-hidden="true" />
+            Limpiar
+          </Button>
+        </div>
       </div>
 
       <div className="admin-metrics">
@@ -136,6 +165,32 @@ export function AdminLeadDashboard() {
         ))}
       </div>
 
+      <div className="privacy-retention-panel">
+        <ShieldCheck size={19} aria-hidden="true" />
+        <div>
+          <strong>Privacidad de la demo</strong>
+          <p>
+            Las solicitudes reales generadas en local se conservan solo en este navegador durante
+            {` ${privacySnapshot.retentionDays} días`}. Los ejemplos mock están separados de los
+            datos introducidos por usuarios.
+          </p>
+        </div>
+        <dl>
+          <div>
+            <dt>Locales</dt>
+            <dd>{privacySnapshot.localLeadCount}</dd>
+          </div>
+          <div>
+            <dt>Más antigua</dt>
+            <dd>{formatOldestDate(privacySnapshot.oldestLocalLead)}</dd>
+          </div>
+          <div>
+            <dt>Purgadas</dt>
+            <dd>{purgedCount}</dd>
+          </div>
+        </dl>
+      </div>
+
       <div className="admin-grid">
         <LeadTable
           leads={filteredLeads}
@@ -150,6 +205,24 @@ export function AdminLeadDashboard() {
       </div>
     </section>
   );
+}
+
+function formatOldestDate(value?: string) {
+  if (!value) {
+    return "Sin datos locales";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Sin fecha válida";
+  }
+
+  return new Intl.DateTimeFormat("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  }).format(date);
 }
 
 function Metric({ label, value }: { label: string; value: string }) {

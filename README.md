@@ -35,6 +35,7 @@ La demo incluye:
 - Panel interno simulado en `/admin-demo`.
 - Analíticas en `/admin-demo/analytics`.
 - Página de memoria visual en `/practicas`.
+- Página de integración y preproducción en `/integracion`.
 - Datos de demostración controlados.
 - IA opcional con Groq u OpenAI.
 - Fallback local si la IA no está configurada.
@@ -56,6 +57,7 @@ La demo incluye:
 /admin-demo             Panel comercial simulado
 /admin-demo/analytics   Analíticas de solicitudes
 /practicas              Memoria visual del proyecto
+/integracion            Guía visual de integración y preproducción
 ```
 
 ## Stack técnico
@@ -70,6 +72,8 @@ La demo incluye:
 - Persistencia local de demo con `localStorage`.
 - IA opcional mediante endpoints backend.
 - Preparación para Groq, OpenAI, Railway, Twilio y Supabase.
+- Exportación de solicitudes en CSV/JSON para revisión comercial.
+- Retención local de datos de demo durante 45 días.
 
 ## Ejecución local
 
@@ -202,6 +206,16 @@ La explicación detallada está en:
 - No hay cálculo estructural.
 - No se confirma normativa.
 
+## Mejoras futuras ya preparadas
+
+Se han implementado varias mejoras que estaban planteadas como evolución natural del MVP:
+
+- Exportación comercial de solicitudes desde el panel interno en CSV y JSON.
+- Panel de privacidad de demo con recuento de datos locales y retención automática.
+- Ruta `/integracion` con propuesta de integración web/WordPress, backend, IA y checklist productivo.
+- Separación clara entre datos mock y solicitudes generadas en local.
+- Preparación visual y documental para explicar despliegue en Railway, uso de IA y futuras conexiones comerciales.
+
 ## Valor del MVP
 
 Para Protecciones Toledo:
@@ -227,4 +241,4 @@ Para prácticas:
 - Base documental validada.
 - RAG con fichas técnicas oficiales.
 - Analítica comercial real.
-- Gestión formal de consentimiento y retención de datos.
+- Gestión formal de consentimiento y retención de datos productivos.
