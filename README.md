@@ -6,6 +6,18 @@ La aplicación es una demo web profesional que convierte un chatbot en un copilo
 
 El objetivo no es sustituir al equipo técnico, sino mejorar el primer contacto comercial y demostrar una solución digital viable, prudente y defendible.
 
+## Aviso visible de derechos de autor
+
+Copyright (c) 2026. Proyecto de prácticas FEDETO - Copiloto Comercial para Protecciones Toledo.
+
+El código fuente, diseño, documentación, textos explicativos y materiales creados específicamente para esta demo quedan protegidos por derechos de autor. No se concede una licencia abierta de reutilización, distribución o explotación comercial salvo autorización expresa de los titulares correspondientes.
+
+El nombre, marca, identidad empresarial y referencias comerciales de Protecciones Toledo S.L. pertenecen a sus titulares legítimos. Su uso en este repositorio tiene finalidad académica, demostrativa y de contextualización del proyecto.
+
+Las dependencias de terceros mantienen sus propias licencias. Los datos de clientes, solicitudes y estadísticas incluidos en la demo son simulados o generados localmente y no representan operaciones comerciales reales.
+
+Documento ampliado: [Derechos de autor y propiedad intelectual](docs/propiedad-intelectual-derechos-autor.md)
+
 ## Documentación principal
 
 Para empresa, tutor y evaluación del proyecto:
