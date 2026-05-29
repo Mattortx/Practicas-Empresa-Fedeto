@@ -8,6 +8,9 @@ dist/
 *.local
 .DS_Store
 
+# Playwright MCP test artifacts
+.playwright-mcp/
+
 # InsForge & AI agent skills
 .insforge
 .agent
