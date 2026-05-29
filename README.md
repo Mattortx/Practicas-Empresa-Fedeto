@@ -14,6 +14,7 @@ Para empresa, tutor y evaluación del proyecto:
 - [Memoria del proyecto para empresa y tutor - PDF](docs/memoria-proyecto-empresa-tutor.pdf)
 - [Seguridad y privacidad del proyecto](docs/seguridad-privacidad.md)
 - [Seguridad y privacidad del proyecto - PDF](docs/seguridad-privacidad.pdf)
+- [Derechos de autor y propiedad intelectual](docs/propiedad-intelectual-derechos-autor.md)
 - [Documentación para evaluación según rúbrica](docs/rubrica-evaluacion/README.md)
 - [Documentación completa de la rúbrica - PDF](docs/rubrica-evaluacion/documentacion-rubrica-completa.pdf)
 - [Dossier completo del proyecto - PDF](docs/documentacion-completa-proyecto.pdf)
@@ -195,6 +196,20 @@ En modo local, las solicitudes se conservan en el navegador mediante `localStora
 La explicación detallada está en:
 
 [Seguridad y privacidad del proyecto](docs/seguridad-privacidad.md)
+
+## Derechos de autor y propiedad intelectual
+
+El proyecto es una prueba de concepto desarrollada para prácticas de FEDETO y orientada a una empresa real. El código, la documentación y los materiales creados para la demo quedan protegidos por derechos de autor salvo que se defina una licencia específica.
+
+El nombre, la identidad empresarial, las referencias comerciales y cualquier signo distintivo de Protecciones Toledo pertenecen a sus titulares legítimos. Su uso en este repositorio tiene finalidad demostrativa, académica y de contextualización del proyecto.
+
+Los datos de clientes, solicitudes y estadísticas incluidos en la demo son simulados o generados localmente. No representan presupuestos, clientes ni operaciones reales.
+
+Las dependencias de terceros conservan sus propias licencias. Antes de una implantación real se recomienda revisar licencias, permisos de uso, titularidad del código, uso de marca, documentación técnica y condiciones de explotación.
+
+Documento ampliado:
+
+[Derechos de autor y propiedad intelectual](docs/propiedad-intelectual-derechos-autor.md)
 
 ## Aspectos simulados
 
